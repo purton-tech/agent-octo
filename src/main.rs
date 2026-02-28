@@ -1,15 +1,26 @@
 mod monty_python;
 
+use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 
 use rig::client::{CompletionClient, ProviderClient};
-use rig::completion::Prompt;
+use rig::completion::{Chat, Message as RigMessage};
 use rig::providers::openai::Client;
 use teloxide::prelude::*;
 use teloxide::types::ChatAction;
+use tokio::sync::RwLock;
 use tracing::{info, warn};
 
 const SYSTEM_PROMPT: &str = include_str!("../SYSTEM_PROMPT.md");
+const MAX_HISTORY_MESSAGES: usize = 20;
+
+fn trim_history(history: &mut Vec<RigMessage>) {
+    if history.len() > MAX_HISTORY_MESSAGES {
+        let drop_count = history.len() - MAX_HISTORY_MESSAGES;
+        history.drain(0..drop_count);
+    }
+}
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -25,31 +36,56 @@ async fn main() -> anyhow::Result<()> {
             .agent("gpt-5-mini") // method provided by CompletionClient trait
             .preamble(SYSTEM_PROMPT)
             .name("Bob") // used in logging
+            .default_max_turns(4)
             .tool(monty_python::RunPython)
             .build(),
     );
+    let histories = Arc::new(RwLock::new(HashMap::<i64, Vec<RigMessage>>::new()));
     let bot = Bot::new(std::env::var("TELEGRAM_BOT_TOKEN")?);
     info!("telegram bot started");
 
     teloxide::repl(bot, move |bot: Bot, msg: Message| {
         let agent = Arc::clone(&agent);
+        let histories = Arc::clone(&histories);
         async move {
             let Some(text) = msg.text() else {
                 return respond(());
             };
-            info!(chat_id = msg.chat.id.0, "received telegram message");
-            let _ = bot.send_chat_action(msg.chat.id, ChatAction::Typing).await;
+            let chat_id = msg.chat.id;
+            info!(chat_id = chat_id.0, "received telegram message");
+            let typing_bot = bot.clone();
+            let typing = tokio::spawn(async move {
+                loop {
+                    let _ = typing_bot
+                        .send_chat_action(chat_id, ChatAction::Typing)
+                        .await;
+                    tokio::time::sleep(Duration::from_secs(4)).await;
+                }
+            });
 
-            let reply = match agent.prompt(text).await {
-                Ok(reply) => reply,
-                Err(err) => format!("Model error: {err}"),
+            let history = {
+                let histories = histories.read().await;
+                histories.get(&chat_id.0).cloned().unwrap_or_default()
             };
 
-            if reply.starts_with("Model error: ") {
-                warn!(chat_id = msg.chat.id.0, error = %reply, "model request failed");
-            }
-            bot.send_message(msg.chat.id, reply).await?;
-            info!(chat_id = msg.chat.id.0, "sent telegram reply");
+            let reply = match agent.chat(text, history).await {
+                Ok(reply) => {
+                    let mut histories = histories.write().await;
+                    let history = histories.entry(chat_id.0).or_default();
+                    history.push(RigMessage::user(text));
+                    history.push(RigMessage::assistant(reply.clone()));
+                    trim_history(history);
+                    reply
+                }
+                Err(err) => {
+                    warn!(chat_id = chat_id.0, error = %err, "model request failed");
+                    format!("Model error: {err}")
+                }
+            };
+            typing.abort();
+
+            bot.send_message(chat_id, reply).await?;
+            info!(chat_id = chat_id.0, "sent telegram reply");
             respond(())
         }
     })
