@@ -1,6 +1,6 @@
-mod bitcoin_price;
 mod fetch_url;
 mod monty_python;
+mod openapi_actions;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -32,19 +32,35 @@ async fn main() -> anyhow::Result<()> {
         .with_target(false)
         .init();
 
+    let openapi_specs =
+        openapi_actions::OpenApiRegistry::load_specs_from_dir("/workspace/plugins")?;
+    let openapi_actions = Arc::new(openapi_actions::OpenApiRegistry::from_specs(&openapi_specs));
+    let system_prompt = {
+        let dynamic_actions = openapi_actions.prompt_fragment();
+        if dynamic_actions.is_empty() {
+            SYSTEM_PROMPT.to_string()
+        } else {
+            format!("{SYSTEM_PROMPT}\n\n{dynamic_actions}")
+        }
+    };
+
     let openai_client = Client::from_env();
     let agent = Arc::new(
         openai_client
             .agent("gpt-5-mini") // method provided by CompletionClient trait
-            .preamble(SYSTEM_PROMPT)
+            .preamble(&system_prompt)
             .name("Bob") // used in logging
             .default_max_turns(4)
-            .tool(monty_python::RunPython)
+            .tool(monty_python::RunPython::new(Arc::clone(&openapi_actions)))
             .build(),
     );
     let histories = Arc::new(RwLock::new(HashMap::<i64, Vec<RigMessage>>::new()));
     let bot = Bot::new(std::env::var("TELEGRAM_BOT_TOKEN")?);
-    info!("telegram bot started");
+    info!(
+        plugin_count = openapi_specs.len(),
+        action_count = openapi_actions.function_names().len(),
+        "telegram bot started"
+    );
 
     teloxide::repl(bot, move |bot: Bot, msg: Message| {
         let agent = Arc::clone(&agent);

@@ -1,9 +1,11 @@
-use crate::{bitcoin_price, fetch_url};
+use std::sync::Arc;
+
+use crate::{fetch_url, openapi_actions::OpenApiRegistry};
 
 use monty::{MontyRun, NoLimitTracker, PrintWriter, RunProgress};
 use rig::completion::ToolDefinition;
 use rig::tool::Tool;
-use serde::{Deserialize, Serialize};
+use serde::Deserialize;
 use serde_json::json;
 use tracing::{info, warn};
 
@@ -16,8 +18,16 @@ pub struct RunPythonArgs {
 #[error("python execution failed: {0}")]
 pub struct RunPythonError(String);
 
-#[derive(Deserialize, Serialize)]
-pub struct RunPython;
+#[derive(Clone)]
+pub struct RunPython {
+    openapi_actions: Arc<OpenApiRegistry>,
+}
+
+impl RunPython {
+    pub fn new(openapi_actions: Arc<OpenApiRegistry>) -> Self {
+        Self { openapi_actions }
+    }
+}
 
 impl Tool for RunPython {
     const NAME: &'static str = "run_python";
@@ -28,13 +38,13 @@ impl Tool for RunPython {
     async fn definition(&self, _prompt: String) -> ToolDefinition {
         ToolDefinition {
             name: "run_python".to_string(),
-            description: "Run a small snippet of sandboxed Python with Monty and return the result. Use this for calculation, looping, or data reshaping. Python code may call bitcoin_price(currency) which returns a fake numeric price, and fetch_url(url) for HTTP(S) GET requests; fetch_url(url) returns the response body as text, so parse JSON with json.loads(fetch_url(url)).".to_string(),
+            description: "Run a small snippet of sandboxed Python with Monty and return the result. Use this for calculation, looping, or data reshaping. Python code may call fetch_url(url) and any dynamically loaded OpenAPI actions.".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string",
-                        "description": "Python code to execute. The last expression becomes the result. Host-provided functions include bitcoin_price(currency) and fetch_url(url)."
+                        "description": "Python code to execute. The last expression becomes the result. Host-provided functions include fetch_url(url) and runtime OpenAPI actions."
                     }
                 },
                 "required": ["code"]
@@ -53,12 +63,11 @@ impl Tool for RunPython {
             .take(80)
             .collect::<String>();
         info!(code_len, code_preview = %code_preview, "running python tool");
-        let runner = MontyRun::new(
-            args.code,
-            "tool.py",
-            vec![],
-            vec!["bitcoin_price".to_owned(), "fetch_url".to_owned()],
-        )
+        let runner = MontyRun::new(args.code, "tool.py", vec![], {
+            let mut functions = vec!["fetch_url".to_owned()];
+            functions.extend(self.openapi_actions.function_names());
+            functions
+        })
         .map_err(|err| {
             warn!(error = %err, "failed to initialize python tool");
             RunPythonError(err.to_string())
@@ -85,13 +94,6 @@ impl Tool for RunPython {
                     state,
                     ..
                 } => match function_name.as_str() {
-                    "bitcoin_price" => {
-                        progress = bitcoin_price::handle_bitcoin_price_call(&args, &kwargs, state)
-                            .map_err(|err| {
-                                warn!(error = %err, "python tool execution failed after bitcoin_price");
-                                RunPythonError(err.to_string())
-                            })?;
-                    }
                     "fetch_url" => {
                         progress = fetch_url::handle_fetch_url_call(&args, &kwargs, state)
                             .await
@@ -101,10 +103,14 @@ impl Tool for RunPython {
                             })?;
                     }
                     _ => {
-                        warn!(function_name = %function_name, "python tool called unsupported external function");
-                        return Err(RunPythonError(format!(
-                            "unsupported external function: {function_name}"
-                        )));
+                        progress = self
+                            .openapi_actions
+                            .handle_call(&function_name, &args, &kwargs, state)
+                            .await
+                            .map_err(|err| {
+                                warn!(function_name = %function_name, error = %err, "python tool external function failed");
+                                RunPythonError(err.to_string())
+                            })?;
                     }
                 },
                 RunProgress::OsCall { function, .. } => {

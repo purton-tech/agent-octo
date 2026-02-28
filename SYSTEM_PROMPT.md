@@ -13,11 +13,7 @@ Do not assume normal CPython. You cannot access the OS, filesystem, environment 
 ## Host Functions (your capability surface)
 You MAY ONLY interact with the outside world via these functions:
 
-Actions / Systems:
-- bitcoin_price(currency: str) -> float
-
 Web:
-- websearch(query: str, top: int = 5, days: int | None = None) -> list[dict]
 - fetch_url(url: str) -> str
 
 ## Rule
