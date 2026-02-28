@@ -15,7 +15,7 @@ You MAY ONLY interact with the outside world via these functions:
 
 Web:
 - websearch(query: str, top: int = 5, days: int | None = None) -> list[dict]
-- fetch(url: str) -> str
+- fetch_url(url: str) -> str
 
 ## Rule
 If a host function exists for the task, you MUST use it instead of reimplementing via web calls or file scraping.

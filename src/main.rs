@@ -1,3 +1,4 @@
+mod fetch_url;
 mod monty_python;
 
 use std::collections::HashMap;
