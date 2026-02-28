@@ -10,6 +10,7 @@ use tracing::{info, warn};
 #[derive(Clone, Debug)]
 pub struct OpenApiRegistry {
     actions: HashMap<String, Arc<OpenApiAction>>,
+    plugins: Vec<OpenApiPlugin>,
 }
 
 #[derive(Clone, Debug)]
@@ -20,6 +21,12 @@ struct OpenApiAction {
     base_url: String,
     path: String,
     parameters: Vec<OpenApiParameter>,
+}
+
+#[derive(Clone, Debug)]
+struct OpenApiPlugin {
+    title: String,
+    actions: Vec<String>,
 }
 
 #[derive(Clone, Debug)]
@@ -59,8 +66,15 @@ impl OpenApiRegistry {
 
     pub fn from_specs(specs: &[Value]) -> Self {
         let mut actions = HashMap::new();
+        let mut plugins = Vec::new();
 
         for spec in specs {
+            let info = spec.get("info").and_then(Value::as_object);
+            let title = info
+                .and_then(|info| info.get("title"))
+                .and_then(Value::as_str)
+                .unwrap_or("OpenAPI Plugin")
+                .to_string();
             let base_url = spec
                 .get("servers")
                 .and_then(Value::as_array)
@@ -74,6 +88,8 @@ impl OpenApiRegistry {
             let Some(paths) = spec.get("paths").and_then(Value::as_object) else {
                 continue;
             };
+
+            let mut plugin_action_names = Vec::new();
 
             for (path, path_item) in paths {
                 let Some(path_item_obj) = path_item.as_object() else {
@@ -117,11 +133,23 @@ impl OpenApiRegistry {
                             parameters,
                         }),
                     );
+                    plugin_action_names.push(operation_id.to_string());
                 }
+            }
+
+            plugin_action_names.sort();
+            plugin_action_names.dedup();
+            if !plugin_action_names.is_empty() {
+                plugins.push(OpenApiPlugin {
+                    title,
+                    actions: plugin_action_names,
+                });
             }
         }
 
-        Self { actions }
+        plugins.sort_by(|a, b| a.title.cmp(&b.title));
+
+        Self { actions, plugins }
     }
 
     pub fn function_names(&self) -> Vec<String> {
@@ -131,36 +159,36 @@ impl OpenApiRegistry {
     }
 
     pub fn prompt_fragment(&self) -> String {
-        if self.actions.is_empty() {
+        if self.plugins.is_empty() {
             return String::new();
         }
 
-        let mut actions: Vec<_> = self.actions.values().collect();
-        actions.sort_by(|a, b| a.name.cmp(&b.name));
-
-        let mut lines = vec![
-            "OpenAPI Actions:".to_string(),
-            "These functions map to host REST calls derived from OpenAPI specs.".to_string(),
-        ];
-        for action in actions {
-            let args = action
-                .parameters
-                .iter()
-                .map(|param| {
-                    let py_type = python_type(&param.schema_type);
-                    if param.required {
-                        format!("{}: {}", param.name, py_type)
-                    } else {
-                        format!("{}: {} = None", param.name, py_type)
-                    }
-                })
-                .collect::<Vec<_>>()
-                .join(", ");
-            let signature = format!("{}({}) -> dict | str", action.name, args);
-            if action.description.is_empty() {
-                lines.push(format!("- {}", signature));
-            } else {
-                lines.push(format!("- {}  # {}", signature, action.description));
+        let mut lines = Vec::new();
+        for plugin in &self.plugins {
+            lines.push(format!("{}:", plugin.title));
+            for action_name in &plugin.actions {
+                let Some(action) = self.actions.get(action_name) else {
+                    continue;
+                };
+                let args = action
+                    .parameters
+                    .iter()
+                    .map(|param| {
+                        let py_type = python_type(&param.schema_type);
+                        if param.required {
+                            format!("{}: {}", param.name, py_type)
+                        } else {
+                            format!("{}: {} = None", param.name, py_type)
+                        }
+                    })
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                let signature = format!("{}({}) -> dict | str", action.name, args);
+                if action.description.is_empty() {
+                    lines.push(format!("- {}", signature));
+                } else {
+                    lines.push(format!("- {}  # {}", signature, action.description));
+                }
             }
         }
         lines.join("\n")

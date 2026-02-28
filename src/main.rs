@@ -39,10 +39,14 @@ async fn main() -> anyhow::Result<()> {
         let dynamic_actions = openapi_actions.prompt_fragment();
         if dynamic_actions.is_empty() {
             SYSTEM_PROMPT.to_string()
+        } else if let Some((before_rule, rule_and_after)) = SYSTEM_PROMPT.split_once("\n## Rule\n")
+        {
+            format!("{before_rule}\n{dynamic_actions}\n\n## Rule\n{rule_and_after}")
         } else {
             format!("{SYSTEM_PROMPT}\n\n{dynamic_actions}")
         }
     };
+    println!("System prompt:\n{system_prompt}\n");
 
     let openai_client = Client::from_env();
     let agent = Arc::new(
