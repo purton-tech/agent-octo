@@ -1,3 +1,4 @@
+mod bitcoin_price;
 mod fetch_url;
 mod monty_python;
 

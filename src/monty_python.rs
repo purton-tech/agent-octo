@@ -1,4 +1,4 @@
-use crate::fetch_url;
+use crate::{bitcoin_price, fetch_url};
 
 use monty::{MontyRun, NoLimitTracker, PrintWriter, RunProgress};
 use rig::completion::ToolDefinition;
@@ -28,13 +28,13 @@ impl Tool for RunPython {
     async fn definition(&self, _prompt: String) -> ToolDefinition {
         ToolDefinition {
             name: "run_python".to_string(),
-            description: "Run a small snippet of sandboxed Python with Monty and return the result. Use this for calculation, looping, or data reshaping. Python code may call fetch_url(url) for HTTP(S) GET requests; fetch_url(url) returns the response body as text, so parse JSON with json.loads(fetch_url(url)).".to_string(),
+            description: "Run a small snippet of sandboxed Python with Monty and return the result. Use this for calculation, looping, or data reshaping. Python code may call bitcoin_price(currency) which returns a fake numeric price, and fetch_url(url) for HTTP(S) GET requests; fetch_url(url) returns the response body as text, so parse JSON with json.loads(fetch_url(url)).".to_string(),
             parameters: json!({
                 "type": "object",
                 "properties": {
                     "code": {
                         "type": "string",
-                        "description": "Python code to execute. The last expression becomes the result. A host-provided fetch_url(url) function is available for HTTP(S) GET and returns response text."
+                        "description": "Python code to execute. The last expression becomes the result. Host-provided functions include bitcoin_price(currency) and fetch_url(url)."
                     }
                 },
                 "required": ["code"]
@@ -53,11 +53,16 @@ impl Tool for RunPython {
             .take(80)
             .collect::<String>();
         info!(code_len, code_preview = %code_preview, "running python tool");
-        let runner = MontyRun::new(args.code, "tool.py", vec![], vec!["fetch_url".to_owned()])
-            .map_err(|err| {
-                warn!(error = %err, "failed to initialize python tool");
-                RunPythonError(err.to_string())
-            })?;
+        let runner = MontyRun::new(
+            args.code,
+            "tool.py",
+            vec![],
+            vec!["bitcoin_price".to_owned(), "fetch_url".to_owned()],
+        )
+        .map_err(|err| {
+            warn!(error = %err, "failed to initialize python tool");
+            RunPythonError(err.to_string())
+        })?;
         let mut progress = {
             let mut writer = PrintWriter::Stdout;
             runner.start(vec![], NoLimitTracker, &mut writer)
@@ -79,20 +84,29 @@ impl Tool for RunPython {
                     kwargs,
                     state,
                     ..
-                } => {
-                    if function_name != "fetch_url" {
+                } => match function_name.as_str() {
+                    "bitcoin_price" => {
+                        progress = bitcoin_price::handle_bitcoin_price_call(&args, &kwargs, state)
+                            .map_err(|err| {
+                                warn!(error = %err, "python tool execution failed after bitcoin_price");
+                                RunPythonError(err.to_string())
+                            })?;
+                    }
+                    "fetch_url" => {
+                        progress = fetch_url::handle_fetch_url_call(&args, &kwargs, state)
+                            .await
+                            .map_err(|err| {
+                                warn!(error = %err, "python tool execution failed after fetch_url");
+                                RunPythonError(err.to_string())
+                            })?;
+                    }
+                    _ => {
                         warn!(function_name = %function_name, "python tool called unsupported external function");
                         return Err(RunPythonError(format!(
                             "unsupported external function: {function_name}"
                         )));
                     }
-                    progress = fetch_url::handle_fetch_url_call(&args, &kwargs, state)
-                        .await
-                        .map_err(|err| {
-                            warn!(error = %err, "python tool execution failed after fetch");
-                            RunPythonError(err.to_string())
-                        })?;
-                }
+                },
                 RunProgress::OsCall { function, .. } => {
                     warn!(function = %function, "python tool blocked os call");
                     return Err(RunPythonError(format!("unsupported os call: {function}")));
