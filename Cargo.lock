@@ -3540,6 +3540,7 @@ dependencies = [
  "anyhow",
  "dotenvy",
  "monty",
+ "reqwest 0.12.28",
  "rig-core",
  "serde",
  "serde_json",
