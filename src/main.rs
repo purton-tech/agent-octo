@@ -1,23 +1,41 @@
+use std::sync::Arc;
+
 use rig::client::{CompletionClient, ProviderClient};
 use rig::completion::Prompt;
 use rig::providers::openai::Client;
+use teloxide::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let openai_client = Client::from_env(); // method provided by the ProviderClient trait
+    dotenvy::dotenv().ok();
 
-    let agent = openai_client
-        .agent("gpt-5-mini") // method provided by CompletionClient trait
-        .preamble("You are a helpful assistant. Be very brief and concise")
-        .name("Bob") // used in logging
-        .build();
+    let openai_client = Client::from_env();
+    let agent = Arc::new(
+        openai_client
+            .agent("gpt-5-mini") // method provided by CompletionClient trait
+            .preamble("You are a helpful assistant. Be very brief and concise")
+            .name("Bob") // used in logging
+            .build(),
+    );
+    let bot = Bot::new(std::env::var("TELEGRAM_BOT_TOKEN")?);
 
-    let prompt = "What is the Rust programming language?";
-    println!("{prompt}");
+    teloxide::repl(bot, move |bot: Bot, msg: Message| {
+        let agent = Arc::clone(&agent);
+        async move {
+            let Some(text) = msg.text() else {
+                return respond(());
+            };
 
-    let response_text = agent.prompt(prompt).await?; // prompt method provided by Prompt trait
+            let reply = match agent.prompt(text).await {
+                Ok(reply) => reply,
+                Err(err) => format!("Model error: {err}"),
+            };
 
-    println!("Response: {response_text}");
+            bot.send_message(msg.chat.id, reply).await?;
+            respond(())
+        }
+    })
+    .await;
 
     Ok(())
 }

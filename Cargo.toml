@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+dotenvy = "0.15.7"
 rig-core = "0.31.0"
+teloxide = { version = "0.13.0", default-features = false, features = ["rustls", "ctrlc_handler"] }
 tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread"] }
