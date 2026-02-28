@@ -9,6 +9,8 @@ use teloxide::prelude::*;
 use teloxide::types::ChatAction;
 use tracing::{info, warn};
 
+const SYSTEM_PROMPT: &str = include_str!("../SYSTEM_PROMPT.md");
+
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
@@ -21,7 +23,7 @@ async fn main() -> anyhow::Result<()> {
     let agent = Arc::new(
         openai_client
             .agent("gpt-5-mini") // method provided by CompletionClient trait
-            .preamble("You are a helpful assistant. Be very brief and concise. You can use the run_python tool for calculations or short code execution when helpful. Inside that tool, Python may call fetch(url) for HTTP(S) GET requests. fetch(url) returns the response body as text, not a response object, so use json.loads(fetch(url)) when the endpoint returns JSON.")
+            .preamble(SYSTEM_PROMPT)
             .name("Bob") // used in logging
             .tool(monty_python::RunPython)
             .build(),
