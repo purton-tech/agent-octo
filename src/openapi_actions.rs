@@ -4,7 +4,8 @@ use std::path::Path;
 use std::sync::Arc;
 
 use monty::{MontyObject, PrintWriter, ResourceTracker, RunProgress, Snapshot};
-use serde_json::Value;
+use oas3::OpenApiV3Spec;
+use oas3::spec::{Operation, ParameterIn, RequestBody, SchemaType, SchemaTypeSet};
 use tracing::{info, warn};
 
 #[derive(Clone, Debug)]
@@ -46,95 +47,72 @@ enum ParameterLocation {
 }
 
 impl OpenApiRegistry {
-    pub fn load_specs_from_dir(path: impl AsRef<Path>) -> anyhow::Result<Vec<Value>> {
+    pub fn load_specs_from_dir(path: impl AsRef<Path>) -> anyhow::Result<Vec<OpenApiV3Spec>> {
         let mut specs = Vec::new();
 
         for entry in fs::read_dir(path)? {
             let entry = entry?;
             let path = entry.path();
-            if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
+            let ext = path.extension().and_then(|ext| ext.to_str());
+            if !matches!(ext, Some("yaml" | "yml")) {
                 continue;
             }
 
             let contents = fs::read_to_string(&path)?;
-            let spec: Value = serde_json::from_str(&contents)?;
+            let spec = oas3::from_yaml(contents)?;
             specs.push(spec);
         }
 
         Ok(specs)
     }
 
-    pub fn from_specs(specs: &[Value]) -> Self {
+    pub fn from_specs(specs: &[OpenApiV3Spec]) -> Self {
         let mut actions = HashMap::new();
         let mut plugins = Vec::new();
 
         for spec in specs {
-            let info = spec.get("info").and_then(Value::as_object);
-            let title = info
-                .and_then(|info| info.get("title"))
-                .and_then(Value::as_str)
-                .unwrap_or("OpenAPI Plugin")
-                .to_string();
+            let title = spec.info.title.clone();
             let base_url = spec
-                .get("servers")
-                .and_then(Value::as_array)
-                .and_then(|servers| servers.first())
-                .and_then(|server| server.get("url"))
-                .and_then(Value::as_str)
-                .unwrap_or("")
-                .trim_end_matches('/')
-                .to_string();
-
-            let Some(paths) = spec.get("paths").and_then(Value::as_object) else {
-                continue;
-            };
+                .servers
+                .first()
+                .map(|server| server.url.trim_end_matches('/').to_string())
+                .unwrap_or_default();
 
             let mut plugin_action_names = Vec::new();
 
-            for (path, path_item) in paths {
-                let Some(path_item_obj) = path_item.as_object() else {
+            for (path, method, operation) in spec.operations() {
+                let Some(operation_id) = operation
+                    .operation_id
+                    .as_ref()
+                    .map(|value| value.trim())
+                    .filter(|value| !value.is_empty())
+                else {
                     continue;
                 };
 
-                for method in ["get", "post", "put", "patch", "delete"] {
-                    let Some(operation) = path_item_obj.get(method).and_then(Value::as_object)
-                    else {
-                        continue;
-                    };
-                    let Some(operation_id) = operation
-                        .get("operationId")
-                        .and_then(Value::as_str)
-                        .map(str::trim)
-                        .filter(|value| !value.is_empty())
-                    else {
-                        continue;
-                    };
+                let description = operation
+                    .description
+                    .clone()
+                    .or_else(|| operation.summary.clone())
+                    .unwrap_or_default();
 
-                    let description = operation
-                        .get("description")
-                        .and_then(Value::as_str)
-                        .or_else(|| operation.get("summary").and_then(Value::as_str))
-                        .unwrap_or("")
-                        .to_string();
+                let mut parameters = Vec::new();
+                collect_operation_parameters(spec, operation, &mut parameters);
+                collect_request_body_parameters(spec, operation, &mut parameters);
 
-                    let mut parameters = Vec::new();
-                    collect_parameters(path_item_obj.get("parameters"), &mut parameters);
-                    collect_parameters(operation.get("parameters"), &mut parameters);
-                    collect_request_body(operation.get("requestBody"), &mut parameters);
-
-                    actions.insert(
-                        operation_id.to_string(),
-                        Arc::new(OpenApiAction {
-                            name: operation_id.to_string(),
-                            description,
-                            method: method.to_uppercase(),
-                            base_url: base_url.clone(),
-                            path: path.clone(),
-                            parameters,
-                        }),
-                    );
-                    plugin_action_names.push(operation_id.to_string());
-                }
+                let name = operation_id.to_string();
+                actions.insert(
+                    name.clone(),
+                    Arc::new(OpenApiAction {
+                        name: name.clone(),
+                        description,
+                        method: method.as_str().to_string(),
+                        base_url: base_url.clone(),
+                        path: path.clone(),
+                        parameters,
+                    }),
+                );
+                plugin_action_names.push(name);
             }
 
             plugin_action_names.sort();
@@ -250,79 +228,79 @@ impl OpenApiAction {
     }
 }
 
-fn collect_parameters(value: Option<&Value>, out: &mut Vec<OpenApiParameter>) {
-    let Some(params) = value.and_then(Value::as_array) else {
+fn collect_operation_parameters(
+    spec: &OpenApiV3Spec,
+    operation: &Operation,
+    out: &mut Vec<OpenApiParameter>,
+) {
+    let Ok(parameters) = operation.parameters(spec) else {
         return;
     };
 
-    for param in params {
-        let Some(param_obj) = param.as_object() else {
-            continue;
+    for parameter in parameters {
+        let location = match parameter.location {
+            ParameterIn::Path => ParameterLocation::Path,
+            ParameterIn::Query => ParameterLocation::Query,
+            ParameterIn::Header => ParameterLocation::Header,
+            _ => continue,
         };
-        let Some(name) = param_obj.get("name").and_then(Value::as_str) else {
-            continue;
-        };
-        let Some(location) = param_obj.get("in").and_then(Value::as_str) else {
-            continue;
-        };
-        let Some(location) = parse_location(location) else {
-            continue;
-        };
-        let schema_type = param_obj
-            .get("schema")
-            .and_then(|schema| schema.get("type"))
-            .and_then(Value::as_str)
-            .unwrap_or("string")
-            .to_string();
-        let required = param_obj
-            .get("required")
-            .and_then(Value::as_bool)
-            .unwrap_or(false);
+
+        let schema_type = parameter
+            .schema
+            .as_ref()
+            .and_then(|schema| schema.resolve(spec).ok())
+            .map(|schema| schema_type(&schema))
+            .unwrap_or_else(|| "string".to_string());
 
         out.push(OpenApiParameter {
-            name: name.to_string(),
+            name: parameter.name.clone(),
             location,
-            required,
+            required: parameter.required.unwrap_or(false),
             schema_type,
         });
     }
 }
 
-fn collect_request_body(value: Option<&Value>, out: &mut Vec<OpenApiParameter>) {
-    let Some(request_body) = value.and_then(Value::as_object) else {
+fn collect_request_body_parameters(
+    spec: &OpenApiV3Spec,
+    operation: &Operation,
+    out: &mut Vec<OpenApiParameter>,
+) {
+    let Ok(Some(request_body)) = operation.request_body(spec) else {
         return;
     };
-    let required_fields = request_body
-        .get("content")
-        .and_then(|content| content.get("application/json"))
-        .and_then(|item| item.get("schema"))
-        .and_then(|schema| schema.get("required"))
-        .and_then(Value::as_array)
-        .map(|items| {
-            items
-                .iter()
-                .filter_map(Value::as_str)
-                .map(str::to_string)
-                .collect::<Vec<_>>()
-        })
-        .unwrap_or_default();
 
-    let Some(properties) = request_body
-        .get("content")
-        .and_then(|content| content.get("application/json"))
-        .and_then(|item| item.get("schema"))
-        .and_then(|schema| schema.get("properties"))
-        .and_then(Value::as_object)
+    collect_request_body_schema(spec, &request_body, out);
+}
+
+fn collect_request_body_schema(
+    spec: &OpenApiV3Spec,
+    request_body: &RequestBody,
+    out: &mut Vec<OpenApiParameter>,
+) {
+    let Some(content) = request_body.content.get("application/json") else {
+        return;
+    };
+    if content.schema.is_none() {
+        return;
+    }
+    let Ok(Some(schema)) = content.schema(spec) else {
+        return;
+    };
+
+    let required_fields = schema.required.clone();
+    let Some(SchemaTypeSet::Single(SchemaType::Object) | SchemaTypeSet::Multiple(_)) =
+        &schema.schema_type
     else {
         return;
     };
 
-    for (name, schema) in properties {
-        let schema_type = schema
-            .get("type")
-            .and_then(Value::as_str)
-            .unwrap_or("string")
-            .to_string();
+    for (name, property_schema) in &schema.properties {
+        let schema_type = property_schema
+            .resolve(spec)
+            .map(|schema| schema_type(&schema))
+            .unwrap_or_else(|_| "string".to_string());
+
         out.push(OpenApiParameter {
             name: name.clone(),
             location: ParameterLocation::Body,
@@ -332,13 +310,16 @@ fn collect_request_body(value: Option<&Value>, out: &mut Vec<OpenApiParameter>) 
     }
 }
 
-fn parse_location(value: &str) -> Option<ParameterLocation> {
-    match value {
-        "path" => Some(ParameterLocation::Path),
-        "query" => Some(ParameterLocation::Query),
-        "header" => Some(ParameterLocation::Header),
-        _ => None,
+fn schema_type(schema: &oas3::spec::ObjectSchema) -> String {
+    match &schema.schema_type {
+        Some(SchemaTypeSet::Single(SchemaType::Integer)) => "integer",
+        Some(SchemaTypeSet::Single(SchemaType::Number)) => "number",
+        Some(SchemaTypeSet::Single(SchemaType::Boolean)) => "boolean",
+        Some(SchemaTypeSet::Single(SchemaType::Array)) => "array",
+        Some(SchemaTypeSet::Single(SchemaType::Object)) => "object",
+        _ => "string",
     }
+    .to_string()
 }
 
 fn python_type(schema_type: &str) -> &str {
@@ -417,21 +398,21 @@ fn monty_to_string(value: &MontyObject) -> anyhow::Result<String> {
     }
 }
 
-fn monty_to_json(value: &MontyObject) -> anyhow::Result<Value> {
+fn monty_to_json(value: &MontyObject) -> anyhow::Result<serde_json::Value> {
     match value {
-        MontyObject::None => Ok(Value::Null),
-        MontyObject::Bool(value) => Ok(Value::Bool(*value)),
-        MontyObject::Int(value) => Ok(Value::Number((*value).into())),
+        MontyObject::None => Ok(serde_json::Value::Null),
+        MontyObject::Bool(value) => Ok(serde_json::Value::Bool(*value)),
+        MontyObject::Int(value) => Ok(serde_json::Value::Number((*value).into())),
         MontyObject::Float(value) => serde_json::Number::from_f64(*value)
-            .map(Value::Number)
+            .map(serde_json::Value::Number)
             .ok_or_else(|| anyhow::anyhow!("invalid float value")),
-        MontyObject::String(value) => Ok(Value::String(value.clone())),
+        MontyObject::String(value) => Ok(serde_json::Value::String(value.clone())),
         MontyObject::List(items) | MontyObject::Tuple(items) => {
             let mut out = Vec::with_capacity(items.len());
             for item in items {
                 out.push(monty_to_json(item)?);
             }
-            Ok(Value::Array(out))
+            Ok(serde_json::Value::Array(out))
         }
         MontyObject::Dict(pairs) => {
             let mut out = serde_json::Map::new();
@@ -441,24 +422,24 @@ fn monty_to_json(value: &MontyObject) -> anyhow::Result<Value> {
                 };
                 out.insert(key, monty_to_json(&value)?);
             }
-            Ok(Value::Object(out))
+            Ok(serde_json::Value::Object(out))
         }
         _ => anyhow::bail!("unsupported argument type for json conversion: {value:?}"),
     }
 }
 
 fn response_to_monty(body: String) -> MontyObject {
-    match serde_json::from_str::<Value>(&body) {
+    match serde_json::from_str::<serde_json::Value>(&body) {
         Ok(value) => json_to_monty(&value),
         Err(_) => MontyObject::String(body),
     }
 }
 
-fn json_to_monty(value: &Value) -> MontyObject {
+fn json_to_monty(value: &serde_json::Value) -> MontyObject {
     match value {
-        Value::Null => MontyObject::None,
-        Value::Bool(value) => MontyObject::Bool(*value),
-        Value::Number(value) => {
+        serde_json::Value::Null => MontyObject::None,
+        serde_json::Value::Bool(value) => MontyObject::Bool(*value),
+        serde_json::Value::Number(value) => {
             if let Some(int) = value.as_i64() {
                 MontyObject::Int(int)
             } else if let Some(float) = value.as_f64() {
@@ -467,9 +448,11 @@ fn json_to_monty(value: &Value) -> MontyObject {
                 MontyObject::String(value.to_string())
             }
         }
-        Value::String(value) => MontyObject::String(value.clone()),
-        Value::Array(items) => MontyObject::List(items.iter().map(json_to_monty).collect()),
-        Value::Object(map) => MontyObject::dict(
+        serde_json::Value::String(value) => MontyObject::String(value.clone()),
+        serde_json::Value::Array(items) => {
+            MontyObject::List(items.iter().map(json_to_monty).collect())
+        }
+        serde_json::Value::Object(map) => MontyObject::dict(
             map.iter()
                 .map(|(key, value)| (MontyObject::String(key.clone()), json_to_monty(value)))
                 .collect::<Vec<_>>(),
