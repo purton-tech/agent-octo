@@ -10,12 +10,6 @@ dev-setup:
 dev-secrets:
     stack secrets --manifest infra-as-code/stack.yaml --db-host host.docker.internal --db-port 30061 >> .env
 
-db:
-    bash -lc 'set -a; source .env; set +a; psql "$MIGRATIONS_URL"'
-
-dbmate *args:
-    bash -lc 'set -a; source .env; set +a; export DATABASE_URL="${DATABASE_URL:-$MIGRATIONS_URL}"; dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations {{args}}'
-
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
     k3d kubeconfig write k3d-octo --kubeconfig-merge-default
