@@ -7,7 +7,7 @@
     </picture>
 </p>
 
-An [OpenClaw](https://openclaw.ai/) clone with some enhancements.
+An [OpenClaw](https://openclaw.ai/) clone with a major reduction in token usage.
 
 1. The Token Usage is around 10% of OpenClaw whilst still supporting most of the main features.
 1. Runs the [Monty](https://github.com/pydantic/monty) Python interpreter to give the LLM sandboxed scripting abilities.
@@ -22,6 +22,21 @@ Built with the [Rust on Nails](https://rust-on-nails.com/) architecture for secu
 
 ## Installation
 
+Download the `docker-compose.yaml` file.
+
 ```sh
 curl -LO https://raw.githubusercontent.com/purton-tech/agent-octo/main/infra-as-code/docker-compose.yaml
+```
+
+Create a `.env` file and add your Telegram Token and model provider details.
+
+```
+TELEGRAM_BOT_TOKEN=<telegram-token>
+OPENAI_API_KEY=<api key>
+```
+
+Run the server
+
+```sh
+docker-compose up
 ```
