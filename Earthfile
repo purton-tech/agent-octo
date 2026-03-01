@@ -31,8 +31,8 @@ image:
     ARG REGISTRY=your-registry
     ARG TAG=latest
     FROM scratch
-    COPY (+build/$BINARY --BINARY=$BINARY) /$BINARY
-    ENTRYPOINT ["/$BINARY"]
+    COPY (+build/$BINARY --BINARY=$BINARY) /app
+    ENTRYPOINT ["/app"]
     SAVE IMAGE $REGISTRY/$BINARY:$TAG
 
 release-candidate:

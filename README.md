@@ -10,7 +10,7 @@
 An [OpenClaw](https://openclaw.ai/) clone with some enhancements.
 
 1. The Token Usage is around 10% of OpenClaw whilst still supporting most of the main features.
-1. Runs the [Monty](https://github.com/pydantic/monty) Python interpreter to give the LLM sandboxed tool usage.
+1. Runs the [Monty](https://github.com/pydantic/monty) Python interpreter to give the LLM sandboxed scripting abilities.
 1. Yaml plugins which are [Open API](https://www.openapis.org/) specifications allow you to add tools at runtime with no code.
 1. All Plugins are discoverable. Only a few tokens are used in the System Prompt and no entries in the Tool Definitions.
 1. Uses [Postgresql](https://www.postgresql.org/) for storage and backup.
