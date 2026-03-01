@@ -56,20 +56,32 @@ jobs:
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "Determined next version: $VERSION"
 
+      - name: Prepare release tag
+        id: release_tag
+        run: |
+          set -euo pipefail
+          version="${{ steps.next_version.outputs.version }}"
+          latest_for_version=$(git tag -l "v${version}-rc*" --sort=-v:refname | head -n1)
+          if [ -z "$latest_for_version" ]; then
+            rc_number=1
+          elif [ "$latest_for_version" = "v${version}-rc" ]; then
+            rc_number=2
+          else
+            rc_number=$(( ${latest_for_version##*.} + 1 ))
+          fi
+          tag="v${version}-rc.${rc_number}"
+          image_tag="${version}-rc.${rc_number}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
       - name: Build release candidate image
-        run: earthly --ci --push +release-candidate --VERSION=${{ steps.next_version.outputs.version }}
+        run: earthly --ci --push +release-candidate --TAG=${{ steps.release_tag.outputs.image_tag }}
 
       - name: Configure git author
         run: |
           git config user.email "github-actions@users.noreply.github.com"
           git config user.name "github-actions"
-
-      - name: Prepare release tag
-        id: release_tag
-        run: |
-          tag="v${{ steps.next_version.outputs.version }}-rc"
-          echo "tag=$tag" >> "$GITHUB_OUTPUT"
-          echo "version=${{ steps.next_version.outputs.version }}" >> "$GITHUB_OUTPUT"
 
       - name: Create RC tag
         run: |

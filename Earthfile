@@ -37,9 +37,9 @@ image:
 
 release-candidate:
     ARG REGISTRY=ghcr.io/purton-tech
-    ARG VERSION
+    ARG TAG
     BUILD +checks
-    BUILD +image --BINARY=octo --REGISTRY=$REGISTRY --TAG=$VERSION-rc
+    BUILD +image --BINARY=octo --REGISTRY=$REGISTRY --TAG=$TAG
 
 # Build all currently known binary crates. Add one BUILD line per new bin.
 all:
