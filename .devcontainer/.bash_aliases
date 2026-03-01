@@ -27,3 +27,5 @@ dbmate() {
 }
 
 alias dbdown='while dbmate down; do :; done'
+
+alias j='just'

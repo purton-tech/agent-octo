@@ -47,6 +47,15 @@ jobs:
           echo "stable_image=ghcr.io/purton-tech/octo:${base}" >> "$GITHUB_OUTPUT"
           echo "Promoting ghcr.io/purton-tech/octo:${rc_tag} -> ghcr.io/purton-tech/octo:${base}"
 
+      - name: Verify RC image exists
+        run: |
+          set -euo pipefail
+          if ! docker manifest inspect "${{ steps.release.outputs.rc_image }}" >/dev/null 2>&1; then
+            echo "RC image not found: ${{ steps.release.outputs.rc_image }}" >&2
+            echo "Use the exact tag from the Release Candidate workflow step summary." >&2
+            exit 1
+          fi
+
       - name: Promote RC image to stable tag
         run: |
           set -euo pipefail
@@ -69,7 +78,7 @@ jobs:
         run: |
           set -euo pipefail
           files=(
-            "infra-as-code/docker-compose.yml"
+            "infra-as-code/docker-compose.yaml"
             "infra-as-code/stack.yaml"
             "infra-as-code/stack-selenium.yaml"
           )
@@ -91,7 +100,7 @@ jobs:
         run: |
           set -euo pipefail
           files=()
-          [ -f infra-as-code/docker-compose.yml ] && files+=("infra-as-code/docker-compose.yml")
+          [ -f infra-as-code/docker-compose.yaml ] && files+=("infra-as-code/docker-compose.yaml")
           [ -f infra-as-code/stack.yaml ] && files+=("infra-as-code/stack.yaml")
           [ -f infra-as-code/stack-selenium.yaml ] && files+=("infra-as-code/stack-selenium.yaml")
 
