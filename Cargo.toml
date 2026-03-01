@@ -1,9 +1,12 @@
-[package]
-name = "workspace"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+members = [
+    "crates/tool-runtime",
+    "crates/agent-runtime",
+    "crates/octo",
+]
+resolver = "3"
 
-[dependencies]
+[workspace.dependencies]
 anyhow = "1.0.98"
 dotenvy = "0.15.7"
 monty = { git = "https://github.com/pydantic/monty" }
@@ -14,6 +17,6 @@ serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
 teloxide = { version = "0.17.0", default-features = false, features = ["rustls", "ctrlc_handler"] }
 thiserror = "2.0.12"
-tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread"] }
+tokio = "1.49.0"
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }

@@ -1,0 +1,15 @@
+[package]
+name = "octo"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+agent-runtime = { path = "../agent-runtime" }
+anyhow.workspace = true
+dotenvy.workspace = true
+rig-core.workspace = true
+teloxide.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tool-runtime = { path = "../tool-runtime" }
+tracing.workspace = true
+tracing-subscriber.workspace = true

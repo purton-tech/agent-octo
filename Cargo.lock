@@ -3,6 +3,15 @@
 version = 4
 
 [[package]]
+name = "agent-runtime"
+version = "0.1.0"
+dependencies = [
+ "rig-core",
+ "tokio",
+ "tool-runtime",
+]
+
+[[package]]
 name = "ahash"
 version = "0.8.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1467,6 +1476,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "octo"
+version = "0.1.0"
+dependencies = [
+ "agent-runtime",
+ "anyhow",
+ "dotenvy",
+ "rig-core",
+ "teloxide",
+ "tokio",
+ "tool-runtime",
+ "tracing",
+ "tracing-subscriber",
+]
+
+[[package]]
 name = "once_cell"
 version = "1.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2795,6 +2819,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "tool-runtime"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "monty",
+ "oas3",
+ "reqwest 0.12.28",
+ "rig-core",
+ "serde",
+ "serde_json",
+ "thiserror 2.0.18",
+ "tracing",
+]
+
+[[package]]
 name = "tower"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3618,25 +3657,6 @@ dependencies = [
  "serde_json",
  "unicode-xid",
  "wasmparser",
-]
-
-[[package]]
-name = "workspace"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "dotenvy",
- "monty",
- "oas3",
- "reqwest 0.12.28",
- "rig-core",
- "serde",
- "serde_json",
- "teloxide",
- "thiserror 2.0.18",
- "tokio",
- "tracing",
- "tracing-subscriber",
 ]
 
 [[package]]

@@ -1,0 +1,9 @@
+[package]
+name = "agent-runtime"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rig-core.workspace = true
+tokio = { workspace = true, features = ["sync"] }
+tool-runtime = { path = "../tool-runtime" }
