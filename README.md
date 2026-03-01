@@ -3,7 +3,7 @@
 <p align="center">
     <picture>
         <source media="(prefers-color-scheme: light)" srcset=".github/octo.png">
-        <img src=".github/octo.png" alt="Agent Octo" width="500">
+        <img src=".github/octo.png" alt="Agent Octo" width="250">
     </picture>
 </p>
 
