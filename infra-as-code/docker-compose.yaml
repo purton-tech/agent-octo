@@ -1,3 +1,5 @@
 services:
   octo:
+    env_file:
+      - .env
     image: ghcr.io/purton-tech/octo:1.0.0-rc.11

@@ -48,7 +48,12 @@ enum ParameterLocation {
 
 impl OpenApiRegistry {
     pub fn load_specs_from_dir(path: impl AsRef<Path>) -> anyhow::Result<Vec<OpenApiV3Spec>> {
+        let path = path.as_ref();
         let mut specs = Vec::new();
+
+        if !path.exists() {
+            return Ok(specs);
+        }
 
         for entry in fs::read_dir(path)? {
             let entry = entry?;
