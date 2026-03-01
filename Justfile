@@ -16,7 +16,7 @@ dev-secrets:
     sed -i 's/^MIGRATIONS_URL=/DATABASE_URL=/' .env
 
 wc:
-    cargo watch -w ./crates/db/queries/ -s 'clorinde live ./crates/db/queries/ -d crates/clorinde'
+    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/clorinde $DATABASE_URL'
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:

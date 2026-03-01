@@ -1,5 +1,5 @@
 {
-  "name": "Rust on Nails",
+  "name": "Agent Octo",
   "build": {
     "dockerfile": "Dockerfile",
     "context": "."
@@ -39,7 +39,8 @@
         "matklad.rust-analyzer",
         "tamasfe.even-better-toml",
         "fill-labs.dependi",
-				"glehmann.earthlyls"
+				"glehmann.earthlyls",
+        "nefrob.vscode-just-syntax"
       ]
     }
   },
