@@ -2,7 +2,7 @@
 members = [
     "crates/tool-runtime",
     "crates/agent-runtime",
-    "crates/octo",
+    "crates/octo", "crates/db",
 ]
 resolver = "3"
 
