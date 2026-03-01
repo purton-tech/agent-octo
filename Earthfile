@@ -6,6 +6,10 @@ devcontainer:
     FROM DOCKERFILE .devcontainer
     WORKDIR /workspace
 
+certs:
+    FROM alpine:3.19
+    RUN apk add --no-cache ca-certificates
+
 # Run the Rust checks that CI enforces inside the shared devcontainer toolchain.
 checks:
     FROM +devcontainer
@@ -31,6 +35,7 @@ image:
     ARG REGISTRY=your-registry
     ARG TAG=latest
     FROM scratch
+    COPY +certs/etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
     COPY (+build/$BINARY --BINARY=$BINARY) /app
     ENTRYPOINT ["/app"]
     SAVE IMAGE --push $REGISTRY/$BINARY:$TAG
