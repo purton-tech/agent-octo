@@ -1,5 +1,12 @@
 ## Agent Octo
 
+<p align="center">
+    <picture>
+        <source media="(prefers-color-scheme: light)" srcset=".github/agent-octo.png">
+        <img src=".github/agent-octo.png" alt="Agent Octo" width="500">
+    </picture>
+</p>
+
 An [OpenClaw](https://openclaw.ai/) clone with some enhancements.
 
 1. The Token Usage is around 10% of OpenClaw whilst still supporting most of the main features.
