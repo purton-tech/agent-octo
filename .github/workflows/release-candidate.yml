@@ -40,11 +40,12 @@ jobs:
       - name: Determine next version
         id: next_version
         run: |
-          VERSION=$(npx semantic-release@20 --dry-run --no-ci --plugins @semantic-release/commit-analyzer --plugins @semantic-release/release-notes-generator 2>&1 \
-            | grep -Eo 'The next release version is [0-9]+\.[0-9]+\.[0-9]+' \
+          npx semantic-release@20 --dry-run --no-ci --branches main --plugins @semantic-release/commit-analyzer --plugins @semantic-release/release-notes-generator > semantic-release.log 2>&1 || true
+          VERSION=$(grep -Eo 'The next release version is [0-9]+\.[0-9]+\.[0-9]+' semantic-release.log \
             | awk '{print $6}' \
             | tail -n 1)
           if [ -z "$VERSION" ]; then
+            cat semantic-release.log >&2
             echo "Unable to determine next version" >&2
             exit 1
           fi
