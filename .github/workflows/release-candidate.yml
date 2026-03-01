@@ -41,8 +41,8 @@ jobs:
         id: next_version
         run: |
           npx semantic-release@20 --dry-run --no-ci --branches main --plugins @semantic-release/commit-analyzer --plugins @semantic-release/release-notes-generator > semantic-release.log 2>&1 || true
-          VERSION=$(grep -Eo 'The next release version is [0-9]+\.[0-9]+\.[0-9]+' semantic-release.log \
-            | awk '{print $6}' \
+          VERSION=$(grep -Eio 'next release version is [0-9]+\.[0-9]+\.[0-9]+' semantic-release.log \
+            | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+' \
             | tail -n 1)
           if [ -z "$VERSION" ]; then
             cat semantic-release.log >&2
