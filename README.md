@@ -2,8 +2,8 @@
 
 <p align="center">
     <picture>
-        <source media="(prefers-color-scheme: light)" srcset=".github/agent-octo.png">
-        <img src=".github/agent-octo.png" alt="Agent Octo" width="500">
+        <source media="(prefers-color-scheme: light)" srcset=".github/octo.png">
+        <img src=".github/octo.png" alt="Agent Octo" width="500">
     </picture>
 </p>
 
