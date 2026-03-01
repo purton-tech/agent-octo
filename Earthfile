@@ -9,6 +9,7 @@ devcontainer:
 certs:
     FROM alpine:3.19
     RUN apk add --no-cache ca-certificates
+    SAVE ARTIFACT /etc/ssl/certs/ca-certificates.crt /ca-certificates.crt
 
 # Run the Rust checks that CI enforces inside the shared devcontainer toolchain.
 checks:
@@ -35,8 +36,9 @@ image:
     ARG REGISTRY=your-registry
     ARG TAG=latest
     FROM scratch
-    COPY +certs/etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+    COPY +certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
     COPY (+build/$BINARY --BINARY=$BINARY) /app
+    USER 65532:65532
     ENTRYPOINT ["/app"]
     SAVE IMAGE --push $REGISTRY/$BINARY:$TAG
 

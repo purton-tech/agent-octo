@@ -16,7 +16,7 @@ An [OpenClaw](https://openclaw.ai/) clone with a **90% reduction** in token usag
 1. Uses [Postgresql](https://www.postgresql.org/) for storage and backup.
 1. Kubernetes deployments with [Stack](https://stack-cli.com/)
 1. `docker-compose.yaml` file for easy install and de-install.
-1. Runs in minimal docker containers, `FROM scratch`.
+1. Runs in hardened docker containers, `FROM scratch` with a NON root user.
 
 Built with the [Rust on Nails](https://rust-on-nails.com/) architecture for secure full stack web applications.
 
