@@ -22,6 +22,6 @@ Built with the [Rust on Nails](https://rust-on-nails.com/) architecture for secu
 
 ## Installation
 
-```
-curl -O https://raw.githubusercontent.com/purton-tech/agent-octo/refs/heads/main/infra-as-code/docker-compose.yaml
+```sh
+curl -LO https://raw.githubusercontent.com/purton-tech/agent-octo/main/infra-as-code/docker-compose.yaml
 ```
