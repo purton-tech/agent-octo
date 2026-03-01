@@ -38,5 +38,5 @@ OPENAI_API_KEY=<api key>
 Run the server
 
 ```sh
-docker-compose up
+docker compose up
 ```
