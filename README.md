@@ -19,3 +19,9 @@ An [OpenClaw](https://openclaw.ai/) clone with some enhancements.
 1. Runs in minimal docker containers, `FROM scratch`.
 
 Built with the [Rust on Nails](https://rust-on-nails.com/) architecture for secure full stack web applications.
+
+## Installation
+
+```
+curl -O https://raw.githubusercontent.com/purton-tech/agent-octo/refs/heads/main/infra-as-code/docker-compose.yaml
+```
