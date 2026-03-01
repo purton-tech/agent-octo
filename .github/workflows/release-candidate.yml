@@ -1,0 +1,69 @@
+name: Release Candidate
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch or tag to release from
+        required: false
+        default: main
+
+permissions:
+  contents: write
+
+jobs:
+  release-candidate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.inputs.ref || 'main' }}
+
+      - name: Install Earthly
+        uses: earthly/actions-setup@v1
+        with:
+          version: v0.8.15
+
+      - name: Determine next version
+        id: next_version
+        run: |
+          earthly --ci +version
+          VERSION="$(tr -d '\n' < version.txt)"
+          if [ -z "$VERSION" ]; then
+            echo "Unable to determine next version" >&2
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "Determined next version: $VERSION"
+
+      - name: Build release candidate image
+        run: earthly --ci +release-candidate --VERSION=${{ steps.next_version.outputs.version }}
+
+      - name: Configure git author
+        run: |
+          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name "github-actions"
+
+      - name: Prepare release tag
+        id: release_tag
+        run: |
+          tag="v${{ steps.next_version.outputs.version }}-rc"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${{ steps.next_version.outputs.version }}" >> "$GITHUB_OUTPUT"
+
+      - name: Create RC tag
+        run: |
+          rc_tag="${{ steps.release_tag.outputs.tag }}"
+          git tag -a "$rc_tag" -m "Release candidate $rc_tag"
+          git push origin "$rc_tag"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release_tag.outputs.tag }}
+          target_commitish: ${{ github.sha }}
+          prerelease: true
+          generate_release_notes: true
