@@ -15,3 +15,6 @@ get-config:
     sed -i '/certificate-authority-data/d' "$HOME/.kube/config"
     sed -i '/cluster:/a \ \ \ \ insecure-skip-tls-verify: true' "$HOME/.kube/config"
     echo "✅ kubeconfig updated and TLS verification disabled"
+
+codex: 
+    sudo npm install -g @openai/codex
