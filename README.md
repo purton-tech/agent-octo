@@ -7,7 +7,7 @@
     </picture>
 </p>
 
-An [OpenClaw](https://openclaw.ai/) clone with **90% reduction** in token usage.
+An [OpenClaw](https://openclaw.ai/) clone with a **90% reduction** in token usage.
 
 1. The Token Usage is around 10% of OpenClaw whilst still supporting most of the main features.
 1. Runs the [Monty](https://github.com/pydantic/monty) Python interpreter to give the LLM sandboxed scripting abilities.

@@ -33,13 +33,13 @@ image:
     FROM scratch
     COPY (+build/$BINARY --BINARY=$BINARY) /app
     ENTRYPOINT ["/app"]
-    SAVE IMAGE $REGISTRY/$BINARY:$TAG
+    SAVE IMAGE --push $REGISTRY/$BINARY:$TAG
 
 release-candidate:
     ARG REGISTRY=ghcr.io/purton-tech
     ARG TAG
     BUILD +checks
-    BUILD --push +image --BINARY=octo --REGISTRY=$REGISTRY --TAG=$TAG
+    BUILD +image --BINARY=octo --REGISTRY=$REGISTRY --TAG=$TAG
 
 # Build all currently known binary crates. Add one BUILD line per new bin.
 all:
