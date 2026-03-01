@@ -1,0 +1,98 @@
+name: Release
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  promote:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find latest RC tag
+        id: rc
+        shell: bash
+        run: |
+          set -euo pipefail
+          latest_rc=$(git tag -l "v*-rc" --sort=-v:refname | head -n1)
+          if [ -z "${latest_rc}" ]; then
+            echo "No RC tags found"
+            exit 1
+          fi
+          echo "latest_rc=${latest_rc}" >> "$GITHUB_OUTPUT"
+          base="${latest_rc%%-rc}"
+          echo "base=${base#v}" >> "$GITHUB_OUTPUT"
+          echo "Promoting ${latest_rc} -> ${base}"
+
+      - name: Create stable tag (same commit as RC)
+        run: |
+          set -euo pipefail
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+          rc_tag="${{ steps.rc.outputs.latest_rc }}"
+          stable="v${{ steps.rc.outputs.base }}"
+          commit=$(git rev-list -n 1 "${rc_tag}")
+          git tag -a "${stable}" -m "Promote ${rc_tag} to ${stable}" "${commit}"
+          git push origin "${stable}"
+
+      - name: Update versioned assets
+        env:
+          RELEASE_VERSION: ${{ steps.rc.outputs.base }}
+        run: |
+          set -euo pipefail
+          files=(
+            "infra-as-code/docker-compose.yml"
+            "infra-as-code/stack.yaml"
+            "infra-as-code/stack-selenium.yaml"
+          )
+
+          for file in "${files[@]}"; do
+            if [ ! -f "$file" ]; then
+              echo "Skipping missing file: $file"
+              continue
+            fi
+            sed -E -i "s#(^[[:space:]]*image:[[:space:]]*[^:[:space:]]+):[^[:space:]]+#\\1:${RELEASE_VERSION}#g" "$file"
+          done
+
+      - name: Configure git author
+        run: |
+          git config user.email "github-actions@users.noreply.github.com"
+          git config user.name "github-actions"
+
+      - name: Commit version bump
+        run: |
+          set -euo pipefail
+          files=()
+          [ -f infra-as-code/docker-compose.yml ] && files+=("infra-as-code/docker-compose.yml")
+          [ -f infra-as-code/stack.yaml ] && files+=("infra-as-code/stack.yaml")
+          [ -f infra-as-code/stack-selenium.yaml ] && files+=("infra-as-code/stack-selenium.yaml")
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No versioned asset files found"
+            exit 0
+          fi
+
+          git add "${files[@]}"
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+            exit 0
+          fi
+
+          git commit -m "chore(deployment): Update release metadata for ${{ steps.rc.outputs.base }} [ci skip]"
+          git push
+
+      - name: Create GitHub Release (stable)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.rc.outputs.base }}
+          prerelease: false
+          generate_release_notes: true
