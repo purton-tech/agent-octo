@@ -1,3 +1,3 @@
 services:
   octo:
-    image: ghcr.io/purton-tech/octo:latest
+    image: ghcr.io/purton-tech/octo:1.0.0-rc.11
