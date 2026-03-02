@@ -12,6 +12,10 @@ use rig::client::ProviderClient;
 use rig::completion::{Chat, Message as RigMessage};
 use rig::providers::openai::Client;
 use serde_json::json;
+use supabase_client_realtime::{
+    PostgresChangesEvent, PostgresChangesFilter, RealtimeClient,
+};
+use tokio::sync::Notify;
 use tool_runtime::openapi_actions::OpenApiRegistry;
 use tracing::{info, warn};
 
@@ -31,6 +35,7 @@ async fn main() -> anyhow::Result<()> {
 
     let config = Config::new();
     let pool = db::create_pool(&config.application_url);
+    let inbound_notify = Arc::new(Notify::new());
 
     let plugin_dir = format!("{}/../octo/plugins", env!("CARGO_MANIFEST_DIR"));
     let openapi_specs = OpenApiRegistry::load_specs_from_dir(&plugin_dir)?;
@@ -44,6 +49,11 @@ async fn main() -> anyhow::Result<()> {
         action_count = openapi_actions.function_names().len(),
         "agent runtime started"
     );
+
+    tokio::spawn(watch_inbound_realtime(
+        config.clone(),
+        inbound_notify.clone(),
+    ));
 
     loop {
         let client = match pool.get().await {
@@ -66,7 +76,7 @@ async fn main() -> anyhow::Result<()> {
             .opt()
             .await?
         else {
-            tokio::time::sleep(Duration::from_millis(500)).await;
+            wait_for_work(&inbound_notify).await;
             continue;
         };
 
@@ -128,5 +138,51 @@ async fn main() -> anyhow::Result<()> {
             conversation_id = inbound_message.external_conversation_id,
             "processed inbound message"
         );
+    }
+}
+
+async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
+    let realtime = match RealtimeClient::new(config.stack_api_url, config.service_role_jwt) {
+        Ok(realtime) => realtime,
+        Err(err) => {
+            warn!(error = %err, "failed to build realtime client");
+            return;
+        }
+    };
+
+    if let Err(err) = realtime.connect().await {
+        warn!(error = %err, "failed to connect to realtime");
+        return;
+    }
+
+    let channel = realtime
+        .channel("agent-inbound")
+        .on_postgres_changes(
+            PostgresChangesEvent::Insert,
+            PostgresChangesFilter::new("public", "channel_messages")
+                .with_filter("direction=eq.inbound"),
+            move |_payload| {
+                inbound_notify.notify_one();
+            },
+        )
+        .subscribe(|status, err| {
+            if let Some(err) = err {
+                warn!(%status, error = %err, "realtime subscription status");
+            } else {
+                info!(%status, "realtime subscription status");
+            }
+        })
+        .await;
+
+    match channel {
+        Ok(_channel) => std::future::pending::<()>().await,
+        Err(err) => warn!(error = %err, "failed to subscribe to inbound realtime"),
+    }
+}
+
+async fn wait_for_work(notify: &Notify) {
+    tokio::select! {
+        _ = notify.notified() => {}
+        _ = tokio::time::sleep(Duration::from_secs(5)) => {}
     }
 }

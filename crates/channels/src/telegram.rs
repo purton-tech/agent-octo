@@ -7,16 +7,26 @@ use db::clorinde::queries::channels::{
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use serde_json::json;
+use supabase_client_realtime::{
+    PostgresChangesEvent, PostgresChangesFilter, RealtimeClient,
+};
 use teloxide::prelude::*;
 use teloxide::types::ChatId;
+use tokio::sync::Notify;
 use tracing::{info, warn};
 
 pub async fn run() -> anyhow::Result<()> {
     let config = Config::new();
-    let bot = Bot::new(config.telegram_bot_token);
+    let bot = Bot::new(config.telegram_bot_token.clone());
     let pool = db::create_pool(&config.application_url);
+    let outbound_notify = std::sync::Arc::new(Notify::new());
 
-    tokio::spawn(drive_outbound_messages(bot.clone(), pool.clone()));
+    tokio::spawn(drive_outbound_messages(
+        bot.clone(),
+        pool.clone(),
+        outbound_notify.clone(),
+    ));
+    tokio::spawn(watch_outbound_realtime(config.clone(), outbound_notify));
 
     info!("telegram ingress started");
 
@@ -83,7 +93,11 @@ pub async fn run() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn drive_outbound_messages(bot: Bot, pool: Pool) {
+async fn drive_outbound_messages(
+    bot: Bot,
+    pool: Pool,
+    outbound_notify: std::sync::Arc<Notify>,
+) {
     loop {
         let client = match pool.get().await {
             Ok(client) => client,
@@ -114,7 +128,7 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool) {
         };
 
         let Some(message) = next_message else {
-            tokio::time::sleep(Duration::from_millis(500)).await;
+            wait_for_work(&outbound_notify).await;
             continue;
         };
 
@@ -168,5 +182,54 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool) {
                 "failed to update telegram message status"
             );
         }
+    }
+}
+
+async fn watch_outbound_realtime(
+    config: Config,
+    outbound_notify: std::sync::Arc<Notify>,
+) {
+    let realtime = match RealtimeClient::new(config.stack_api_url, config.service_role_jwt) {
+        Ok(realtime) => realtime,
+        Err(err) => {
+            warn!(error = %err, "failed to build realtime client");
+            return;
+        }
+    };
+
+    if let Err(err) = realtime.connect().await {
+        warn!(error = %err, "failed to connect to realtime");
+        return;
+    }
+
+    let channel = realtime
+        .channel("telegram-outbound")
+        .on_postgres_changes(
+            PostgresChangesEvent::Insert,
+            PostgresChangesFilter::new("public", "channel_messages")
+                .with_filter("direction=eq.outbound"),
+            move |_payload| {
+                outbound_notify.notify_one();
+            },
+        )
+        .subscribe(|status, err| {
+            if let Some(err) = err {
+                warn!(%status, error = %err, "realtime subscription status");
+            } else {
+                info!(%status, "realtime subscription status");
+            }
+        })
+        .await;
+
+    match channel {
+        Ok(_channel) => std::future::pending::<()>().await,
+        Err(err) => warn!(error = %err, "failed to subscribe to outbound realtime"),
+    }
+}
+
+async fn wait_for_work(notify: &Notify) {
+    tokio::select! {
+        _ = notify.notified() => {}
+        _ = tokio::time::sleep(Duration::from_secs(5)) => {}
     }
 }
