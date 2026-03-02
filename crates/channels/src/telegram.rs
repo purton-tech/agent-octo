@@ -7,9 +7,7 @@ use db::clorinde::queries::channels::{
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use serde_json::json;
-use supabase_client_realtime::{
-    PostgresChangesEvent, PostgresChangesFilter, RealtimeClient,
-};
+use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use teloxide::prelude::*;
 use teloxide::types::ChatId;
 use tokio::sync::Notify;
@@ -93,11 +91,7 @@ pub async fn run() -> anyhow::Result<()> {
     Ok(())
 }
 
-async fn drive_outbound_messages(
-    bot: Bot,
-    pool: Pool,
-    outbound_notify: std::sync::Arc<Notify>,
-) {
+async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::sync::Arc<Notify>) {
     loop {
         let client = match pool.get().await {
             Ok(client) => client,
@@ -185,10 +179,7 @@ async fn drive_outbound_messages(
     }
 }
 
-async fn watch_outbound_realtime(
-    config: Config,
-    outbound_notify: std::sync::Arc<Notify>,
-) {
+async fn watch_outbound_realtime(config: Config, outbound_notify: std::sync::Arc<Notify>) {
     let realtime = match RealtimeClient::new(config.stack_api_url, config.service_role_jwt) {
         Ok(realtime) => realtime,
         Err(err) => {

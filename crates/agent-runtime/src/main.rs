@@ -1,8 +1,8 @@
 use std::sync::Arc;
 use std::time::Duration;
 
-use agent_runtime::{build_agent, build_system_prompt};
 use agent_runtime::config::Config;
+use agent_runtime::{build_agent, build_system_prompt};
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
     update_channel_message_status,
@@ -12,9 +12,7 @@ use rig::client::ProviderClient;
 use rig::completion::{Chat, Message as RigMessage};
 use rig::providers::openai::Client;
 use serde_json::json;
-use supabase_client_realtime::{
-    PostgresChangesEvent, PostgresChangesFilter, RealtimeClient,
-};
+use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use tokio::sync::Notify;
 use tool_runtime::openapi_actions::OpenApiRegistry;
 use tracing::{info, warn};
@@ -95,11 +93,14 @@ async fn main() -> anyhow::Result<()> {
             .filter(|message| message.id != inbound_message.id)
             .filter_map(|message| match message.direction {
                 ChannelMessageDirection::inbound => Some(RigMessage::user(message.message_text)),
-                ChannelMessageDirection::outbound => Some(RigMessage::assistant(message.message_text)),
+                ChannelMessageDirection::outbound => {
+                    Some(RigMessage::assistant(message.message_text))
+                }
             })
             .collect::<Vec<_>>();
 
-        let (reply, inbound_status) = match agent.chat(&inbound_message.message_text, history).await {
+        let (reply, inbound_status) = match agent.chat(&inbound_message.message_text, history).await
+        {
             Ok(reply) => (reply, ChannelMessageStatus::processed),
             Err(err) => {
                 warn!(
