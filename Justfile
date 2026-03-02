@@ -1,5 +1,6 @@
 set dotenv-load := true
 
+## Manage Our k3d clsuter
 dev-init:
     k3d cluster delete k3d-octo
     k3d cluster create k3d-octo --agents 1 -p "30060-30066:30060-30066@agent:0"
@@ -15,8 +16,9 @@ dev-secrets:
     stack secrets --manifest infra-as-code/stack.yaml --db-host host.docker.internal --db-port 30061 >> .env
     sed -i 's/^MIGRATIONS_URL=/DATABASE_URL=/' .env
 
+## Run the code generators
 wc:
-    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/clorinde $DATABASE_URL'
+    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen $DATABASE_URL'
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
@@ -29,3 +31,7 @@ get-config:
 
 codex: 
     sudo npm install -g @openai/codex
+
+octo:
+    cargo binstall --no-confirm zellij
+    zellij -l .devcontainer/layout.kdl

@@ -4,5 +4,5 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-clorinde = { version = "0.0.0", path = "../clorinde" }
+clorinde = { version = "0.0.0", path = "../db-gen" }
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
