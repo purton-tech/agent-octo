@@ -38,6 +38,9 @@ CREATE INDEX channel_messages_inbound_idx
 CREATE INDEX channel_messages_conversation_idx
     ON channel_messages (channel, external_conversation_id, created_at DESC);
 
+GRANT SELECT, INSERT, UPDATE ON channel_messages TO application_user;
+GRANT USAGE, SELECT ON SEQUENCE channel_messages_id_seq TO application_user;
+
 
 -- migrate:down
 DROP TABLE IF EXISTS channel_messages;

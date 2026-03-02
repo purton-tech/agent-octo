@@ -1,5 +1,6 @@
 use std::time::Duration;
 
+use crate::config::Config;
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, update_channel_message_status,
@@ -11,9 +12,9 @@ use teloxide::types::ChatId;
 use tracing::{info, warn};
 
 pub async fn run() -> anyhow::Result<()> {
-    let database_url = std::env::var("DATABASE_URL")?;
-    let bot = Bot::new(std::env::var("TELEGRAM_BOT_TOKEN")?);
-    let pool = db::create_pool(&database_url);
+    let config = Config::new();
+    let bot = Bot::new(config.telegram_bot_token);
+    let pool = db::create_pool(&config.application_url);
 
     tokio::spawn(drive_outbound_messages(bot.clone(), pool.clone()));
 

@@ -2,6 +2,7 @@ use std::sync::Arc;
 use std::time::Duration;
 
 use agent_runtime::{build_agent, build_system_prompt};
+use agent_runtime::config::Config;
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
     update_channel_message_status,
@@ -28,8 +29,8 @@ async fn main() -> anyhow::Result<()> {
         .with_target(false)
         .init();
 
-    let database_url = std::env::var("DATABASE_URL")?;
-    let pool = db::create_pool(&database_url);
+    let config = Config::new();
+    let pool = db::create_pool(&config.application_url);
 
     let plugin_dir = format!("{}/../octo/plugins", env!("CARGO_MANIFEST_DIR"));
     let openapi_specs = OpenApiRegistry::load_specs_from_dir(&plugin_dir)?;
