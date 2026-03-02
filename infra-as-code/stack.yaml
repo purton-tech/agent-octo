@@ -22,3 +22,12 @@ spec:
       image: ghcr.io/purton-tech/octo:1.0.0
       port: 8080
       database_url: DATABASE_URL
+      init:
+        - image: ghcr.io/purton-tech/octo-migrations:1.0.0
+          database_url: DATABASE_URL
+    channels:
+      image: ghcr.io/purton-tech/channels:1.0.0
+      database_url: DATABASE_URL
+    agent-runtime:
+      image: ghcr.io/purton-tech/agent-runtime:1.0.0
+      database_url: DATABASE_URL
