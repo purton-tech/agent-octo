@@ -6,9 +6,15 @@ version = 4
 name = "agent-runtime"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
+ "db",
+ "dotenvy",
  "rig-core",
+ "serde_json",
  "tokio",
  "tool-runtime",
+ "tracing",
+ "tracing-subscriber",
 ]
 
 [[package]]

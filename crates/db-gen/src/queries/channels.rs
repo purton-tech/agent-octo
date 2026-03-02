@@ -22,6 +22,13 @@ pub struct UpdateChannelMessageStatusParams {
     pub status: crate::types::ChannelMessageStatus,
     pub id: i64,
 }
+#[derive(Clone, Copy, Debug)]
+pub struct ClaimNextChannelMessageParams {
+    pub channel: crate::types::ChannelType,
+    pub direction: crate::types::ChannelMessageDirection,
+    pub from_status: crate::types::ChannelMessageStatus,
+    pub to_status: crate::types::ChannelMessageStatus,
+}
 #[derive(Debug)]
 pub struct ListConversationMessagesParams<T1: crate::StringSql> {
     pub channel: crate::types::ChannelType,
@@ -414,10 +421,80 @@ impl<'c, 'a, 's, C: GenericClient>
         self.bind(client, &params.status, &params.id)
     }
 }
+pub struct ClaimNextChannelMessageStmt(&'static str, Option<tokio_postgres::Statement>);
+pub fn claim_next_channel_message() -> ClaimNextChannelMessageStmt {
+    ClaimNextChannelMessageStmt(
+        "WITH next_message AS ( SELECT id FROM channel_messages WHERE channel = $1::channel_type AND direction = $2::channel_message_direction AND status = $3::channel_message_status ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) UPDATE channel_messages SET status = $4::channel_message_status, updated_at = NOW() WHERE id IN (SELECT id FROM next_message) RETURNING id, channel, direction, external_conversation_id, message_text, status, created_at, updated_at",
+        None,
+    )
+}
+impl ClaimNextChannelMessageStmt {
+    pub async fn prepare<'a, C: GenericClient>(
+        mut self,
+        client: &'a C,
+    ) -> Result<Self, tokio_postgres::Error> {
+        self.1 = Some(client.prepare(self.0).await?);
+        Ok(self)
+    }
+    pub fn bind<'c, 'a, 's, C: GenericClient>(
+        &'s self,
+        client: &'c C,
+        channel: &'a crate::types::ChannelType,
+        direction: &'a crate::types::ChannelMessageDirection,
+        from_status: &'a crate::types::ChannelMessageStatus,
+        to_status: &'a crate::types::ChannelMessageStatus,
+    ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 4> {
+        ChannelMessageQuery {
+            client,
+            params: [channel, direction, from_status, to_status],
+            query: self.0,
+            cached: self.1.as_ref(),
+            extractor: |
+                row: &tokio_postgres::Row,
+            | -> Result<ChannelMessageBorrowed, tokio_postgres::Error> {
+                Ok(ChannelMessageBorrowed {
+                    id: row.try_get(0)?,
+                    channel: row.try_get(1)?,
+                    direction: row.try_get(2)?,
+                    external_conversation_id: row.try_get(3)?,
+                    message_text: row.try_get(4)?,
+                    status: row.try_get(5)?,
+                    created_at: row.try_get(6)?,
+                    updated_at: row.try_get(7)?,
+                })
+            },
+            mapper: |it| ChannelMessage::from(it),
+        }
+    }
+}
+impl<'c, 'a, 's, C: GenericClient>
+    crate::client::async_::Params<
+        'c,
+        'a,
+        's,
+        ClaimNextChannelMessageParams,
+        ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 4>,
+        C,
+    > for ClaimNextChannelMessageStmt
+{
+    fn params(
+        &'s self,
+        client: &'c C,
+        params: &'a ClaimNextChannelMessageParams,
+    ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 4> {
+        self.bind(
+            client,
+            &params.channel,
+            &params.direction,
+            &params.from_status,
+            &params.to_status,
+        )
+    }
+}
 pub struct ListConversationMessagesStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn list_conversation_messages() -> ListConversationMessagesStmt {
     ListConversationMessagesStmt(
-        "SELECT id, direction, message_text, status, created_at FROM channel_messages WHERE channel = $1::channel_type AND external_conversation_id = $2::TEXT ORDER BY created_at ASC LIMIT $3::BIGINT",
+        "SELECT id, direction, message_text, status, created_at FROM ( SELECT id, direction, message_text, status, created_at FROM channel_messages WHERE channel = $1::channel_type AND external_conversation_id = $2::TEXT ORDER BY created_at DESC LIMIT $3::BIGINT ) AS recent_messages ORDER BY created_at ASC",
         None,
     )
 }

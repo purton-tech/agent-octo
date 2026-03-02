@@ -4,6 +4,12 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+anyhow.workspace = true
+db = { path = "../db" }
+dotenvy.workspace = true
 rig-core.workspace = true
-tokio = { workspace = true, features = ["sync"] }
+serde_json.workspace = true
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "time"] }
 tool-runtime = { path = "../tool-runtime" }
+tracing.workspace = true
+tracing-subscriber.workspace = true
