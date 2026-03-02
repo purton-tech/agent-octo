@@ -43,25 +43,32 @@ jobs:
           base="${BASH_REMATCH[1]}"
           echo "rc_tag=${rc_tag}" >> "$GITHUB_OUTPUT"
           echo "base=${base}" >> "$GITHUB_OUTPUT"
-          echo "rc_image=ghcr.io/purton-tech/octo:${rc_tag}" >> "$GITHUB_OUTPUT"
-          echo "stable_image=ghcr.io/purton-tech/octo:${base}" >> "$GITHUB_OUTPUT"
-          echo "Promoting ghcr.io/purton-tech/octo:${rc_tag} -> ghcr.io/purton-tech/octo:${base}"
+          echo "Promoting all release images from :${rc_tag} to :${base}"
 
-      - name: Verify RC image exists
+      - name: Verify RC images exist
         run: |
           set -euo pipefail
-          if ! docker manifest inspect "${{ steps.release.outputs.rc_image }}" >/dev/null 2>&1; then
-            echo "RC image not found: ${{ steps.release.outputs.rc_image }}" >&2
-            echo "Use the exact tag from the Release Candidate workflow step summary." >&2
-            exit 1
-          fi
+          images=(octo channels agent-runtime octo-migrations)
+          for image in "${images[@]}"; do
+            ref="ghcr.io/purton-tech/${image}:${{ steps.release.outputs.rc_tag }}"
+            if ! docker manifest inspect "${ref}" >/dev/null 2>&1; then
+              echo "RC image not found: ${ref}" >&2
+              echo "Use the exact tag from the Release Candidate workflow step summary." >&2
+              exit 1
+            fi
+          done
 
-      - name: Promote RC image to stable tag
+      - name: Promote RC images to stable tags
         run: |
           set -euo pipefail
-          docker pull "${{ steps.release.outputs.rc_image }}"
-          docker tag "${{ steps.release.outputs.rc_image }}" "${{ steps.release.outputs.stable_image }}"
-          docker push "${{ steps.release.outputs.stable_image }}"
+          images=(octo channels agent-runtime octo-migrations)
+          for image in "${images[@]}"; do
+            rc_image="ghcr.io/purton-tech/${image}:${{ steps.release.outputs.rc_tag }}"
+            stable_image="ghcr.io/purton-tech/${image}:${{ steps.release.outputs.base }}"
+            docker pull "${rc_image}"
+            docker tag "${rc_image}" "${stable_image}"
+            docker push "${stable_image}"
+          done
 
       - name: Create stable git tag
         run: |

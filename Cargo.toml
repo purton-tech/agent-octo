@@ -2,19 +2,27 @@
 members = [
     "crates/tool-runtime",
     "crates/agent-runtime",
-    "crates/octo", "crates/db",
+    "crates/channels",
+    "crates/octo",
+    "crates/db",
 ]
 resolver = "3"
 
 [workspace.dependencies]
 anyhow = "1.0.98"
+axum = "0.8.4"
 dotenvy = "0.15.7"
 monty = { git = "https://github.com/pydantic/monty" }
+# `supabase-client-realtime` pulls in `supabase-client-core`, which currently
+# brings in a `native-tls` path on Linux. Vendoring avoids needing system
+# OpenSSL/pkg-config in this devcontainer.
+native-tls = { version = "0.2.18", features = ["vendored"] }
 oas3 = { version = "0.20.1", features = ["yaml-spec"] }
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls"] }
 rig-core = "0.31.0"
 serde = { version = "1.0.219", features = ["derive"] }
 serde_json = "1.0.140"
+supabase-client-realtime = "0.2.2"
 teloxide = { version = "0.17.0", default-features = false, features = ["rustls", "ctrlc_handler"] }
 thiserror = "2.0.12"
 tokio = "1.49.0"

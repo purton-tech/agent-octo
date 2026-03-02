@@ -1,85 +1,140 @@
-use std::sync::Arc;
-use std::time::Duration;
-
-use agent_runtime::{ConversationStore, build_agent, build_system_prompt};
-use rig::client::ProviderClient;
-use rig::completion::Chat;
-use rig::providers::openai::Client;
-use teloxide::prelude::*;
-use teloxide::types::ChatAction;
-use tool_runtime::openapi_actions::OpenApiRegistry;
-use tracing::{info, warn};
-
-const SYSTEM_PROMPT: &str = include_str!("../SYSTEM_PROMPT.md");
+use axum::Router;
+use axum::http::header;
+use axum::response::{Html, IntoResponse};
+use axum::routing::get;
+use tracing::info;
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     dotenvy::dotenv().ok();
     tracing_subscriber::fmt()
-        .with_env_filter(tracing_subscriber::EnvFilter::new("octo=info"))
+        .with_env_filter(
+            tracing_subscriber::EnvFilter::try_from_default_env()
+                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
+        )
         .with_target(false)
         .init();
 
-    let plugin_dir = format!("{}/plugins", env!("CARGO_MANIFEST_DIR"));
-    let openapi_specs = OpenApiRegistry::load_specs_from_dir(&plugin_dir)?;
-    let openapi_actions = Arc::new(OpenApiRegistry::from_specs(&openapi_specs));
-    let system_prompt = build_system_prompt(SYSTEM_PROMPT, &openapi_actions);
-    println!("System prompt:\n{system_prompt}\n");
+    let app = Router::new().route("/", get(index));
+    let bind_addr = std::env::var("OCTO_BIND_ADDR").unwrap_or_else(|_| "0.0.0.0:8080".to_string());
+    let listener = tokio::net::TcpListener::bind(&bind_addr).await?;
 
-    let openai_client = Client::from_env();
-    let agent = Arc::new(build_agent(
-        openai_client,
-        system_prompt,
-        Arc::clone(&openapi_actions),
-    ));
-    let conversations = Arc::new(ConversationStore::new());
-    let bot = Bot::new(std::env::var("TELEGRAM_BOT_TOKEN")?);
-    info!(
-        plugin_count = openapi_specs.len(),
-        action_count = openapi_actions.function_names().len(),
-        "telegram bot started"
-    );
+    info!(bind_addr, "octo web server started");
 
-    teloxide::repl(bot, move |bot: Bot, msg: Message| {
-        let agent = Arc::clone(&agent);
-        let conversations = Arc::clone(&conversations);
-        async move {
-            let Some(text) = msg.text() else {
-                return respond(());
-            };
-
-            let chat_id = msg.chat.id;
-            info!(chat_id = chat_id.0, "received telegram message");
-
-            let typing_bot = bot.clone();
-            let typing = tokio::spawn(async move {
-                loop {
-                    let _ = typing_bot
-                        .send_chat_action(chat_id, ChatAction::Typing)
-                        .await;
-                    tokio::time::sleep(Duration::from_secs(4)).await;
-                }
-            });
-
-            let history = conversations.history(chat_id.0).await;
-            let reply = match agent.chat(text, history).await {
-                Ok(reply) => {
-                    conversations.push_turn(chat_id.0, text, &reply).await;
-                    reply
-                }
-                Err(err) => {
-                    warn!(chat_id = chat_id.0, error = %err, "model request failed");
-                    format!("Model error: {err}")
-                }
-            };
-            typing.abort();
-
-            bot.send_message(chat_id, reply).await?;
-            info!(chat_id = chat_id.0, "sent telegram reply");
-            respond(())
-        }
-    })
-    .await;
+    axum::serve(listener, app).await?;
 
     Ok(())
+}
+
+async fn index() -> impl IntoResponse {
+    (
+        [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
+        Html(
+            r#"<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Octo Under Construction</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at top left, #ffff66 0, transparent 28%),
+        radial-gradient(circle at bottom right, #00ffff 0, transparent 24%),
+        repeating-linear-gradient(
+          45deg,
+          #001a66 0,
+          #001a66 14px,
+          #003399 14px,
+          #003399 28px
+        );
+      color: #00ff33;
+      font-family: "Courier New", monospace;
+    }
+
+    .frame {
+      width: min(92vw, 760px);
+      border: 6px ridge #c0c0c0;
+      background: #000033;
+      box-shadow: 0 0 0 6px #000, 18px 18px 0 rgba(0, 0, 0, 0.45);
+      padding: 2rem;
+      text-align: center;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.5rem, 8vw, 5rem);
+      line-height: 0.95;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-shadow: 3px 3px 0 #ff00ff;
+    }
+
+    .blink {
+      margin: 1.5rem 0;
+      font-size: 1.2rem;
+      color: #ffff00;
+      animation: blink 1s steps(2, start) infinite;
+    }
+
+    p {
+      margin: 0.75rem 0;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .marquee {
+      margin-top: 1.5rem;
+      overflow: hidden;
+      border: 3px inset #c0c0c0;
+      background: #111;
+      color: #ffcc00;
+      white-space: nowrap;
+    }
+
+    .marquee span {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      animation: scroll 12s linear infinite;
+    }
+
+    @keyframes blink {
+      to {
+        opacity: 0;
+      }
+    }
+
+    @keyframes scroll {
+      from {
+        transform: translateX(100%);
+      }
+
+      to {
+        transform: translateX(-100%);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="frame">
+    <h1>Under<br>Construction</h1>
+    <div class="blink">[ WORK IN PROGRESS ]</div>
+    <p>Welcome to <strong>Octo</strong>, the future home of a dangerously serious web app.</p>
+    <p>Please excuse the neon debris while we assemble the server-rendered empire.</p>
+    <div class="marquee">
+      <span>Best viewed with unreasonable optimism and a fresh copy of Netscape Navigator.</span>
+    </div>
+  </main>
+</body>
+</html>"#,
+        ),
+    )
 }

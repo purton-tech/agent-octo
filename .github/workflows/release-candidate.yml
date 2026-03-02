@@ -64,7 +64,6 @@ jobs:
           image_tag="${version}-rc.${{ github.run_number }}"
           echo "image_tag=$image_tag" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          echo "IMAGE_TAG=ghcr.io/purton-tech/octo:${image_tag}" >> "$GITHUB_ENV"
 
       - name: Build release candidate image
         run: earthly --ci --push +release-candidate --TAG=${{ steps.release_candidate.outputs.image_tag }}
@@ -72,8 +71,11 @@ jobs:
       - name: Publish release candidate summary
         run: |
           {
-            echo "## Release Candidate Image"
+            echo "## Release Candidate Images"
             echo ""
             echo "- Version: \`${{ steps.release_candidate.outputs.version }}\`"
-            echo "- Image: \`${IMAGE_TAG}\`"
+            echo "- \`ghcr.io/purton-tech/octo:${{ steps.release_candidate.outputs.image_tag }}\`"
+            echo "- \`ghcr.io/purton-tech/channels:${{ steps.release_candidate.outputs.image_tag }}\`"
+            echo "- \`ghcr.io/purton-tech/agent-runtime:${{ steps.release_candidate.outputs.image_tag }}\`"
+            echo "- \`ghcr.io/purton-tech/octo-migrations:${{ steps.release_candidate.outputs.image_tag }}\`"
           } >> "$GITHUB_STEP_SUMMARY"

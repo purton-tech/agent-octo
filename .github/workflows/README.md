@@ -2,8 +2,8 @@
 
 This repository uses two separate release flows:
 
-- `Release Candidate`: builds and pushes an RC container image only
-- `Release`: promotes a chosen RC image to a stable image tag and updates deployment manifests
+- `Release Candidate`: builds and pushes RC container images for all deployable services
+- `Release`: promotes a chosen RC tag to stable image tags and updates deployment manifests
 
 ## Release Candidate
 
@@ -13,21 +13,24 @@ What it does:
 
 - checks out `main`
 - calculates the next semantic version using `semantic-release --dry-run`
-- builds and pushes the RC image to GHCR
+- builds and pushes the RC images to GHCR
 
 The RC image tag format is:
 
 ```text
-ghcr.io/purton-tech/octo:<version>-rc.<github_run_number>
+ghcr.io/purton-tech/<image>:<version>-rc.<github_run_number>
 ```
 
 Example:
 
 ```text
 ghcr.io/purton-tech/octo:1.2.0-rc.42
+ghcr.io/purton-tech/channels:1.2.0-rc.42
+ghcr.io/purton-tech/agent-runtime:1.2.0-rc.42
+ghcr.io/purton-tech/octo-migrations:1.2.0-rc.42
 ```
 
-The workflow writes the final image tag into the GitHub Actions step summary.
+The workflow writes the final image tags into the GitHub Actions step summary.
 
 This workflow does not create a git tag or a GitHub prerelease.
 
@@ -38,7 +41,7 @@ After validating an RC image, run the `Release` GitHub Actions workflow manually
 What it does:
 
 - takes an `rc_tag` input such as `1.2.0-rc.42`
-- retags `ghcr.io/purton-tech/octo:<rc_tag>` to `ghcr.io/purton-tech/octo:<version>`
+- retags all deployable images from `:<rc_tag>` to `:<version>`
 - creates the stable `v<version>` git tag from the current `main` commit
 - updates image tags in the manifests under `infra-as-code/`
 - commits those manifest updates if needed
