@@ -91,11 +91,9 @@ async fn main() -> anyhow::Result<()> {
         let history = conversation_rows
             .into_iter()
             .filter(|message| message.id != inbound_message.id)
-            .filter_map(|message| match message.direction {
-                ChannelMessageDirection::inbound => Some(RigMessage::user(message.message_text)),
-                ChannelMessageDirection::outbound => {
-                    Some(RigMessage::assistant(message.message_text))
-                }
+            .map(|message| match message.direction {
+                ChannelMessageDirection::inbound => RigMessage::user(message.message_text),
+                ChannelMessageDirection::outbound => RigMessage::assistant(message.message_text),
             })
             .collect::<Vec<_>>();
 

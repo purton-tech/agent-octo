@@ -6,6 +6,12 @@ pub struct Config {
     pub telegram_bot_token: String,
 }
 
+impl Default for Config {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl Config {
     pub fn new() -> Self {
         let application_url = std::env::var("APPLICATION_URL").expect("APPLICATION_URL not set");
