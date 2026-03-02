@@ -10,6 +10,7 @@ resolver = "3"
 
 [workspace.dependencies]
 anyhow = "1.0.98"
+axum = "0.8.4"
 dotenvy = "0.15.7"
 monty = { git = "https://github.com/pydantic/monty" }
 # `supabase-client-realtime` pulls in `supabase-client-core`, which currently
