@@ -20,6 +20,29 @@ dev-secrets:
 wc:
     cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen $DATABASE_URL'
 
+wa env_file=".env":
+    #!/usr/bin/env bash
+    set -euo pipefail
+
+    if [ ! -f "{{env_file}}" ]; then
+        echo "Missing env file: {{env_file}}  run just dot-env" >&2
+        exit 1
+    fi
+
+    set -a
+    . "{{env_file}}"
+    set +a
+
+    mold -run cargo watch \
+        --workdir /workspace/ \
+        -w crates/agent-runtime \
+        -w crates/channels \
+        -w crates/db \
+        -w crates/db-gen \
+        -w crates/octo \
+        -w crates/tool-runtime \
+        --no-gitignore -x "run --bin octo"
+
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
     k3d kubeconfig write k3d-octo --kubeconfig-merge-default
