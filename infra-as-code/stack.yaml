@@ -6,6 +6,10 @@ metadata:
 spec:
   components:
     db: {}
+    realtime: {}
+    storage:
+      install_minio: true
+      max_upload_size: 50mb
   profiles:
     dev:
       components:
@@ -15,6 +19,6 @@ spec:
           expose_db_port: 30061
   services:
     web:
-      image: mendhak/http-https-echo:1.0.0
+      image: ghcr.io/purton-tech/octo:1.0.0
       port: 8080
       database_url: DATABASE_URL
