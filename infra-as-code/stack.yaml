@@ -17,31 +17,40 @@ spec:
           port: 30060
         db:
           expose_db_port: 30061
-  services:
-    web:
-      image: ghcr.io/purton-tech/octo:1.0.1-rc.15
-      port: 8080
-      database_url: APPLICATION_URL
-      init:
-        image: ghcr.io/purton-tech/octo-migrations:1.0.1-rc.15
-        migrations_database_url: DATABASE_URL
-    channels:
-      image: ghcr.io/purton-tech/channels:1.0.1-rc.15
-      database_url: APPLICATION_URL
-      secret_env:
-        - name: SERVICE_ROLE_JWT
-          secret_name: jwt-auth
-          secret_key: service-role-jwt
-        - name: TELEGRAM_BOT_TOKEN
-          secret_name: octo-runtime
-          secret_key: telegram-bot-token
-    agent-runtime:
-      image: ghcr.io/purton-tech/agent-runtime:1.0.1-rc.15
-      database_url: APPLICATION_URL
-      secret_env:
-        - name: SERVICE_ROLE_JWT
-          secret_name: jwt-auth
-          secret_key: service-role-jwt
-        - name: OPENAI_API_KEY
-          secret_name: octo-runtime
-          secret_key: openai-api-key
+      services:
+        web:
+          image: ghcr.io/purton-tech/octo:1.0.1-rc.15
+          port: 8080
+          database_url: APPLICATION_URL
+          init:
+            image: ghcr.io/purton-tech/octo-migrations:1.0.1-rc.15
+            migrations_database_url: DATABASE_URL
+    prod:
+      services:
+        web:
+          image: ghcr.io/purton-tech/octo:1.0.1-rc.15
+          port: 8080
+          database_url: APPLICATION_URL
+          init:
+            image: ghcr.io/purton-tech/octo-migrations:1.0.1-rc.15
+            migrations_database_url: DATABASE_URL
+        channels:
+          image: ghcr.io/purton-tech/channels:1.0.1-rc.15
+          database_url: APPLICATION_URL
+          secret_env:
+            - name: SERVICE_ROLE_JWT
+              secret_name: jwt-auth
+              secret_key: service-role-jwt
+            - name: TELEGRAM_BOT_TOKEN
+              secret_name: octo-runtime
+              secret_key: telegram-bot-token
+        agent-runtime:
+          image: ghcr.io/purton-tech/agent-runtime:1.0.1-rc.15
+          database_url: APPLICATION_URL
+          secret_env:
+            - name: SERVICE_ROLE_JWT
+              secret_name: jwt-auth
+              secret_key: service-role-jwt
+            - name: OPENAI_API_KEY
+              secret_name: octo-runtime
+              secret_key: openai-api-key

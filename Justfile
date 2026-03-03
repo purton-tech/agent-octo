@@ -13,7 +13,7 @@ dev-setup:
 dev-secrets:
     touch .env
     printf "\n" >> .env
-    stack secrets --manifest infra-as-code/stack.yaml --db-host host.docker.internal --db-port 30061 >> .env
+    stack secrets --manifest infra-as-code/stack.yaml --profile dev --db-host host.docker.internal --db-port 30061 >> .env
     sed -i 's/^MIGRATIONS_URL=/DATABASE_URL=/' .env
 
 runtime-secrets env_file=".env":
