@@ -385,8 +385,6 @@ dependencies = [
  "postgres",
  "postgres-protocol",
  "postgres-types",
- "serde",
- "serde_json",
  "tokio-postgres",
  "uuid",
 ]
@@ -2120,8 +2118,6 @@ dependencies = [
  "fallible-iterator",
  "postgres-derive",
  "postgres-protocol",
- "serde_core",
- "serde_json",
  "uuid",
 ]
 

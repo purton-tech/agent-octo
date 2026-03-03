@@ -20,25 +20,6 @@ CREATE TYPE channel_type AS ENUM (
 COMMENT ON TYPE channel_type IS
 'Supported external channel integration types.';
 
-CREATE TYPE channel_message_direction AS ENUM (
-    'inbound',
-    'outbound'
-);
-
-COMMENT ON TYPE channel_message_direction IS
-'Direction of a channel message in the processing pipeline.';
-
-CREATE TYPE channel_message_status AS ENUM (
-    'pending',
-    'processing',
-    'processed',
-    'sent',
-    'failed'
-);
-
-COMMENT ON TYPE channel_message_status IS
-'Lifecycle state for a channel-driven message in the processing pipeline.';
-
 CREATE TABLE public.channels (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
 
@@ -143,6 +124,4 @@ DROP POLICY IF EXISTS channels_insert ON public.channels;
 DROP POLICY IF EXISTS channels_select ON public.channels;
 
 DROP TABLE IF EXISTS public.channels;
-DROP TYPE IF EXISTS channel_message_status;
-DROP TYPE IF EXISTS channel_message_direction;
 DROP TYPE IF EXISTS channel_type;

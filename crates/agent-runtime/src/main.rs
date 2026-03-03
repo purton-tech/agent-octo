@@ -7,10 +7,10 @@ use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
     update_channel_message_status,
 };
+use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use rig::client::ProviderClient;
 use rig::completion::{Chat, Message as RigMessage};
 use rig::providers::openai::Client;
-use serde_json::json;
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use tokio::sync::Notify;
 use tool_runtime::openapi_actions::OpenApiRegistry;
@@ -63,7 +63,13 @@ async fn main() -> anyhow::Result<()> {
         };
 
         let Some(inbound_message) = claim_next_channel_message()
-            .bind(&client, &"telegram", &"inbound", &"pending", &"processing")
+            .bind(
+                &client,
+                &ChannelType::telegram,
+                &ChannelMessageDirection::inbound,
+                &ChannelMessageStatus::pending,
+                &ChannelMessageStatus::processing,
+            )
             .opt()
             .await?
         else {
@@ -74,8 +80,7 @@ async fn main() -> anyhow::Result<()> {
         let conversation_rows = list_conversation_messages()
             .bind(
                 &client,
-                &"telegram",
-                &inbound_message.external_conversation_id,
+                &inbound_message.conversation_id,
                 &MAX_HISTORY_MESSAGES,
             )
             .all()
@@ -84,39 +89,33 @@ async fn main() -> anyhow::Result<()> {
         let history = conversation_rows
             .into_iter()
             .filter(|message| message.id != inbound_message.id)
-            .map(|message| match message.direction.as_str() {
-                "inbound" => RigMessage::user(message.message_text),
-                "outbound" => RigMessage::assistant(message.message_text),
-                _ => RigMessage::user(message.message_text),
+            .map(|message| match message.direction {
+                ChannelMessageDirection::inbound => RigMessage::user(message.message_text),
+                ChannelMessageDirection::outbound => RigMessage::assistant(message.message_text),
             })
             .collect::<Vec<_>>();
 
         let (reply, inbound_status) = match agent.chat(&inbound_message.message_text, history).await
         {
-            Ok(reply) => (reply, "processed"),
+            Ok(reply) => (reply, ChannelMessageStatus::processed),
             Err(err) => {
                 warn!(
                     message_id = %inbound_message.id,
                     error = %err,
                     "model request failed"
                 );
-                (format!("Model error: {err}"), "failed")
+                (format!("Model error: {err}"), ChannelMessageStatus::failed)
             }
         };
 
         insert_channel_message()
             .bind(
                 &client,
-                &"telegram",
-                &inbound_message.external_conversation_id,
-                &"outbound",
+                &Option::<String>::None,
+                &inbound_message.channel_conversation_id,
+                &ChannelMessageDirection::outbound,
                 &reply,
-                &json!({
-                    "source_message_id": inbound_message.id,
-                }),
-                &Option::<String>::None,
-                &Option::<String>::None,
-                &"pending",
+                &ChannelMessageStatus::pending,
             )
             .one()
             .await?;
@@ -128,7 +127,7 @@ async fn main() -> anyhow::Result<()> {
 
         info!(
             inbound_message_id = %inbound_message.id,
-            conversation_id = inbound_message.external_conversation_id,
+            conversation_id = %inbound_message.conversation_id,
             "processed inbound message"
         );
     }

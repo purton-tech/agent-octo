@@ -1,180 +1,193 @@
---: ChannelMessage()
+--: ChannelConversation()
 
---! insert_channel_message (external_user_id?, external_message_id?) : ChannelMessage
+--! get_or_create_channel_conversation (external_user_id?) : ChannelConversation
 WITH selected_channel AS (
     SELECT
+        c.id,
         c.org_id,
-        c.created_by_user_id
+        c.created_by_user_id,
+        c.default_agent_id
     FROM public.channels c
-    WHERE c.kind::TEXT = :channel::TEXT
+    WHERE c.kind = :channel::channel_type
     ORDER BY c.created_at ASC
     LIMIT 1
 ),
-existing_conversation AS (
-    SELECT
-        c.id
-    FROM public.conversations c
-    WHERE c.title = :external_conversation_id::TEXT
-    ORDER BY c.created_at ASC
-    LIMIT 1
+updated_binding AS (
+    UPDATE public.channel_conversations cc
+    SET
+        external_user_id = COALESCE(:external_user_id::TEXT, cc.external_user_id),
+        updated_at = NOW()
+    FROM selected_channel sc
+    WHERE cc.channel_id = sc.id
+      AND cc.external_conversation_id = :external_conversation_id::TEXT
+    RETURNING
+        cc.id,
+        cc.channel_id,
+        cc.conversation_id,
+        cc.external_conversation_id
 ),
 inserted_conversation AS (
     INSERT INTO public.conversations (
         org_id,
         created_by_user_id,
+        agent_id,
         title
     )
     SELECT
         sc.org_id,
         sc.created_by_user_id,
-        :external_conversation_id::TEXT
+        sc.default_agent_id,
+        NULL
     FROM selected_channel sc
-    WHERE NOT EXISTS (SELECT 1 FROM existing_conversation)
+    WHERE sc.default_agent_id IS NOT NULL
+      AND NOT EXISTS (SELECT 1 FROM updated_binding)
     RETURNING id
 ),
-resolved_conversation AS (
-    SELECT id FROM existing_conversation
+inserted_binding AS (
+    INSERT INTO public.channel_conversations (
+        channel_id,
+        conversation_id,
+        external_conversation_id,
+        external_user_id
+    )
+    SELECT
+        sc.id,
+        ic.id,
+        :external_conversation_id::TEXT,
+        :external_user_id::TEXT
+    FROM selected_channel sc
+    INNER JOIN inserted_conversation ic
+        ON TRUE
+    RETURNING
+        id,
+        channel_id,
+        conversation_id,
+        external_conversation_id
+),
+resolved_binding AS (
+    SELECT * FROM updated_binding
     UNION ALL
-    SELECT id FROM inserted_conversation
+    SELECT * FROM inserted_binding
+)
+SELECT
+    rb.id,
+    rb.channel_id,
+    rb.conversation_id,
+    rb.external_conversation_id,
+    c.agent_id
+FROM resolved_binding rb
+INNER JOIN public.conversations c
+    ON c.id = rb.conversation_id
+LIMIT 1;
+
+--: ChannelMessage()
+
+--! insert_channel_message (external_message_id?) : ChannelMessage
+WITH updated_binding AS (
+    UPDATE public.channel_conversations cc
+    SET
+        last_external_message_id = COALESCE(
+            :external_message_id::TEXT,
+            cc.last_external_message_id
+        ),
+        updated_at = NOW()
+    WHERE cc.id = :channel_conversation_id::UUID
+    RETURNING
+        cc.id,
+        cc.conversation_id,
+        cc.external_conversation_id
 ),
 inserted_message AS (
     INSERT INTO public.messages (
         conversation_id,
         role,
         content,
-        metadata_json
+        channel_conversation_id,
+        channel_message_direction,
+        channel_message_status,
+        external_message_id
     )
     SELECT
-        rc.id,
+        ub.conversation_id,
         CASE
-            WHEN :direction::TEXT = 'inbound' THEN 'user'::message_role
+            WHEN :direction::channel_message_direction = 'inbound' THEN 'user'::message_role
             ELSE 'assistant'::message_role
         END,
         :message_text::TEXT,
-        COALESCE(:metadata_json::JSONB, '{}'::JSONB)
-            || jsonb_build_object(
-                'channel', :channel::TEXT,
-                'direction', :direction::TEXT,
-                'external_conversation_id', :external_conversation_id::TEXT,
-                'external_user_id', :external_user_id::TEXT,
-                'external_message_id', :external_message_id::TEXT,
-                'status', :status::TEXT,
-                'updated_at', NOW()
-            )
-    FROM resolved_conversation rc
+        ub.id,
+        :direction::channel_message_direction,
+        :status::channel_message_status,
+        :external_message_id::TEXT
+    FROM updated_binding ub
     RETURNING
         id,
+        conversation_id,
+        channel_conversation_id,
+        channel_message_direction,
         content,
-        metadata_json,
+        channel_message_status,
         created_at
 )
 SELECT
-    m.id,
-    m.metadata_json ->> 'channel' AS channel,
-    m.metadata_json ->> 'direction' AS direction,
-    m.metadata_json ->> 'external_conversation_id' AS external_conversation_id,
-    m.content AS message_text,
-    m.metadata_json ->> 'status' AS status,
-    m.created_at,
-    COALESCE((m.metadata_json ->> 'updated_at')::TIMESTAMPTZ, m.created_at) AS updated_at
-FROM inserted_message m;
+    im.id,
+    im.conversation_id,
+    im.channel_conversation_id,
+    im.channel_message_direction AS direction,
+    ub.external_conversation_id,
+    im.content AS message_text,
+    im.channel_message_status AS status,
+    im.created_at
+FROM inserted_message im
+INNER JOIN updated_binding ub
+    ON ub.id = im.channel_conversation_id;
 
 --! update_channel_message_status : ChannelMessage
-UPDATE public.messages
+UPDATE public.messages m
 SET
-    metadata_json = CASE
-        WHEN :status::TEXT = 'processed' THEN
-            jsonb_set(
-                jsonb_set(
-                    jsonb_set(
-                        metadata_json,
-                        '{status}',
-                        to_jsonb(:status::TEXT),
-                        true
-                    ),
-                    '{processed_at}',
-                    to_jsonb(NOW()),
-                    true
-                ),
-                '{updated_at}',
-                to_jsonb(NOW()),
-                true
-            )
-        WHEN :status::TEXT = 'sent' THEN
-            jsonb_set(
-                jsonb_set(
-                    jsonb_set(
-                        metadata_json,
-                        '{status}',
-                        to_jsonb(:status::TEXT),
-                        true
-                    ),
-                    '{delivered_at}',
-                    to_jsonb(NOW()),
-                    true
-                ),
-                '{updated_at}',
-                to_jsonb(NOW()),
-                true
-            )
-        ELSE
-            jsonb_set(
-                jsonb_set(
-                    metadata_json,
-                    '{status}',
-                    to_jsonb(:status::TEXT),
-                    true
-                ),
-                '{updated_at}',
-                to_jsonb(NOW()),
-                true
-            )
-    END
-WHERE id = :id::UUID
+    channel_message_status = :status::channel_message_status
+FROM public.channel_conversations cc
+WHERE m.id = :id::UUID
+  AND cc.id = m.channel_conversation_id
 RETURNING
-    id,
-    metadata_json ->> 'channel' AS channel,
-    metadata_json ->> 'direction' AS direction,
-    metadata_json ->> 'external_conversation_id' AS external_conversation_id,
-    content AS message_text,
-    metadata_json ->> 'status' AS status,
-    created_at,
-    COALESCE((metadata_json ->> 'updated_at')::TIMESTAMPTZ, created_at) AS updated_at;
+    m.id,
+    m.conversation_id,
+    m.channel_conversation_id,
+    m.channel_message_direction AS direction,
+    cc.external_conversation_id,
+    m.content AS message_text,
+    m.channel_message_status AS status,
+    m.created_at;
 
 --! claim_next_channel_message : ChannelMessage
 WITH next_message AS (
-    SELECT id
-    FROM public.messages
-    WHERE (metadata_json ->> 'channel') = :channel::TEXT
-      AND (metadata_json ->> 'direction') = :direction::TEXT
-      AND (metadata_json ->> 'status') = :from_status::TEXT
-    ORDER BY created_at ASC
+    SELECT m.id
+    FROM public.messages m
+    INNER JOIN public.channel_conversations cc
+        ON cc.id = m.channel_conversation_id
+    INNER JOIN public.channels c
+        ON c.id = cc.channel_id
+    WHERE c.kind = :channel::channel_type
+      AND m.channel_message_direction = :direction::channel_message_direction
+      AND m.channel_message_status = :from_status::channel_message_status
+    ORDER BY m.created_at ASC
     LIMIT 1
-    FOR UPDATE SKIP LOCKED
+    FOR UPDATE OF m SKIP LOCKED
 )
-UPDATE public.messages
+UPDATE public.messages m
 SET
-    metadata_json = jsonb_set(
-        jsonb_set(
-            metadata_json,
-            '{status}',
-            to_jsonb(:to_status::TEXT),
-            true
-        ),
-        '{updated_at}',
-        to_jsonb(NOW()),
-        true
-    )
-WHERE id IN (SELECT id FROM next_message)
+    channel_message_status = :to_status::channel_message_status
+FROM public.channel_conversations cc
+WHERE m.id IN (SELECT id FROM next_message)
+  AND cc.id = m.channel_conversation_id
 RETURNING
-    id,
-    metadata_json ->> 'channel' AS channel,
-    metadata_json ->> 'direction' AS direction,
-    metadata_json ->> 'external_conversation_id' AS external_conversation_id,
-    content AS message_text,
-    metadata_json ->> 'status' AS status,
-    created_at,
-    COALESCE((metadata_json ->> 'updated_at')::TIMESTAMPTZ, created_at) AS updated_at;
+    m.id,
+    m.conversation_id,
+    m.channel_conversation_id,
+    m.channel_message_direction AS direction,
+    cc.external_conversation_id,
+    m.content AS message_text,
+    m.channel_message_status AS status,
+    m.created_at;
 
 --: ConversationMessage()
 
@@ -183,20 +196,16 @@ SELECT
     recent_messages.id,
     recent_messages.direction,
     recent_messages.message_text,
-    recent_messages.status,
     recent_messages.created_at
 FROM (
     SELECT
         m.id,
-        m.metadata_json ->> 'direction' AS direction,
+        m.channel_message_direction AS direction,
         m.content AS message_text,
-        m.metadata_json ->> 'status' AS status,
         m.created_at
     FROM public.messages m
-    INNER JOIN public.conversations c
-        ON c.id = m.conversation_id
-    WHERE (m.metadata_json ->> 'channel') = :channel::TEXT
-      AND c.title = :external_conversation_id::TEXT
+    WHERE m.conversation_id = :conversation_id::UUID
+      AND m.channel_message_direction IS NOT NULL
     ORDER BY m.created_at DESC
     LIMIT :message_limit::BIGINT
 ) AS recent_messages

@@ -3,9 +3,10 @@ use std::time::Duration;
 use crate::config::Config;
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
-    claim_next_channel_message, insert_channel_message, update_channel_message_status,
+    claim_next_channel_message, get_or_create_channel_conversation, insert_channel_message,
+    update_channel_message_status,
 };
-use serde_json::json;
+use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use teloxide::prelude::*;
 use teloxide::types::ChatId;
@@ -38,10 +39,6 @@ pub async fn run() -> anyhow::Result<()> {
             let chat_id = msg.chat.id.0.to_string();
             let external_user_id = msg.from.as_ref().map(|user| user.id.0.to_string());
             let external_message_id = Some(msg.id.0.to_string());
-            let metadata = json!({
-                "telegram_chat_id": msg.chat.id.0,
-                "telegram_message_id": msg.id.0,
-            });
 
             let client = match pool.get().await {
                 Ok(client) => client,
@@ -51,17 +48,37 @@ pub async fn run() -> anyhow::Result<()> {
                 }
             };
 
+            let channel_conversation = match get_or_create_channel_conversation()
+                .bind(&client, &ChannelType::telegram, &external_user_id, &chat_id)
+                .opt()
+                .await
+            {
+                Ok(Some(channel_conversation)) => channel_conversation,
+                Ok(None) => {
+                    warn!(
+                        chat_id = msg.chat.id.0,
+                        "no channel routing configured for inbound telegram message"
+                    );
+                    return respond(());
+                }
+                Err(err) => {
+                    warn!(
+                        chat_id = msg.chat.id.0,
+                        error = %err,
+                        "failed to resolve channel conversation"
+                    );
+                    return respond(());
+                }
+            };
+
             match insert_channel_message()
                 .bind(
                     &client,
-                    &"telegram",
-                    &chat_id,
-                    &"inbound",
-                    &text,
-                    &metadata,
-                    &external_user_id,
                     &external_message_id,
-                    &"pending",
+                    &channel_conversation.id,
+                    &ChannelMessageDirection::inbound,
+                    &text,
+                    &ChannelMessageStatus::pending,
                 )
                 .one()
                 .await
@@ -69,7 +86,7 @@ pub async fn run() -> anyhow::Result<()> {
                 Ok(message) => {
                     info!(
                         message_id = %message.id,
-                        conversation_id = message.external_conversation_id,
+                        conversation_id = %message.conversation_id,
                         "stored inbound telegram message"
                     );
                 }
@@ -102,7 +119,13 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
         };
 
         let next_message = match claim_next_channel_message()
-            .bind(&client, &"telegram", &"outbound", &"pending", &"processing")
+            .bind(
+                &client,
+                &ChannelType::telegram,
+                &ChannelMessageDirection::outbound,
+                &ChannelMessageStatus::pending,
+                &ChannelMessageStatus::processing,
+            )
             .opt()
             .await
         {
@@ -129,7 +152,7 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
                 );
 
                 let _ = update_channel_message_status()
-                    .bind(&client, &"failed", &message.id)
+                    .bind(&client, &ChannelMessageStatus::failed, &message.id)
                     .one()
                     .await;
 
@@ -142,9 +165,9 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             .await;
 
         let new_status = if send_result.is_ok() {
-            "sent"
+            ChannelMessageStatus::sent
         } else {
-            "failed"
+            ChannelMessageStatus::failed
         };
 
         if let Err(err) = send_result {
