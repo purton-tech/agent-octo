@@ -115,10 +115,22 @@ erDiagram
         resource_visibility visibility 
     }
 
+    channel_conversations {
+        uuid channel_id FK,UK 
+        uuid conversation_id FK,UK 
+        timestamp_with_time_zone created_at 
+        text external_conversation_id UK 
+        text external_user_id 
+        uuid id PK 
+        text last_external_message_id 
+        timestamp_with_time_zone updated_at 
+    }
+
     channels {
         text bot_token_secret_ref 
         timestamp_with_time_zone created_at 
         uuid created_by_user_id FK 
+        uuid default_agent_id FK 
         uuid id PK 
         channel_type kind 
         text name 
@@ -166,9 +178,17 @@ erDiagram
     }
 
     messages {
+        uuid channel_conversation_id FK 
+        uuid channel_conversation_id FK 
+        channel_message_direction channel_message_direction 
+        channel_message_direction channel_message_direction 
+        channel_message_status channel_message_status 
+        channel_message_status channel_message_status 
         text content 
         uuid conversation_id FK 
         timestamp_with_time_zone created_at 
+        text external_message_id 
+        text external_message_id 
         uuid id PK 
         jsonb metadata_json 
         message_role role 
@@ -199,7 +219,11 @@ erDiagram
     }
 
     agents }o--|| provider_connections : "default_connection_id"
+    channels }o--|| agents : "default_agent_id"
     conversations }o--|| agents : "agent_id"
+    channel_conversations }o--|| channels : "channel_id"
+    channel_conversations }o--|| conversations : "conversation_id"
+    messages }o--|| channel_conversations : "channel_conversation_id"
     messages }o--|| conversations : "conversation_id"
     integration_connections }o--|| integrations : "integration_id"
     provider_models }o--|| provider_connections : "connection_id"
