@@ -7,54 +7,62 @@ pub struct InsertChannelMessageParams<
     T3: crate::StringSql,
     T4: crate::StringSql,
     T5: crate::JsonSql,
+    T6: crate::StringSql,
+    T7: crate::StringSql,
+    T8: crate::StringSql,
 > {
-    pub channel: crate::types::ChannelType,
-    pub direction: crate::types::ChannelMessageDirection,
-    pub external_conversation_id: T1,
-    pub external_user_id: Option<T2>,
-    pub external_message_id: Option<T3>,
+    pub channel: T1,
+    pub external_conversation_id: T2,
+    pub direction: T3,
     pub message_text: T4,
-    pub status: crate::types::ChannelMessageStatus,
     pub metadata_json: T5,
-}
-#[derive(Clone, Copy, Debug)]
-pub struct UpdateChannelMessageStatusParams {
-    pub status: crate::types::ChannelMessageStatus,
-    pub id: i64,
-}
-#[derive(Clone, Copy, Debug)]
-pub struct ClaimNextChannelMessageParams {
-    pub channel: crate::types::ChannelType,
-    pub direction: crate::types::ChannelMessageDirection,
-    pub from_status: crate::types::ChannelMessageStatus,
-    pub to_status: crate::types::ChannelMessageStatus,
+    pub external_user_id: Option<T6>,
+    pub external_message_id: Option<T7>,
+    pub status: T8,
 }
 #[derive(Debug)]
-pub struct ListConversationMessagesParams<T1: crate::StringSql> {
-    pub channel: crate::types::ChannelType,
-    pub external_conversation_id: T1,
+pub struct UpdateChannelMessageStatusParams<T1: crate::StringSql> {
+    pub status: T1,
+    pub id: uuid::Uuid,
+}
+#[derive(Debug)]
+pub struct ClaimNextChannelMessageParams<
+    T1: crate::StringSql,
+    T2: crate::StringSql,
+    T3: crate::StringSql,
+    T4: crate::StringSql,
+> {
+    pub channel: T1,
+    pub direction: T2,
+    pub from_status: T3,
+    pub to_status: T4,
+}
+#[derive(Debug)]
+pub struct ListConversationMessagesParams<T1: crate::StringSql, T2: crate::StringSql> {
+    pub channel: T1,
+    pub external_conversation_id: T2,
     pub message_limit: i64,
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct ChannelMessage {
-    pub id: i64,
-    pub channel: crate::types::ChannelType,
-    pub direction: crate::types::ChannelMessageDirection,
+    pub id: uuid::Uuid,
+    pub channel: String,
+    pub direction: String,
     pub external_conversation_id: String,
     pub message_text: String,
-    pub status: crate::types::ChannelMessageStatus,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
+    pub updated_at: chrono::DateTime<chrono::FixedOffset>,
 }
 pub struct ChannelMessageBorrowed<'a> {
-    pub id: i64,
-    pub channel: crate::types::ChannelType,
-    pub direction: crate::types::ChannelMessageDirection,
+    pub id: uuid::Uuid,
+    pub channel: &'a str,
+    pub direction: &'a str,
     pub external_conversation_id: &'a str,
     pub message_text: &'a str,
-    pub status: crate::types::ChannelMessageStatus,
-    pub created_at: chrono::NaiveDateTime,
-    pub updated_at: chrono::NaiveDateTime,
+    pub status: &'a str,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
+    pub updated_at: chrono::DateTime<chrono::FixedOffset>,
 }
 impl<'a> From<ChannelMessageBorrowed<'a>> for ChannelMessage {
     fn from(
@@ -71,11 +79,11 @@ impl<'a> From<ChannelMessageBorrowed<'a>> for ChannelMessage {
     ) -> Self {
         Self {
             id,
-            channel,
-            direction,
+            channel: channel.into(),
+            direction: direction.into(),
             external_conversation_id: external_conversation_id.into(),
             message_text: message_text.into(),
-            status,
+            status: status.into(),
             created_at,
             updated_at,
         }
@@ -83,18 +91,18 @@ impl<'a> From<ChannelMessageBorrowed<'a>> for ChannelMessage {
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct ConversationMessage {
-    pub id: i64,
-    pub direction: crate::types::ChannelMessageDirection,
+    pub id: uuid::Uuid,
+    pub direction: String,
     pub message_text: String,
-    pub status: crate::types::ChannelMessageStatus,
-    pub created_at: chrono::NaiveDateTime,
+    pub status: String,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 pub struct ConversationMessageBorrowed<'a> {
-    pub id: i64,
-    pub direction: crate::types::ChannelMessageDirection,
+    pub id: uuid::Uuid,
+    pub direction: &'a str,
     pub message_text: &'a str,
-    pub status: crate::types::ChannelMessageStatus,
-    pub created_at: chrono::NaiveDateTime,
+    pub status: &'a str,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
 }
 impl<'a> From<ConversationMessageBorrowed<'a>> for ConversationMessage {
     fn from(
@@ -108,9 +116,9 @@ impl<'a> From<ConversationMessageBorrowed<'a>> for ConversationMessage {
     ) -> Self {
         Self {
             id,
-            direction,
+            direction: direction.into(),
             message_text: message_text.into(),
-            status,
+            status: status.into(),
             created_at,
         }
     }
@@ -255,7 +263,7 @@ where
 pub struct InsertChannelMessageStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn insert_channel_message() -> InsertChannelMessageStmt {
     InsertChannelMessageStmt(
-        "INSERT INTO channel_messages ( channel, direction, external_conversation_id, external_user_id, external_message_id, message_text, status, metadata_json ) VALUES ( $1::channel_type, $2::channel_message_direction, $3::TEXT, $4::TEXT, $5::TEXT, $6::TEXT, $7::channel_message_status, $8::JSONB ) RETURNING id, channel, direction, external_conversation_id, message_text, status, created_at, updated_at",
+        "WITH selected_channel AS ( SELECT c.org_id, c.created_by_user_id FROM public.channels c WHERE c.kind::TEXT = $1::TEXT ORDER BY c.created_at ASC LIMIT 1 ), existing_conversation AS ( SELECT c.id FROM public.conversations c WHERE c.title = $2::TEXT ORDER BY c.created_at ASC LIMIT 1 ), inserted_conversation AS ( INSERT INTO public.conversations ( org_id, created_by_user_id, title ) SELECT sc.org_id, sc.created_by_user_id, $2::TEXT FROM selected_channel sc WHERE NOT EXISTS (SELECT 1 FROM existing_conversation) RETURNING id ), resolved_conversation AS ( SELECT id FROM existing_conversation UNION ALL SELECT id FROM inserted_conversation ), inserted_message AS ( INSERT INTO public.messages ( conversation_id, role, content, metadata_json ) SELECT rc.id, CASE WHEN $3::TEXT = 'inbound' THEN 'user'::message_role ELSE 'assistant'::message_role END, $4::TEXT, COALESCE($5::JSONB, '{}'::JSONB) || jsonb_build_object( 'channel', $1::TEXT, 'direction', $3::TEXT, 'external_conversation_id', $2::TEXT, 'external_user_id', $6::TEXT, 'external_message_id', $7::TEXT, 'status', $8::TEXT, 'updated_at', NOW() ) FROM resolved_conversation rc RETURNING id, content, metadata_json, created_at ) SELECT m.id, m.metadata_json ->> 'channel' AS channel, m.metadata_json ->> 'direction' AS direction, m.metadata_json ->> 'external_conversation_id' AS external_conversation_id, m.content AS message_text, m.metadata_json ->> 'status' AS status, m.created_at, COALESCE((m.metadata_json ->> 'updated_at')::TIMESTAMPTZ, m.created_at) AS updated_at FROM inserted_message m",
         None,
     )
 }
@@ -277,29 +285,32 @@ impl InsertChannelMessageStmt {
         T3: crate::StringSql,
         T4: crate::StringSql,
         T5: crate::JsonSql,
+        T6: crate::StringSql,
+        T7: crate::StringSql,
+        T8: crate::StringSql,
     >(
         &'s self,
         client: &'c C,
-        channel: &'a crate::types::ChannelType,
-        direction: &'a crate::types::ChannelMessageDirection,
-        external_conversation_id: &'a T1,
-        external_user_id: &'a Option<T2>,
-        external_message_id: &'a Option<T3>,
+        channel: &'a T1,
+        external_conversation_id: &'a T2,
+        direction: &'a T3,
         message_text: &'a T4,
-        status: &'a crate::types::ChannelMessageStatus,
         metadata_json: &'a T5,
+        external_user_id: &'a Option<T6>,
+        external_message_id: &'a Option<T7>,
+        status: &'a T8,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 8> {
         ChannelMessageQuery {
             client,
             params: [
                 channel,
-                direction,
                 external_conversation_id,
+                direction,
+                message_text,
+                metadata_json,
                 external_user_id,
                 external_message_id,
-                message_text,
                 status,
-                metadata_json,
             ],
             query: self.0,
             cached: self.1.as_ref(),
@@ -331,12 +342,15 @@ impl<
         T3: crate::StringSql,
         T4: crate::StringSql,
         T5: crate::JsonSql,
+        T6: crate::StringSql,
+        T7: crate::StringSql,
+        T8: crate::StringSql,
     >
     crate::client::async_::Params<
         'c,
         'a,
         's,
-        InsertChannelMessageParams<T1, T2, T3, T4, T5>,
+        InsertChannelMessageParams<T1, T2, T3, T4, T5, T6, T7, T8>,
         ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 8>,
         C,
     > for InsertChannelMessageStmt
@@ -344,25 +358,25 @@ impl<
     fn params(
         &'s self,
         client: &'c C,
-        params: &'a InsertChannelMessageParams<T1, T2, T3, T4, T5>,
+        params: &'a InsertChannelMessageParams<T1, T2, T3, T4, T5, T6, T7, T8>,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 8> {
         self.bind(
             client,
             &params.channel,
-            &params.direction,
             &params.external_conversation_id,
+            &params.direction,
+            &params.message_text,
+            &params.metadata_json,
             &params.external_user_id,
             &params.external_message_id,
-            &params.message_text,
             &params.status,
-            &params.metadata_json,
         )
     }
 }
 pub struct UpdateChannelMessageStatusStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn update_channel_message_status() -> UpdateChannelMessageStatusStmt {
     UpdateChannelMessageStatusStmt(
-        "UPDATE channel_messages SET status = $1::channel_message_status, processed_at = CASE WHEN $1::channel_message_status = 'processed' THEN NOW() ELSE processed_at END, delivered_at = CASE WHEN $1::channel_message_status = 'sent' THEN NOW() ELSE delivered_at END, updated_at = NOW() WHERE id = $2::BIGINT RETURNING id, channel, direction, external_conversation_id, message_text, status, created_at, updated_at",
+        "UPDATE public.messages SET metadata_json = CASE WHEN $1::TEXT = 'processed' THEN jsonb_set( jsonb_set( jsonb_set( metadata_json, '{status}', to_jsonb($1::TEXT), true ), '{processed_at}', to_jsonb(NOW()), true ), '{updated_at}', to_jsonb(NOW()), true ) WHEN $1::TEXT = 'sent' THEN jsonb_set( jsonb_set( jsonb_set( metadata_json, '{status}', to_jsonb($1::TEXT), true ), '{delivered_at}', to_jsonb(NOW()), true ), '{updated_at}', to_jsonb(NOW()), true ) ELSE jsonb_set( jsonb_set( metadata_json, '{status}', to_jsonb($1::TEXT), true ), '{updated_at}', to_jsonb(NOW()), true ) END WHERE id = $2::UUID RETURNING id, metadata_json ->> 'channel' AS channel, metadata_json ->> 'direction' AS direction, metadata_json ->> 'external_conversation_id' AS external_conversation_id, content AS message_text, metadata_json ->> 'status' AS status, created_at, COALESCE((metadata_json ->> 'updated_at')::TIMESTAMPTZ, created_at) AS updated_at",
         None,
     )
 }
@@ -374,11 +388,11 @@ impl UpdateChannelMessageStatusStmt {
         self.1 = Some(client.prepare(self.0).await?);
         Ok(self)
     }
-    pub fn bind<'c, 'a, 's, C: GenericClient>(
+    pub fn bind<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>(
         &'s self,
         client: &'c C,
-        status: &'a crate::types::ChannelMessageStatus,
-        id: &'a i64,
+        status: &'a T1,
+        id: &'a uuid::Uuid,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 2> {
         ChannelMessageQuery {
             client,
@@ -403,12 +417,12 @@ impl UpdateChannelMessageStatusStmt {
         }
     }
 }
-impl<'c, 'a, 's, C: GenericClient>
+impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
     crate::client::async_::Params<
         'c,
         'a,
         's,
-        UpdateChannelMessageStatusParams,
+        UpdateChannelMessageStatusParams<T1>,
         ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 2>,
         C,
     > for UpdateChannelMessageStatusStmt
@@ -416,7 +430,7 @@ impl<'c, 'a, 's, C: GenericClient>
     fn params(
         &'s self,
         client: &'c C,
-        params: &'a UpdateChannelMessageStatusParams,
+        params: &'a UpdateChannelMessageStatusParams<T1>,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 2> {
         self.bind(client, &params.status, &params.id)
     }
@@ -424,7 +438,7 @@ impl<'c, 'a, 's, C: GenericClient>
 pub struct ClaimNextChannelMessageStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn claim_next_channel_message() -> ClaimNextChannelMessageStmt {
     ClaimNextChannelMessageStmt(
-        "WITH next_message AS ( SELECT id FROM channel_messages WHERE channel = $1::channel_type AND direction = $2::channel_message_direction AND status = $3::channel_message_status ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) UPDATE channel_messages SET status = $4::channel_message_status, updated_at = NOW() WHERE id IN (SELECT id FROM next_message) RETURNING id, channel, direction, external_conversation_id, message_text, status, created_at, updated_at",
+        "WITH next_message AS ( SELECT id FROM public.messages WHERE (metadata_json ->> 'channel') = $1::TEXT AND (metadata_json ->> 'direction') = $2::TEXT AND (metadata_json ->> 'status') = $3::TEXT ORDER BY created_at ASC LIMIT 1 FOR UPDATE SKIP LOCKED ) UPDATE public.messages SET metadata_json = jsonb_set( jsonb_set( metadata_json, '{status}', to_jsonb($4::TEXT), true ), '{updated_at}', to_jsonb(NOW()), true ) WHERE id IN (SELECT id FROM next_message) RETURNING id, metadata_json ->> 'channel' AS channel, metadata_json ->> 'direction' AS direction, metadata_json ->> 'external_conversation_id' AS external_conversation_id, content AS message_text, metadata_json ->> 'status' AS status, created_at, COALESCE((metadata_json ->> 'updated_at')::TIMESTAMPTZ, created_at) AS updated_at",
         None,
     )
 }
@@ -436,13 +450,22 @@ impl ClaimNextChannelMessageStmt {
         self.1 = Some(client.prepare(self.0).await?);
         Ok(self)
     }
-    pub fn bind<'c, 'a, 's, C: GenericClient>(
+    pub fn bind<
+        'c,
+        'a,
+        's,
+        C: GenericClient,
+        T1: crate::StringSql,
+        T2: crate::StringSql,
+        T3: crate::StringSql,
+        T4: crate::StringSql,
+    >(
         &'s self,
         client: &'c C,
-        channel: &'a crate::types::ChannelType,
-        direction: &'a crate::types::ChannelMessageDirection,
-        from_status: &'a crate::types::ChannelMessageStatus,
-        to_status: &'a crate::types::ChannelMessageStatus,
+        channel: &'a T1,
+        direction: &'a T2,
+        from_status: &'a T3,
+        to_status: &'a T4,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 4> {
         ChannelMessageQuery {
             client,
@@ -467,12 +490,21 @@ impl ClaimNextChannelMessageStmt {
         }
     }
 }
-impl<'c, 'a, 's, C: GenericClient>
+impl<
+        'c,
+        'a,
+        's,
+        C: GenericClient,
+        T1: crate::StringSql,
+        T2: crate::StringSql,
+        T3: crate::StringSql,
+        T4: crate::StringSql,
+    >
     crate::client::async_::Params<
         'c,
         'a,
         's,
-        ClaimNextChannelMessageParams,
+        ClaimNextChannelMessageParams<T1, T2, T3, T4>,
         ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 4>,
         C,
     > for ClaimNextChannelMessageStmt
@@ -480,7 +512,7 @@ impl<'c, 'a, 's, C: GenericClient>
     fn params(
         &'s self,
         client: &'c C,
-        params: &'a ClaimNextChannelMessageParams,
+        params: &'a ClaimNextChannelMessageParams<T1, T2, T3, T4>,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 4> {
         self.bind(
             client,
@@ -494,7 +526,7 @@ impl<'c, 'a, 's, C: GenericClient>
 pub struct ListConversationMessagesStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn list_conversation_messages() -> ListConversationMessagesStmt {
     ListConversationMessagesStmt(
-        "SELECT id, direction, message_text, status, created_at FROM ( SELECT id, direction, message_text, status, created_at FROM channel_messages WHERE channel = $1::channel_type AND external_conversation_id = $2::TEXT ORDER BY created_at DESC LIMIT $3::BIGINT ) AS recent_messages ORDER BY created_at ASC",
+        "SELECT recent_messages.id, recent_messages.direction, recent_messages.message_text, recent_messages.status, recent_messages.created_at FROM ( SELECT m.id, m.metadata_json ->> 'direction' AS direction, m.content AS message_text, m.metadata_json ->> 'status' AS status, m.created_at FROM public.messages m INNER JOIN public.conversations c ON c.id = m.conversation_id WHERE (m.metadata_json ->> 'channel') = $1::TEXT AND c.title = $2::TEXT ORDER BY m.created_at DESC LIMIT $3::BIGINT ) AS recent_messages ORDER BY recent_messages.created_at ASC",
         None,
     )
 }
@@ -506,11 +538,11 @@ impl ListConversationMessagesStmt {
         self.1 = Some(client.prepare(self.0).await?);
         Ok(self)
     }
-    pub fn bind<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>(
+    pub fn bind<'c, 'a, 's, C: GenericClient, T1: crate::StringSql, T2: crate::StringSql>(
         &'s self,
         client: &'c C,
-        channel: &'a crate::types::ChannelType,
-        external_conversation_id: &'a T1,
+        channel: &'a T1,
+        external_conversation_id: &'a T2,
         message_limit: &'a i64,
     ) -> ConversationMessageQuery<'c, 'a, 's, C, ConversationMessage, 3> {
         ConversationMessageQuery {
@@ -533,12 +565,12 @@ impl ListConversationMessagesStmt {
         }
     }
 }
-impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
+impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql, T2: crate::StringSql>
     crate::client::async_::Params<
         'c,
         'a,
         's,
-        ListConversationMessagesParams<T1>,
+        ListConversationMessagesParams<T1, T2>,
         ConversationMessageQuery<'c, 'a, 's, C, ConversationMessage, 3>,
         C,
     > for ListConversationMessagesStmt
@@ -546,7 +578,7 @@ impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
     fn params(
         &'s self,
         client: &'c C,
-        params: &'a ListConversationMessagesParams<T1>,
+        params: &'a ListConversationMessagesParams<T1, T2>,
     ) -> ConversationMessageQuery<'c, 'a, 's, C, ConversationMessage, 3> {
         self.bind(
             client,

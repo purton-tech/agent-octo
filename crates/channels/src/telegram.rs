@@ -5,7 +5,6 @@ use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, update_channel_message_status,
 };
-use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use serde_json::json;
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use teloxide::prelude::*;
@@ -55,21 +54,21 @@ pub async fn run() -> anyhow::Result<()> {
             match insert_channel_message()
                 .bind(
                     &client,
-                    &ChannelType::telegram,
-                    &ChannelMessageDirection::inbound,
+                    &"telegram",
                     &chat_id,
+                    &"inbound",
+                    &text,
+                    &metadata,
                     &external_user_id,
                     &external_message_id,
-                    &text,
-                    &ChannelMessageStatus::pending,
-                    &metadata,
+                    &"pending",
                 )
                 .one()
                 .await
             {
                 Ok(message) => {
                     info!(
-                        message_id = message.id,
+                        message_id = %message.id,
                         conversation_id = message.external_conversation_id,
                         "stored inbound telegram message"
                     );
@@ -103,13 +102,7 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
         };
 
         let next_message = match claim_next_channel_message()
-            .bind(
-                &client,
-                &ChannelType::telegram,
-                &ChannelMessageDirection::outbound,
-                &ChannelMessageStatus::pending,
-                &ChannelMessageStatus::processing,
-            )
+            .bind(&client, &"telegram", &"outbound", &"pending", &"processing")
             .opt()
             .await
         {
@@ -130,13 +123,13 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             Ok(chat_id) => chat_id,
             Err(err) => {
                 warn!(
-                    message_id = message.id,
+                    message_id = %message.id,
                     error = %err,
                     "invalid telegram chat id"
                 );
 
                 let _ = update_channel_message_status()
-                    .bind(&client, &ChannelMessageStatus::failed, &message.id)
+                    .bind(&client, &"failed", &message.id)
                     .one()
                     .await;
 
@@ -149,20 +142,20 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             .await;
 
         let new_status = if send_result.is_ok() {
-            ChannelMessageStatus::sent
+            "sent"
         } else {
-            ChannelMessageStatus::failed
+            "failed"
         };
 
         if let Err(err) = send_result {
             warn!(
-                message_id = message.id,
+                message_id = %message.id,
                 chat_id,
                 error = %err,
                 "failed to send telegram message"
             );
         } else {
-            info!(message_id = message.id, chat_id, "sent telegram reply");
+            info!(message_id = %message.id, chat_id, "sent telegram reply");
         }
 
         if let Err(err) = update_channel_message_status()
@@ -171,7 +164,7 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             .await
         {
             warn!(
-                message_id = message.id,
+                message_id = %message.id,
                 error = %err,
                 "failed to update telegram message status"
             );
@@ -197,8 +190,7 @@ async fn watch_outbound_realtime(config: Config, outbound_notify: std::sync::Arc
         .channel("telegram-outbound")
         .on_postgres_changes(
             PostgresChangesEvent::Insert,
-            PostgresChangesFilter::new("public", "channel_messages")
-                .with_filter("direction=eq.outbound"),
+            PostgresChangesFilter::new("public", "messages"),
             move |_payload| {
                 outbound_notify.notify_one();
             },

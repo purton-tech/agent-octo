@@ -7,7 +7,6 @@ use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
     update_channel_message_status,
 };
-use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use rig::client::ProviderClient;
 use rig::completion::{Chat, Message as RigMessage};
 use rig::providers::openai::Client;
@@ -64,13 +63,7 @@ async fn main() -> anyhow::Result<()> {
         };
 
         let Some(inbound_message) = claim_next_channel_message()
-            .bind(
-                &client,
-                &ChannelType::telegram,
-                &ChannelMessageDirection::inbound,
-                &ChannelMessageStatus::pending,
-                &ChannelMessageStatus::processing,
-            )
+            .bind(&client, &"telegram", &"inbound", &"pending", &"processing")
             .opt()
             .await?
         else {
@@ -81,7 +74,7 @@ async fn main() -> anyhow::Result<()> {
         let conversation_rows = list_conversation_messages()
             .bind(
                 &client,
-                &ChannelType::telegram,
+                &"telegram",
                 &inbound_message.external_conversation_id,
                 &MAX_HISTORY_MESSAGES,
             )
@@ -91,38 +84,39 @@ async fn main() -> anyhow::Result<()> {
         let history = conversation_rows
             .into_iter()
             .filter(|message| message.id != inbound_message.id)
-            .map(|message| match message.direction {
-                ChannelMessageDirection::inbound => RigMessage::user(message.message_text),
-                ChannelMessageDirection::outbound => RigMessage::assistant(message.message_text),
+            .map(|message| match message.direction.as_str() {
+                "inbound" => RigMessage::user(message.message_text),
+                "outbound" => RigMessage::assistant(message.message_text),
+                _ => RigMessage::user(message.message_text),
             })
             .collect::<Vec<_>>();
 
         let (reply, inbound_status) = match agent.chat(&inbound_message.message_text, history).await
         {
-            Ok(reply) => (reply, ChannelMessageStatus::processed),
+            Ok(reply) => (reply, "processed"),
             Err(err) => {
                 warn!(
-                    message_id = inbound_message.id,
+                    message_id = %inbound_message.id,
                     error = %err,
                     "model request failed"
                 );
-                (format!("Model error: {err}"), ChannelMessageStatus::failed)
+                (format!("Model error: {err}"), "failed")
             }
         };
 
         insert_channel_message()
             .bind(
                 &client,
-                &ChannelType::telegram,
-                &ChannelMessageDirection::outbound,
+                &"telegram",
                 &inbound_message.external_conversation_id,
-                &Option::<String>::None,
-                &Option::<String>::None,
+                &"outbound",
                 &reply,
-                &ChannelMessageStatus::pending,
                 &json!({
                     "source_message_id": inbound_message.id,
                 }),
+                &Option::<String>::None,
+                &Option::<String>::None,
+                &"pending",
             )
             .one()
             .await?;
@@ -133,7 +127,7 @@ async fn main() -> anyhow::Result<()> {
             .await?;
 
         info!(
-            inbound_message_id = inbound_message.id,
+            inbound_message_id = %inbound_message.id,
             conversation_id = inbound_message.external_conversation_id,
             "processed inbound message"
         );
@@ -158,8 +152,7 @@ async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
         .channel("agent-inbound")
         .on_postgres_changes(
             PostgresChangesEvent::Insert,
-            PostgresChangesFilter::new("public", "channel_messages")
-                .with_filter("direction=eq.inbound"),
+            PostgresChangesFilter::new("public", "messages"),
             move |_payload| {
                 inbound_notify.notify_one();
             },
