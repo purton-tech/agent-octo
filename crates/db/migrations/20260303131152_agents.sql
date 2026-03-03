@@ -66,7 +66,7 @@ CREATE POLICY agents_select
 ON public.agents
 FOR SELECT
 USING (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         visibility = 'org'
         OR created_by_user_id = auth.uid()
@@ -78,7 +78,7 @@ CREATE POLICY agents_insert
 ON public.agents
 FOR INSERT
 WITH CHECK (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND created_by_user_id = auth.uid()
 );
 
@@ -89,17 +89,17 @@ CREATE POLICY agents_update
 ON public.agents
 FOR UPDATE
 USING (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         (visibility = 'private' AND created_by_user_id = auth.uid())
-        OR (visibility = 'org' AND is_org_admin(org_id))
+        OR (visibility = 'org' AND org.is_org_admin(org_id))
     )
 )
 WITH CHECK (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         (visibility = 'private' AND created_by_user_id = auth.uid())
-        OR (visibility = 'org' AND is_org_admin(org_id))
+        OR (visibility = 'org' AND org.is_org_admin(org_id))
     )
 );
 
@@ -110,10 +110,10 @@ CREATE POLICY agents_delete
 ON public.agents
 FOR DELETE
 USING (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         (visibility = 'private' AND created_by_user_id = auth.uid())
-        OR (visibility = 'org' AND is_org_admin(org_id))
+        OR (visibility = 'org' AND org.is_org_admin(org_id))
     )
 );
 

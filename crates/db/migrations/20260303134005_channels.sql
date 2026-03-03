@@ -13,6 +13,13 @@
 -- Note:
 --   - Routing a channel to an agent is handled in a separate join table migration.
 
+CREATE TYPE channel_type AS ENUM (
+    'telegram'
+);
+
+COMMENT ON TYPE channel_type IS
+'Supported external channel integration types.';
+
 CREATE TABLE public.channels (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
 
@@ -59,7 +66,7 @@ CREATE POLICY channels_select
 ON public.channels
 FOR SELECT
 USING (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         visibility = 'org'
         OR created_by_user_id = auth.uid()
@@ -71,7 +78,7 @@ CREATE POLICY channels_insert
 ON public.channels
 FOR INSERT
 WITH CHECK (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND created_by_user_id = auth.uid()
 );
 
@@ -82,17 +89,17 @@ CREATE POLICY channels_update
 ON public.channels
 FOR UPDATE
 USING (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         (visibility = 'private' AND created_by_user_id = auth.uid())
-        OR (visibility = 'org' AND is_org_admin(org_id))
+        OR (visibility = 'org' AND org.is_org_admin(org_id))
     )
 )
 WITH CHECK (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         (visibility = 'private' AND created_by_user_id = auth.uid())
-        OR (visibility = 'org' AND is_org_admin(org_id))
+        OR (visibility = 'org' AND org.is_org_admin(org_id))
     )
 );
 
@@ -103,10 +110,10 @@ CREATE POLICY channels_delete
 ON public.channels
 FOR DELETE
 USING (
-    is_org_member(org_id)
+    org.is_org_member(org_id)
     AND (
         (visibility = 'private' AND created_by_user_id = auth.uid())
-        OR (visibility = 'org' AND is_org_admin(org_id))
+        OR (visibility = 'org' AND org.is_org_admin(org_id))
     )
 );
 
@@ -117,3 +124,4 @@ DROP POLICY IF EXISTS channels_insert ON public.channels;
 DROP POLICY IF EXISTS channels_select ON public.channels;
 
 DROP TABLE IF EXISTS public.channels;
+DROP TYPE IF EXISTS channel_type;

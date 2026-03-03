@@ -66,26 +66,26 @@ ALTER TABLE public.provider_models ENABLE ROW LEVEL SECURITY;
 CREATE POLICY provider_connections_select_member
 ON public.provider_connections
 FOR SELECT
-USING (is_org_member(org_id));
+USING (org.is_org_member(org_id));
 
 CREATE POLICY provider_connections_insert_admin
 ON public.provider_connections
 FOR INSERT
 WITH CHECK (
-    is_org_admin(org_id)
+    org.is_org_admin(org_id)
     AND created_by_user_id = auth.uid()
 );
 
 CREATE POLICY provider_connections_update_admin
 ON public.provider_connections
 FOR UPDATE
-USING (is_org_admin(org_id))
-WITH CHECK (is_org_admin(org_id));
+USING (org.is_org_admin(org_id))
+WITH CHECK (org.is_org_admin(org_id));
 
 CREATE POLICY provider_connections_delete_admin
 ON public.provider_connections
 FOR DELETE
-USING (is_org_admin(org_id));
+USING (org.is_org_admin(org_id));
 
 -- provider_models: access derived from owning connection's org_id
 CREATE POLICY provider_models_select_member
@@ -96,7 +96,7 @@ USING (
         SELECT 1
         FROM public.provider_connections c
         WHERE c.id = connection_id
-          AND is_org_member(c.org_id)
+          AND org.is_org_member(c.org_id)
     )
 );
 
@@ -108,7 +108,7 @@ WITH CHECK (
         SELECT 1
         FROM public.provider_connections c
         WHERE c.id = connection_id
-          AND is_org_admin(c.org_id)
+          AND org.is_org_admin(c.org_id)
     )
 );
 
@@ -120,7 +120,7 @@ USING (
         SELECT 1
         FROM public.provider_connections c
         WHERE c.id = connection_id
-          AND is_org_admin(c.org_id)
+          AND org.is_org_admin(c.org_id)
     )
 )
 WITH CHECK (
@@ -128,7 +128,7 @@ WITH CHECK (
         SELECT 1
         FROM public.provider_connections c
         WHERE c.id = connection_id
-          AND is_org_admin(c.org_id)
+          AND org.is_org_admin(c.org_id)
     )
 );
 
@@ -140,7 +140,7 @@ USING (
         SELECT 1
         FROM public.provider_connections c
         WHERE c.id = connection_id
-          AND is_org_admin(c.org_id)
+          AND org.is_org_admin(c.org_id)
     )
 );
 
