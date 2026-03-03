@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::time::Duration;
 
 use agent_runtime::config::Config;
 use agent_runtime::{build_agent, build_system_prompt};
@@ -52,15 +51,11 @@ async fn main() -> anyhow::Result<()> {
         inbound_notify.clone(),
     ));
 
+    // Long-lived worker loop: wait for inbound work, claim one message, process it,
+    // then repeat. This stays event-driven and lets the process handle messages
+    // continuously until Kubernetes or the runtime stops it.
     loop {
-        let client = match pool.get().await {
-            Ok(client) => client,
-            Err(err) => {
-                warn!(error = %err, "failed to get database connection");
-                tokio::time::sleep(Duration::from_millis(500)).await;
-                continue;
-            }
-        };
+        let client = pool.get().await?;
 
         let Some(inbound_message) = claim_next_channel_message()
             .bind(
@@ -73,7 +68,9 @@ async fn main() -> anyhow::Result<()> {
             .opt()
             .await?
         else {
-            wait_for_work(&inbound_notify).await;
+            // No pending inbound messages right now, so block until realtime tells
+            // us a new message row was inserted.
+            inbound_notify.notified().await;
             continue;
         };
 
@@ -168,12 +165,5 @@ async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
     match channel {
         Ok(_channel) => std::future::pending::<()>().await,
         Err(err) => warn!(error = %err, "failed to subscribe to inbound realtime"),
-    }
-}
-
-async fn wait_for_work(notify: &Notify) {
-    tokio::select! {
-        _ = notify.notified() => {}
-        _ = tokio::time::sleep(Duration::from_secs(5)) => {}
     }
 }
