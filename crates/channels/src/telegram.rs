@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::config::Config;
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
@@ -108,13 +106,15 @@ pub async fn run() -> anyhow::Result<()> {
 }
 
 async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::sync::Arc<Notify>) {
+    // Long-lived worker loop: claim one pending outbound message, deliver it,
+    // then repeat. If there is no work, block on realtime until a new message
+    // is inserted instead of busy polling.
     loop {
         let client = match pool.get().await {
             Ok(client) => client,
             Err(err) => {
                 warn!(error = %err, "failed to get database connection");
-                tokio::time::sleep(Duration::from_millis(500)).await;
-                continue;
+                return;
             }
         };
 
@@ -132,13 +132,14 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             Ok(message) => message,
             Err(err) => {
                 warn!(error = %err, "failed to claim outbound telegram message");
-                tokio::time::sleep(Duration::from_millis(500)).await;
-                continue;
+                return;
             }
         };
 
         let Some(message) = next_message else {
-            wait_for_work(&outbound_notify).await;
+            // No pending outbound messages right now, so wait for realtime to
+            // signal that a new outbound row was inserted.
+            outbound_notify.notified().await;
             continue;
         };
 
@@ -230,12 +231,5 @@ async fn watch_outbound_realtime(config: Config, outbound_notify: std::sync::Arc
     match channel {
         Ok(_channel) => std::future::pending::<()>().await,
         Err(err) => warn!(error = %err, "failed to subscribe to outbound realtime"),
-    }
-}
-
-async fn wait_for_work(notify: &Notify) {
-    tokio::select! {
-        _ = notify.notified() => {}
-        _ = tokio::time::sleep(Duration::from_secs(5)) => {}
     }
 }
