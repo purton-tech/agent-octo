@@ -1,223 +1,103 @@
-## The Database
+## Database
 
-We use 2 main tools to manage the database
+This crate owns the application database schema and generated query layer.
 
-- `dbmate` For schema migrations
-- `cornucopia` for generating rust code from `sql` files.
-- `just -f crates/db/Justfile db-diagram` add schema diagrams to REDME.md
+We use:
 
-## Database Schemas
+- `dbmate` for schema migrations in [`migrations/`](migrations/)
+- `clorinde` for generating typed Rust query code from SQL files in [`queries/`](queries/)
+- `just -f crates/db/Justfile db-diagram` to refresh schema diagrams in this file from a live database
 
-Run `just -f crates/db/Justfile db-diagram` to refresh the diagrams.
+The diagram task expects `DATABASE_URL` to point at a database with the current migrations applied.
+
+## Current Shape
+
+The database is currently split across three schemas:
+
+- `auth`: authentication identities and sessions
+- `org`: multi-tenant organization data, membership rules, invitations, and helper functions used by RLS
+- `public`: product tables used by the application
+
+## Main Tables
+
+The key tables today are:
+
+- `auth.users`
+- `auth.sessions`
+- `org.orgs`
+- `org.org_memberships`
+- `org.org_invitations`
+- `public.provider_connections`
+- `public.provider_models`
+- `public.agents`
+- `public.conversations`
+- `public.messages`
+- `public.channels`
+- `public.integrations`
+- `public.integration_connections`
+
+The `public` schema also contains shared enum types such as `resource_visibility`, `message_role`, `channel_type`, and `integration_auth_type`.
+
+## Schema Diagrams
+
+Run `just -f crates/db/Justfile db-diagram` to replace the generated diagrams below with fresh output from the current database.
 
 <!-- schemas-start -->
-### `iam`
+### `auth`
 
-Identity, access, roles, teams, and memberships.
-
-```mermaid
-erDiagram
-```
-
-### `integrations`
-
-External integrations, connections, and OpenAPI specs.
+Authentication users and sessions.
 
 ```mermaid
 erDiagram
-```
-
-### `llm`
-
-Chat conversations, messages, and runtime limits.
-
-```mermaid
-erDiagram
-```
-
-### `assistants`
-
-Prompts, categories, and project metadata for assistants.
-
-```mermaid
-erDiagram
-```
-
-### `automation`
-
-Automation triggers and execution history.
-
-```mermaid
-erDiagram
-```
-
-### `rag`
-
-Datasets, documents, chunks, and retrieval metadata.
-
-```mermaid
-erDiagram
-```
-
-### `model_registry`
-
-Model providers, models, and capabilities.
-
-```mermaid
-erDiagram
-```
-
-### `storage`
-
-Stored binary objects and references.
-
-```mermaid
-erDiagram
-    buckets {
-        ARRAY allowed_mime_types 
-        boolean avif_autodetection 
+    users {
         timestamp_with_time_zone created_at 
-        bigint file_size_limit 
-        text id PK 
-        text name 
-        uuid owner 
-        text owner_id 
-        boolean public 
-        buckettype type 
+        text email UK 
+        text first_name 
+        uuid id PK 
+        text issuer UK 
+        text last_name 
+        text sub UK 
         timestamp_with_time_zone updated_at 
     }
+```
 
-    buckets_analytics {
+### `org`
+
+Organization tenancy, memberships, invitations, and org helper functions.
+
+```mermaid
+erDiagram
+    org_invitations {
+        uuid accepted_by_user_id FK 
         timestamp_with_time_zone created_at 
-        timestamp_with_time_zone deleted_at 
-        text format 
+        character_varying email UK 
+        timestamp_with_time_zone expires_at 
+        uuid id PK 
+        uuid invited_by_user_id FK 
+        uuid org_id FK,UK 
+        org_role role 
+    }
+
+    org_memberships {
+        timestamp_with_time_zone joined_at 
+        uuid org_id PK,FK 
+        org_role role 
+        uuid user_id PK,FK 
+    }
+
+    orgs {
+        timestamp_with_time_zone created_at 
         uuid id PK 
         text name 
-        buckettype type 
-        timestamp_with_time_zone updated_at 
     }
 
-    buckets_vectors {
-        timestamp_with_time_zone created_at 
-        text id PK 
-        buckettype type 
-        timestamp_with_time_zone updated_at 
-    }
-
-    iceberg_namespaces {
-        text bucket_name 
-        uuid catalog_id FK 
-        timestamp_with_time_zone created_at 
-        uuid id PK 
-        jsonb metadata 
-        text name 
-        timestamp_with_time_zone updated_at 
-    }
-
-    iceberg_tables {
-        text bucket_name 
-        uuid catalog_id FK 
-        timestamp_with_time_zone created_at 
-        uuid id PK 
-        text location 
-        text name 
-        uuid namespace_id FK 
-        text remote_table_id 
-        text shard_id 
-        text shard_key 
-        timestamp_with_time_zone updated_at 
-    }
-
-    migrations {
-        timestamp_without_time_zone executed_at 
-        character_varying hash 
-        integer id PK 
-        character_varying name UK 
-    }
-
-    objects {
-        text bucket_id FK 
-        timestamp_with_time_zone created_at 
-        uuid id PK 
-        timestamp_with_time_zone last_accessed_at 
-        integer level 
-        jsonb metadata 
-        text name 
-        uuid owner 
-        text owner_id 
-        ARRAY path_tokens 
-        timestamp_with_time_zone updated_at 
-        jsonb user_metadata 
-        text version 
-    }
-
-    prefixes {
-        text bucket_id PK,FK 
-        timestamp_with_time_zone created_at 
-        integer level PK 
-        text name PK 
-        timestamp_with_time_zone updated_at 
-    }
-
-    s3_multipart_uploads {
-        text bucket_id FK 
-        timestamp_with_time_zone created_at 
-        text id PK 
-        bigint in_progress_size 
-        text key 
-        text owner_id 
-        text upload_signature 
-        jsonb user_metadata 
-        text version 
-    }
-
-    s3_multipart_uploads_parts {
-        text bucket_id FK 
-        timestamp_with_time_zone created_at 
-        text etag 
-        uuid id PK 
-        text key 
-        text owner_id 
-        integer part_number 
-        bigint size 
-        text upload_id FK 
-        text version 
-    }
-
-    vector_indexes {
-        text bucket_id FK 
-        timestamp_with_time_zone created_at 
-        text data_type 
-        integer dimension 
-        text distance_metric 
-        text id PK 
-        jsonb metadata_configuration 
-        text name 
-        timestamp_with_time_zone updated_at 
-    }
-
-    objects }o--|| buckets : "bucket_id"
-    prefixes }o--|| buckets : "bucket_id"
-    s3_multipart_uploads }o--|| buckets : "bucket_id"
-    s3_multipart_uploads_parts }o--|| buckets : "bucket_id"
-    iceberg_namespaces }o--|| buckets_analytics : "catalog_id"
-    iceberg_tables }o--|| buckets_analytics : "catalog_id"
-    vector_indexes }o--|| buckets_vectors : "bucket_id"
-    iceberg_tables }o--|| iceberg_namespaces : "namespace_id"
-    s3_multipart_uploads_parts }o--|| s3_multipart_uploads : "upload_id"
-```
-
-### `ops`
-
-Operational data like audit trails and translations.
-
-```mermaid
-erDiagram
+    org_invitations }o--|| orgs : "org_id"
+    org_memberships }o--|| orgs : "org_id"
 ```
 
 ### `public`
 
-Legacy schema for extensions, helpers, and compatibility objects.
+Application domain tables: providers, agents, conversations, channels, integrations, and shared enum types.
 
 ```mermaid
 erDiagram
@@ -325,3 +205,9 @@ erDiagram
     provider_models }o--|| provider_connections : "connection_id"
 ```
 <!-- schemas-end -->
+
+## Notes
+
+- Most application tables are org-scoped and use row-level security policies built on `org.is_org_member(...)` and `org.is_org_admin(...)`.
+- Resource-style tables use `resource_visibility` to distinguish `private` rows from `org`-shared rows.
+- Secrets are stored outside the database; the schema stores secret references only.

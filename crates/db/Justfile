@@ -20,29 +20,15 @@ db-diagram:
 
     readme = Path("README.md")
     schemas = [
-        "iam",
-        "integrations",
-        "llm",
-        "assistants",
-        "automation",
-        "rag",
-        "model_registry",
-        "storage",
-        "ops",
+        "auth",
+        "org",
         "public",
     ]
 
     descriptions = {
-        "iam": "Identity, access, roles, teams, and memberships.",
-        "integrations": "External integrations, connections, and OpenAPI specs.",
-        "llm": "Chat conversations, messages, and runtime limits.",
-        "assistants": "Prompts, categories, and project metadata for assistants.",
-        "automation": "Automation triggers and execution history.",
-        "rag": "Datasets, documents, chunks, and retrieval metadata.",
-        "model_registry": "Model providers, models, and capabilities.",
-        "storage": "Stored binary objects and references.",
-        "ops": "Operational data like audit trails and translations.",
-        "public": "Legacy schema for extensions, helpers, and compatibility objects.",
+        "auth": "Authentication users and sessions.",
+        "org": "Organization tenancy, memberships, invitations, and org helper functions.",
+        "public": "Application domain tables: providers, agents, conversations, channels, integrations, and shared enum types.",
     }
 
     database_url = os.environ.get("DATABASE_URL")
@@ -78,7 +64,7 @@ db-diagram:
         )
         diagram = tmp_schema.read_text().rstrip()
         blocks.append(
-            f"### `{schema}`\n\n{descriptions.get(schema, '')}\n\n```mermaid\n{diagram}\n```"
+            f"### `{schema}`\n\n{descriptions[schema]}\n\n```mermaid\n{diagram}\n```"
         )
         tmp_schema.unlink(missing_ok=True)
 
