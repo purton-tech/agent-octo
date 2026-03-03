@@ -2,11 +2,11 @@
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct User {
-    pub id: i32,
+    pub id: uuid::Uuid,
     pub email: String,
 }
 pub struct UserBorrowed<'a> {
-    pub id: i32,
+    pub id: uuid::Uuid,
     pub email: &'a str,
 }
 impl<'a> From<UserBorrowed<'a>> for User {

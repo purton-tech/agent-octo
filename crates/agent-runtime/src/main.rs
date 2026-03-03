@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::time::Duration;
 
 use agent_runtime::config::Config;
 use agent_runtime::{build_agent, build_system_prompt};
@@ -11,7 +10,6 @@ use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, Channel
 use rig::client::ProviderClient;
 use rig::completion::{Chat, Message as RigMessage};
 use rig::providers::openai::Client;
-use serde_json::json;
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use tokio::sync::Notify;
 use tool_runtime::openapi_actions::OpenApiRegistry;
@@ -53,15 +51,11 @@ async fn main() -> anyhow::Result<()> {
         inbound_notify.clone(),
     ));
 
+    // Long-lived worker loop: wait for inbound work, claim one message, process it,
+    // then repeat. This stays event-driven and lets the process handle messages
+    // continuously until Kubernetes or the runtime stops it.
     loop {
-        let client = match pool.get().await {
-            Ok(client) => client,
-            Err(err) => {
-                warn!(error = %err, "failed to get database connection");
-                tokio::time::sleep(Duration::from_millis(500)).await;
-                continue;
-            }
-        };
+        let client = pool.get().await?;
 
         let Some(inbound_message) = claim_next_channel_message()
             .bind(
@@ -74,15 +68,16 @@ async fn main() -> anyhow::Result<()> {
             .opt()
             .await?
         else {
-            wait_for_work(&inbound_notify).await;
+            // No pending inbound messages right now, so block until realtime tells
+            // us a new message row was inserted.
+            inbound_notify.notified().await;
             continue;
         };
 
         let conversation_rows = list_conversation_messages()
             .bind(
                 &client,
-                &ChannelType::telegram,
-                &inbound_message.external_conversation_id,
+                &inbound_message.conversation_id,
                 &MAX_HISTORY_MESSAGES,
             )
             .all()
@@ -102,7 +97,7 @@ async fn main() -> anyhow::Result<()> {
             Ok(reply) => (reply, ChannelMessageStatus::processed),
             Err(err) => {
                 warn!(
-                    message_id = inbound_message.id,
+                    message_id = %inbound_message.id,
                     error = %err,
                     "model request failed"
                 );
@@ -113,16 +108,11 @@ async fn main() -> anyhow::Result<()> {
         insert_channel_message()
             .bind(
                 &client,
-                &ChannelType::telegram,
+                &Option::<String>::None,
+                &inbound_message.channel_conversation_id,
                 &ChannelMessageDirection::outbound,
-                &inbound_message.external_conversation_id,
-                &Option::<String>::None,
-                &Option::<String>::None,
                 &reply,
                 &ChannelMessageStatus::pending,
-                &json!({
-                    "source_message_id": inbound_message.id,
-                }),
             )
             .one()
             .await?;
@@ -133,8 +123,8 @@ async fn main() -> anyhow::Result<()> {
             .await?;
 
         info!(
-            inbound_message_id = inbound_message.id,
-            conversation_id = inbound_message.external_conversation_id,
+            inbound_message_id = %inbound_message.id,
+            conversation_id = %inbound_message.conversation_id,
             "processed inbound message"
         );
     }
@@ -158,8 +148,7 @@ async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
         .channel("agent-inbound")
         .on_postgres_changes(
             PostgresChangesEvent::Insert,
-            PostgresChangesFilter::new("public", "channel_messages")
-                .with_filter("direction=eq.inbound"),
+            PostgresChangesFilter::new("public", "messages"),
             move |_payload| {
                 inbound_notify.notify_one();
             },
@@ -176,12 +165,5 @@ async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
     match channel {
         Ok(_channel) => std::future::pending::<()>().await,
         Err(err) => warn!(error = %err, "failed to subscribe to inbound realtime"),
-    }
-}
-
-async fn wait_for_work(notify: &Notify) {
-    tokio::select! {
-        _ = notify.notified() => {}
-        _ = tokio::time::sleep(Duration::from_secs(5)) => {}
     }
 }

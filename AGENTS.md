@@ -73,4 +73,4 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 
 ## Build Check
 
-* Always run `cargo build` after making changes.
+* Always run `cargo build` after making changes to rust code.

@@ -1,12 +1,10 @@
-use std::time::Duration;
-
 use crate::config::Config;
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
-    claim_next_channel_message, insert_channel_message, update_channel_message_status,
+    claim_next_channel_message, get_or_create_channel_conversation, insert_channel_message,
+    update_channel_message_status,
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
-use serde_json::json;
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use teloxide::prelude::*;
 use teloxide::types::ChatId;
@@ -39,10 +37,6 @@ pub async fn run() -> anyhow::Result<()> {
             let chat_id = msg.chat.id.0.to_string();
             let external_user_id = msg.from.as_ref().map(|user| user.id.0.to_string());
             let external_message_id = Some(msg.id.0.to_string());
-            let metadata = json!({
-                "telegram_chat_id": msg.chat.id.0,
-                "telegram_message_id": msg.id.0,
-            });
 
             let client = match pool.get().await {
                 Ok(client) => client,
@@ -52,25 +46,45 @@ pub async fn run() -> anyhow::Result<()> {
                 }
             };
 
+            let channel_conversation = match get_or_create_channel_conversation()
+                .bind(&client, &ChannelType::telegram, &external_user_id, &chat_id)
+                .opt()
+                .await
+            {
+                Ok(Some(channel_conversation)) => channel_conversation,
+                Ok(None) => {
+                    warn!(
+                        chat_id = msg.chat.id.0,
+                        "no channel routing configured for inbound telegram message"
+                    );
+                    return respond(());
+                }
+                Err(err) => {
+                    warn!(
+                        chat_id = msg.chat.id.0,
+                        error = %err,
+                        "failed to resolve channel conversation"
+                    );
+                    return respond(());
+                }
+            };
+
             match insert_channel_message()
                 .bind(
                     &client,
-                    &ChannelType::telegram,
-                    &ChannelMessageDirection::inbound,
-                    &chat_id,
-                    &external_user_id,
                     &external_message_id,
+                    &channel_conversation.id,
+                    &ChannelMessageDirection::inbound,
                     &text,
                     &ChannelMessageStatus::pending,
-                    &metadata,
                 )
                 .one()
                 .await
             {
                 Ok(message) => {
                     info!(
-                        message_id = message.id,
-                        conversation_id = message.external_conversation_id,
+                        message_id = %message.id,
+                        conversation_id = %message.conversation_id,
                         "stored inbound telegram message"
                     );
                 }
@@ -92,13 +106,15 @@ pub async fn run() -> anyhow::Result<()> {
 }
 
 async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::sync::Arc<Notify>) {
+    // Long-lived worker loop: claim one pending outbound message, deliver it,
+    // then repeat. If there is no work, block on realtime until a new message
+    // is inserted instead of busy polling.
     loop {
         let client = match pool.get().await {
             Ok(client) => client,
             Err(err) => {
                 warn!(error = %err, "failed to get database connection");
-                tokio::time::sleep(Duration::from_millis(500)).await;
-                continue;
+                return;
             }
         };
 
@@ -116,13 +132,14 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             Ok(message) => message,
             Err(err) => {
                 warn!(error = %err, "failed to claim outbound telegram message");
-                tokio::time::sleep(Duration::from_millis(500)).await;
-                continue;
+                return;
             }
         };
 
         let Some(message) = next_message else {
-            wait_for_work(&outbound_notify).await;
+            // No pending outbound messages right now, so wait for realtime to
+            // signal that a new outbound row was inserted.
+            outbound_notify.notified().await;
             continue;
         };
 
@@ -130,7 +147,7 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             Ok(chat_id) => chat_id,
             Err(err) => {
                 warn!(
-                    message_id = message.id,
+                    message_id = %message.id,
                     error = %err,
                     "invalid telegram chat id"
                 );
@@ -156,13 +173,13 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
 
         if let Err(err) = send_result {
             warn!(
-                message_id = message.id,
+                message_id = %message.id,
                 chat_id,
                 error = %err,
                 "failed to send telegram message"
             );
         } else {
-            info!(message_id = message.id, chat_id, "sent telegram reply");
+            info!(message_id = %message.id, chat_id, "sent telegram reply");
         }
 
         if let Err(err) = update_channel_message_status()
@@ -171,7 +188,7 @@ async fn drive_outbound_messages(bot: Bot, pool: Pool, outbound_notify: std::syn
             .await
         {
             warn!(
-                message_id = message.id,
+                message_id = %message.id,
                 error = %err,
                 "failed to update telegram message status"
             );
@@ -197,8 +214,7 @@ async fn watch_outbound_realtime(config: Config, outbound_notify: std::sync::Arc
         .channel("telegram-outbound")
         .on_postgres_changes(
             PostgresChangesEvent::Insert,
-            PostgresChangesFilter::new("public", "channel_messages")
-                .with_filter("direction=eq.outbound"),
+            PostgresChangesFilter::new("public", "messages"),
             move |_payload| {
                 outbound_notify.notify_one();
             },
@@ -215,12 +231,5 @@ async fn watch_outbound_realtime(config: Config, outbound_notify: std::sync::Arc
     match channel {
         Ok(_channel) => std::future::pending::<()>().await,
         Err(err) => warn!(error = %err, "failed to subscribe to outbound realtime"),
-    }
-}
-
-async fn wait_for_work(notify: &Notify) {
-    tokio::select! {
-        _ = notify.notified() => {}
-        _ = tokio::time::sleep(Duration::from_secs(5)) => {}
     }
 }

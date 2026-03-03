@@ -6,6 +6,7 @@ alias gcam='git commit -a -m'
 alias gpsup="git push --set-upstream origin $(git symbolic-ref -q HEAD | sed -e 's|^refs/heads/||')"
 alias gcb='git checkout -b'
 alias gcr='f() { git checkout -b $1 origin/$1; }; f'
+alias gdb='git branch | grep -v "main" | xargs git branch -D'
 
 gitsetup() {
   git config --global user.name "$NAME"
