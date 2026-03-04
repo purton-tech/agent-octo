@@ -16,6 +16,7 @@ checks:
     FROM +devcontainer
     WORKDIR /workspace
     COPY . .
+    RUN cd /workspace/crates/octo-assets && mkdir -p dist && tailwind-extra -i ./input.css -o ./dist/tailwind.css
     RUN cargo fmt --check
     RUN cargo clippy --workspace --all-targets -- -D warnings
 
@@ -25,10 +26,12 @@ build:
     FROM +devcontainer
     WORKDIR /workspace
     COPY . .
+    RUN cd /workspace/crates/octo-assets && mkdir -p dist && tailwind-extra -i ./input.css -o ./dist/tailwind.css
     RUN rustup target add x86_64-unknown-linux-musl
     RUN cargo build --workspace --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/octo /octo
-    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/channels /channels
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/telegram-ingress-polling /telegram-ingress-polling
+    SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/telegram-egress /telegram-egress
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/agent-runtime /agent-runtime
 
 # Package a selected binary into a scratch image tagged with the binary name.
@@ -59,7 +62,8 @@ release-candidate:
     ARG TAG
     BUILD +checks
     BUILD +image --BINARY=octo --REGISTRY=$REGISTRY --TAG=$TAG
-    BUILD +image --BINARY=channels --REGISTRY=$REGISTRY --TAG=$TAG
+    BUILD +image --BINARY=telegram-ingress-polling --REGISTRY=$REGISTRY --TAG=$TAG
+    BUILD +image --BINARY=telegram-egress --REGISTRY=$REGISTRY --TAG=$TAG
     BUILD +image --BINARY=agent-runtime --REGISTRY=$REGISTRY --TAG=$TAG
     BUILD +migration-image --REGISTRY=$REGISTRY --TAG=$TAG
 
@@ -68,6 +72,7 @@ all:
     ARG REGISTRY=ghcr.io/purton-tech
     BUILD +checks
     BUILD +image --BINARY=octo --REGISTRY=$REGISTRY --TAG=latest
-    BUILD +image --BINARY=channels --REGISTRY=$REGISTRY --TAG=latest
+    BUILD +image --BINARY=telegram-ingress-polling --REGISTRY=$REGISTRY --TAG=latest
+    BUILD +image --BINARY=telegram-egress --REGISTRY=$REGISTRY --TAG=latest
     BUILD +image --BINARY=agent-runtime --REGISTRY=$REGISTRY --TAG=latest
     BUILD +migration-image --REGISTRY=$REGISTRY --TAG=latest

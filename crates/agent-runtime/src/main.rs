@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use agent_runtime::config::Config;
 use agent_runtime::provider;
+use agent_runtime::system_prompt::SYSTEM_PROMPT;
 use agent_runtime::{build_agent, build_system_prompt};
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
@@ -14,7 +15,6 @@ use tokio::sync::Notify;
 use tool_runtime::openapi_actions::OpenApiRegistry;
 use tracing::{info, warn};
 
-const SYSTEM_PROMPT: &str = include_str!("../../octo/SYSTEM_PROMPT.md");
 const MAX_HISTORY_MESSAGES: i64 = 20;
 
 #[tokio::main]

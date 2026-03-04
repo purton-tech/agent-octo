@@ -3,6 +3,8 @@ members = [
     "crates/tool-runtime",
     "crates/agent-runtime",
     "crates/channels",
+    "crates/octo-assets",
+    "crates/octo-ui",
     "crates/octo",
     "crates/db",
 ]
