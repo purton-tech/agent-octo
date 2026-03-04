@@ -1,5 +1,6 @@
 pub mod config;
 pub mod provider;
+pub mod system_prompt;
 
 use std::collections::HashMap;
 use std::sync::Arc;

@@ -5,8 +5,13 @@ edition = "2024"
 
 [dependencies]
 anyhow.workspace = true
-axum.workspace = true
+axum = { version = "0.8", default-features = false, features = ["json", "http1", "tokio"] }
+axum-extra = { version = "0.10", features = ["form", "typed-routing"] }
+clorinde = { version = "0.0.0", path = "../db-gen" }
 dotenvy.workspace = true
-tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+serde = { version = "1", features = ["derive"] }
+tokio = { features = ["fs", "macros", "rt-multi-thread"], version = "1", default-features = false }
+tokio-util = { version = "0.7", default-features = false, features = ["io"] }
+tower-livereload = "0.9"
 tracing.workspace = true
 tracing-subscriber.workspace = true
