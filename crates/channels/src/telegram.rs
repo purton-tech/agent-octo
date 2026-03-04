@@ -1,4 +1,5 @@
 use crate::config::Config;
+use anyhow::{Context, anyhow};
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
     claim_next_channel_message, get_or_create_channel_conversation, insert_channel_message,
@@ -13,8 +14,8 @@ use tracing::{info, warn};
 
 pub async fn run() -> anyhow::Result<()> {
     let config = Config::new();
-    let bot = Bot::new(config.telegram_bot_token.clone());
     let pool = db::create_pool(&config.application_url);
+    let bot = Bot::new(load_telegram_bot_token(&pool).await?);
     let outbound_notify = std::sync::Arc::new(Notify::new());
 
     let outbound_task = tokio::spawn(drive_outbound_messages(
@@ -109,6 +110,32 @@ pub async fn run() -> anyhow::Result<()> {
             }
         }
     }
+}
+
+async fn load_telegram_bot_token(pool: &Pool) -> anyhow::Result<String> {
+    let client = pool
+        .get()
+        .await
+        .context("failed to get database connection for telegram bot startup")?;
+
+    let row = client
+        .query_opt(
+            "
+            SELECT c.bot_token
+            FROM public.channels c
+            WHERE c.kind = $1
+            ORDER BY c.created_at ASC
+            LIMIT 1
+            ",
+            &[&ChannelType::telegram],
+        )
+        .await
+        .context("failed to load telegram channel configuration")?;
+
+    let row = row.ok_or_else(|| anyhow!("no telegram channel configured"))?;
+
+    row.try_get("bot_token")
+        .context("telegram channel is missing bot_token")
 }
 
 async fn drive_outbound_messages(

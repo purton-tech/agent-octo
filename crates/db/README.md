@@ -127,7 +127,7 @@ erDiagram
     }
 
     channels {
-        text bot_token_secret_ref 
+        text bot_token 
         timestamp_with_time_zone created_at 
         uuid created_by_user_id FK 
         uuid default_agent_id FK 

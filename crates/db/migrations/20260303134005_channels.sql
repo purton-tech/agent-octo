@@ -9,7 +9,7 @@
 -- - Created by a user.
 -- - Private by default; can be shared to org.
 -- - Can point at a default agent for new inbound external threads.
--- - bot_token_secret_ref points to a secret store entry (never store raw tokens).
+-- - bot_token stores the provider token for this channel.
 --
 -- Channel routing:
 --   - channel_conversations binds an external thread to one internal conversation
@@ -62,14 +62,14 @@ CREATE TABLE public.channels (
     name TEXT NOT NULL,
     default_agent_id UUID REFERENCES public.agents(id) ON DELETE SET NULL,
 
-    bot_token_secret_ref TEXT NOT NULL,
+    bot_token TEXT NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
 COMMENT ON TABLE public.channels IS
-'External messaging integrations (e.g. Telegram bot). Secrets are stored externally and referenced here.';
+'External messaging integrations (e.g. Telegram bot).';
 
 COMMENT ON COLUMN public.channels.visibility IS
 'private = only creator can see/use; org = visible to all org members (RLS enforced).';
@@ -80,8 +80,8 @@ COMMENT ON COLUMN public.channels.kind IS
 COMMENT ON COLUMN public.channels.default_agent_id IS
 'Default agent assigned to newly created conversations routed through this channel.';
 
-COMMENT ON COLUMN public.channels.bot_token_secret_ref IS
-'Reference to a secret store entry containing the bot token/credentials for this channel.';
+COMMENT ON COLUMN public.channels.bot_token IS
+'Bot token/credentials for this channel.';
 
 CREATE TABLE public.channel_conversations (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
