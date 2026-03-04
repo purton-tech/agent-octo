@@ -74,7 +74,9 @@ wo env_file=".env": (_watch "octo" env_file)
 
 wa env_file=".env": (_watch "agent-runtime" env_file)
 
-wc env_file=".env": (_watch "channels" env_file)
+wci env_file=".env": (_watch "telegram-ingress-polling" env_file)
+
+wce env_file=".env": (_watch "telegram-egress" env_file)
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
