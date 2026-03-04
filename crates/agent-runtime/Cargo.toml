@@ -10,7 +10,6 @@ dotenvy.workspace = true
 native-tls.workspace = true
 rig-core.workspace = true
 serde_json.workspace = true
-supabase-client-realtime.workspace = true
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "time"] }
 tool-runtime = { path = "../tool-runtime" }
 tracing.workspace = true

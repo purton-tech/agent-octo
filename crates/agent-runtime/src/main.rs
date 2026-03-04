@@ -1,4 +1,5 @@
 use std::sync::Arc;
+use std::time::Duration;
 
 use agent_runtime::config::Config;
 use agent_runtime::provider;
@@ -10,12 +11,12 @@ use db::clorinde::queries::channels::{
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use rig::completion::{Chat, Message as RigMessage};
-use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
-use tokio::sync::Notify;
+use tokio::time::sleep;
 use tool_runtime::openapi_actions::OpenApiRegistry;
 use tracing::{info, warn};
 
 const MAX_HISTORY_MESSAGES: i64 = 20;
+const POLL_INTERVAL: Duration = Duration::from_secs(1);
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
@@ -30,7 +31,6 @@ async fn main() -> anyhow::Result<()> {
 
     let config = Config::new();
     let pool = db::create_pool(&config.database_url);
-    let inbound_notify = Arc::new(Notify::new());
 
     let plugin_dir = format!("{}/../octo/plugins", env!("CARGO_MANIFEST_DIR"));
     let openapi_specs = OpenApiRegistry::load_specs_from_dir(&plugin_dir)?;
@@ -43,14 +43,8 @@ async fn main() -> anyhow::Result<()> {
         "agent runtime started"
     );
 
-    tokio::spawn(watch_inbound_realtime(
-        config.clone(),
-        inbound_notify.clone(),
-    ));
-
     // Long-lived worker loop: wait for inbound work, claim one message, process it,
-    // then repeat. This stays event-driven and lets the process handle messages
-    // continuously until Kubernetes or the runtime stops it.
+    // then repeat. If there is no work, sleep briefly before retrying.
     loop {
         let client = pool.get().await?;
 
@@ -65,9 +59,7 @@ async fn main() -> anyhow::Result<()> {
             .opt()
             .await?
         else {
-            // No pending inbound messages right now, so block until realtime tells
-            // us a new message row was inserted.
-            inbound_notify.notified().await;
+            sleep(POLL_INTERVAL).await;
             continue;
         };
 
@@ -153,42 +145,4 @@ async fn process_inbound_message(
     );
 
     agent.chat(message_text, history).await.map_err(Into::into)
-}
-
-async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
-    let realtime = match RealtimeClient::new(config.stack_api_url, config.service_role_jwt) {
-        Ok(realtime) => realtime,
-        Err(err) => {
-            warn!(error = %err, "failed to build realtime client");
-            return;
-        }
-    };
-
-    if let Err(err) = realtime.connect().await {
-        warn!(error = %err, "failed to connect to realtime");
-        return;
-    }
-
-    let channel = realtime
-        .channel("agent-inbound")
-        .on_postgres_changes(
-            PostgresChangesEvent::Insert,
-            PostgresChangesFilter::new("public", "messages"),
-            move |_payload| {
-                inbound_notify.notify_one();
-            },
-        )
-        .subscribe(|status, err| {
-            if let Some(err) = err {
-                warn!(%status, error = %err, "realtime subscription status");
-            } else {
-                info!(%status, "realtime subscription status");
-            }
-        })
-        .await;
-
-    match channel {
-        Ok(_channel) => std::future::pending::<()>().await,
-        Err(err) => warn!(error = %err, "failed to subscribe to inbound realtime"),
-    }
 }

@@ -9,7 +9,6 @@ db = { path = "../db" }
 dotenvy.workspace = true
 native-tls.workspace = true
 serde_json.workspace = true
-supabase-client-realtime.workspace = true
 teloxide.workspace = true
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }
 tracing.workspace = true
