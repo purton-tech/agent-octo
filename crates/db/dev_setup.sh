@@ -20,10 +20,12 @@ set -a
 set +a
 
 : "${APPLICATION_URL:?APPLICATION_URL not set in ${env_file}}"
+: "${OPENAI_API_KEY:?OPENAI_API_KEY not set in ${env_file}}"
 : "${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN not set in ${env_file}}"
 
 psql "${APPLICATION_URL}" \
     --set=ON_ERROR_STOP=1 \
+    --set=openai_api_key="${OPENAI_API_KEY}" \
     --set=telegram_bot_token="${TELEGRAM_BOT_TOKEN}" <<'SQL'
 BEGIN;
 
@@ -62,13 +64,43 @@ VALUES (
 
 SET LOCAL request.jwt.claim.sub = :'bootstrap_user_id';
 
+INSERT INTO public.provider_connections (
+    org_id,
+    created_by_user_id,
+    provider_kind,
+    display_name,
+    api_key
+)
+VALUES (
+    :'bootstrap_org_id',
+    :'bootstrap_user_id',
+    'openai',
+    'Dev Setup OpenAI',
+    :'openai_api_key'
+)
+RETURNING id
+\gset bootstrap_provider_connection_
+
+INSERT INTO public.provider_models (
+    connection_id,
+    model,
+    is_enabled
+)
+VALUES (
+    :'bootstrap_provider_connection_id',
+    'gpt-4o-mini',
+    true
+);
+
 INSERT INTO public.agents (
     org_id,
     created_by_user_id,
     visibility,
     name,
     description,
-    system_prompt
+    system_prompt,
+    default_connection_id,
+    default_model
 )
 VALUES (
     :'bootstrap_org_id',
@@ -76,7 +108,9 @@ VALUES (
     'private',
     'Dev Setup Agent',
     'Bootstrap agent for local Telegram development.',
-    'You are a helpful assistant for local development.'
+    'You are a helpful assistant for local development.',
+    :'bootstrap_provider_connection_id',
+    'gpt-4o-mini'
 )
 RETURNING id
 \gset bootstrap_agent_
@@ -107,6 +141,8 @@ COMMIT;
 \echo Created bootstrap records:
 \echo user_id=:bootstrap_user_id
 \echo org_id=:bootstrap_org_id
+\echo provider_connection_id=:bootstrap_provider_connection_id
+\echo provider_model=gpt-4o-mini
 \echo agent_id=:bootstrap_agent_id
 \echo channel_id=:bootstrap_channel_id
 \echo channel_name=Dev Setup Telegram

@@ -195,7 +195,7 @@ erDiagram
     }
 
     provider_connections {
-        text api_key_secret_ref 
+        text api_key 
         text base_url 
         timestamp_with_time_zone created_at 
         uuid created_by_user_id FK 
