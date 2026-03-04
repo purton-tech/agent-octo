@@ -1,9 +1,23 @@
 #!/bin/bash
 
-diff=$(cargo fmt -- --check)
-result=$?
+set -euo pipefail
 
-if [[ ${result} -ne 0 ]] ; then
+format_result=0
+
+for manifest in \
+    crates/tool-runtime/Cargo.toml \
+    crates/agent-runtime/Cargo.toml \
+    crates/channels/Cargo.toml \
+    crates/octo/Cargo.toml \
+    crates/db/Cargo.toml
+do
+    if ! cargo fmt --manifest-path "$manifest" -- --check
+    then
+        format_result=1
+    fi
+done
+
+if [[ ${format_result} -ne 0 ]] ; then
     cat <<\EOF
 There are some code style issues, run 'cargo fmt' first.
 EOF

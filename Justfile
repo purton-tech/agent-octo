@@ -42,7 +42,7 @@ runtime-secrets env_file=".env":
 
 ## Run the code generators
 wc:
-    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen $DATABASE_URL'
+    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen'
 
 _watch binary env_file=".env":
     #!/usr/bin/env bash
