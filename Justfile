@@ -41,7 +41,7 @@ runtime-secrets env_file=".env":
         | kubectl apply -f -
 
 ## Run the code generators
-wc:
+wd:
     cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen'
 
 _watch binary env_file=".env":
@@ -71,7 +71,7 @@ wo env_file=".env": (_watch "octo" env_file)
 
 wa env_file=".env": (_watch "agent-runtime" env_file)
 
-wt env_file=".env": (_watch "channels" env_file)
+wc env_file=".env": (_watch "channels" env_file)
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
