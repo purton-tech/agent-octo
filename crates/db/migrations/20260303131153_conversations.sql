@@ -20,6 +20,9 @@ CREATE TYPE message_role AS ENUM (
 COMMENT ON TYPE message_role IS
 'Role of a message within a conversation. tool is for tool call results or tool output.';
 
+GRANT USAGE ON TYPE message_role TO application_user;
+GRANT USAGE ON TYPE message_role TO application_readonly;
+
 CREATE TABLE conversations (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
     org_id UUID NOT NULL REFERENCES org.orgs(id) ON DELETE CASCADE,
@@ -55,6 +58,12 @@ COMMENT ON TABLE messages IS
 
 CREATE INDEX messages_conversation_created_at_idx
     ON messages (conversation_id, created_at ASC, id ASC);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON conversations TO application_user;
+GRANT SELECT ON conversations TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON messages TO application_user;
+GRANT SELECT ON messages TO application_readonly;
 
 -- =========================
 -- RLS

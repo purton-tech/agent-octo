@@ -4,15 +4,18 @@
 -- =========================
 --
 -- provider_connections:
---   A configured LLM provider account for an org (API key stored in secret store).
+--   A configured LLM provider account for an org.
 --
 -- provider_models:
 --   Models available/allowed for a given connection. Populate manually or via sync.
 --
 -- Notes:
 --   - Keep provider_kind/model as TEXT to avoid churn.
---   - Secrets are referenced, not stored.
+--   - API keys are stored directly for now.
 --   - RLS: org members can read; org admins manage.
+
+GRANT USAGE ON SCHEMA public TO application_user;
+GRANT USAGE ON SCHEMA public TO application_readonly;
 
 CREATE TABLE public.provider_connections (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -23,7 +26,7 @@ CREATE TABLE public.provider_connections (
     provider_kind TEXT NOT NULL,              -- "openai", "anthropic", "gemini", etc.
     display_name TEXT NOT NULL,
 
-    api_key_secret_ref TEXT NOT NULL,         -- reference into your secret store
+    api_key TEXT NOT NULL,
     base_url TEXT,                            -- optional (proxy/self-hosted/azure)
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -31,7 +34,7 @@ CREATE TABLE public.provider_connections (
 );
 
 COMMENT ON TABLE public.provider_connections IS
-'Configured LLM provider connections (credentials/config) scoped to an org. Secrets are stored externally and referenced here.';
+'Configured LLM provider connections (credentials/config) scoped to an org.';
 
 CREATE INDEX provider_connections_org_idx
     ON public.provider_connections (org_id);
@@ -54,6 +57,12 @@ COMMENT ON TABLE public.provider_models IS
 
 CREATE INDEX provider_models_connection_idx
     ON public.provider_models (connection_id);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.provider_connections TO application_user;
+GRANT SELECT ON public.provider_connections TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.provider_models TO application_user;
+GRANT SELECT ON public.provider_models TO application_readonly;
 
 -- =========================
 -- RLS

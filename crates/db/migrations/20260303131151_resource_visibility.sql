@@ -22,5 +22,8 @@ CREATE TYPE resource_visibility AS ENUM (
 COMMENT ON TYPE resource_visibility IS
 'Controls resource sharing scope. private = creator only; org = visible to all org members (RLS enforced).';
 
+GRANT USAGE ON TYPE resource_visibility TO application_user;
+GRANT USAGE ON TYPE resource_visibility TO application_readonly;
+
 -- migrate:down
 DROP TYPE IF EXISTS resource_visibility;

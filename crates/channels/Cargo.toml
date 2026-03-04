@@ -11,6 +11,7 @@ native-tls.workspace = true
 serde_json.workspace = true
 supabase-client-realtime.workspace = true
 teloxide.workspace = true
-tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }
 tracing.workspace = true
 tracing-subscriber.workspace = true
+uuid = "1.21.0"

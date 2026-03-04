@@ -40,9 +40,12 @@ runtime-secrets env_file=".env":
         -o yaml \
         | kubectl apply -f -
 
+dev-db-setup env_file=".env":
+    ./crates/db/dev_setup.sh {{env_file}}
+
 ## Run the code generators
-wc:
-    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen $DATABASE_URL'
+wd:
+    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen && cargo fmt'
 
 _watch binary env_file=".env":
     #!/usr/bin/env bash
@@ -71,7 +74,9 @@ wo env_file=".env": (_watch "octo" env_file)
 
 wa env_file=".env": (_watch "agent-runtime" env_file)
 
-wt env_file=".env": (_watch "channels" env_file)
+wci env_file=".env": (_watch "telegram-ingress-polling" env_file)
+
+wce env_file=".env": (_watch "telegram-egress" env_file)
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:

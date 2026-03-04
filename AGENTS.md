@@ -70,7 +70,3 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 
 * Use `just test` or `cargo test --workspace --exclude integration-testing`
 * This will exclude the integration-testing which requires an environment with selenium.
-
-## Build Check
-
-* Always run `cargo build` after making changes to rust code.

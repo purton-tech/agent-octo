@@ -55,6 +55,9 @@ CREATE INDEX agents_org_visibility_idx
 CREATE INDEX agents_creator_idx
     ON public.agents (created_by_user_id);
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.agents TO application_user;
+GRANT SELECT ON public.agents TO application_readonly;
+
 -- =========================
 -- RLS
 -- =========================

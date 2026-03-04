@@ -26,6 +26,9 @@ CREATE TYPE integration_auth_type AS ENUM (
 COMMENT ON TYPE integration_auth_type IS
 'Authentication mechanism used by an integration connection. api_key covers static keys; oauth2 covers access/refresh token flows.';
 
+GRANT USAGE ON TYPE integration_auth_type TO application_user;
+GRANT USAGE ON TYPE integration_auth_type TO application_readonly;
+
 -- =========================
 -- INTEGRATIONS
 -- =========================
@@ -133,6 +136,12 @@ CREATE INDEX integration_connections_org_visibility_idx
 
 CREATE INDEX integration_connections_integration_idx
     ON public.integration_connections (integration_id);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.integrations TO application_user;
+GRANT SELECT ON public.integrations TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.integration_connections TO application_user;
+GRANT SELECT ON public.integration_connections TO application_readonly;
 
 -- =========================
 -- RLS

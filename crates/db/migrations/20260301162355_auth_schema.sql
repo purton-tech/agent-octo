@@ -1,6 +1,9 @@
 -- migrate:up
 CREATE SCHEMA IF NOT EXISTS auth;
 
+GRANT USAGE ON SCHEMA auth TO application_user;
+GRANT USAGE ON SCHEMA auth TO application_readonly;
+
 -- =========================
 -- AUTH USERS
 -- =========================
@@ -74,6 +77,12 @@ $$;
 COMMENT ON FUNCTION auth.uid() IS
 'Returns the authenticated user ID (JWT "sub" claim) from the current session. 
 Requires the API layer to validate the JWT and inject claims via request.jwt.claim.* settings.';
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON auth.users TO application_user;
+GRANT SELECT ON auth.users TO application_readonly;
+
+GRANT EXECUTE ON FUNCTION auth.uid() TO application_user;
+GRANT EXECUTE ON FUNCTION auth.uid() TO application_readonly;
 
 -- migrate:down
 DROP FUNCTION IF EXISTS auth.uid();

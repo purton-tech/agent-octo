@@ -1,4 +1,5 @@
 pub mod config;
+pub mod provider;
 
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -25,11 +26,12 @@ pub fn build_system_prompt(base_prompt: &str, openapi_actions: &OpenApiRegistry)
 
 pub fn build_agent(
     client: Client,
+    model: &str,
     system_prompt: String,
     openapi_actions: Arc<OpenApiRegistry>,
 ) -> impl Chat + Clone {
     client
-        .agent("gpt-5-mini")
+        .agent(model)
         .preamble(&system_prompt)
         .name("Bob")
         .default_max_turns(4)

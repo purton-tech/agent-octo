@@ -21,10 +21,6 @@ spec:
         web:
           image: ghcr.io/purton-tech/octo:1.0.1-rc.15
           port: 8080
-          database_url: APPLICATION_URL
-          init:
-            image: ghcr.io/purton-tech/octo-migrations:1.0.1-rc.15
-            migrations_database_url: DATABASE_URL
     prod:
       services:
         web:
@@ -37,20 +33,8 @@ spec:
         channels:
           image: ghcr.io/purton-tech/channels:1.0.1-rc.15
           database_url: APPLICATION_URL
-          secret_env:
-            - name: SERVICE_ROLE_JWT
-              secret_name: jwt-auth
-              secret_key: service-role-jwt
-            - name: TELEGRAM_BOT_TOKEN
-              secret_name: octo-runtime
-              secret_key: telegram-bot-token
+          service_role_jwt: SERVICE_ROLE_JWT
         agent-runtime:
           image: ghcr.io/purton-tech/agent-runtime:1.0.1-rc.15
           database_url: APPLICATION_URL
-          secret_env:
-            - name: SERVICE_ROLE_JWT
-              secret_name: jwt-auth
-              secret_key: service-role-jwt
-            - name: OPENAI_API_KEY
-              secret_name: octo-runtime
-              secret_key: openai-api-key
+          service_role_jwt: SERVICE_ROLE_JWT

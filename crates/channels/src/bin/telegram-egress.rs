@@ -9,5 +9,5 @@ async fn main() -> anyhow::Result<()> {
         .with_target(false)
         .init();
 
-    channels::telegram::ingress_polling::run().await
+    channels::telegram::egress::run().await
 }
