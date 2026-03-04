@@ -1,5 +1,6 @@
 mod config;
 mod errors;
+mod jwt;
 mod root;
 
 use std::net::SocketAddr;
@@ -8,6 +9,9 @@ use axum::{Extension, Router, routing::get};
 use clorinde::deadpool_postgres::Manager;
 use clorinde::tokio_postgres::NoTls;
 use tower_livereload::LiveReloadLayer;
+
+pub use errors::CustomError;
+pub use jwt::Jwt;
 
 #[tokio::main]
 async fn main() {
