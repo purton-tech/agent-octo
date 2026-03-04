@@ -45,7 +45,7 @@ dev-db-setup env_file=".env":
 
 ## Run the code generators
 wd:
-    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen'
+    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen && cargo fmt'
 
 _watch binary env_file=".env":
     #!/usr/bin/env bash

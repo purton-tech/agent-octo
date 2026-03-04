@@ -30,7 +30,7 @@ async fn main() -> anyhow::Result<()> {
         .init();
 
     let config = Config::new();
-    let pool = db::create_pool(&config.application_url);
+    let pool = db::create_pool(&config.database_url);
     let inbound_notify = Arc::new(Notify::new());
 
     let plugin_dir = format!("{}/../octo/plugins", env!("CARGO_MANIFEST_DIR"));

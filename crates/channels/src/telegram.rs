@@ -14,7 +14,7 @@ use tracing::{info, warn};
 
 pub async fn run() -> anyhow::Result<()> {
     let config = Config::new();
-    let pool = db::create_pool(&config.application_url);
+    let pool = db::create_pool(&config.database_url);
     let bot = Bot::new(load_telegram_bot_token(&pool).await?);
     let outbound_notify = std::sync::Arc::new(Notify::new());
 
