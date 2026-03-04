@@ -16,6 +16,7 @@ checks:
     FROM +devcontainer
     WORKDIR /workspace
     COPY . .
+    RUN mkdir -p crates/octo-assets/dist
     RUN cargo fmt --check
     RUN cargo clippy --workspace --all-targets -- -D warnings
 
@@ -25,6 +26,7 @@ build:
     FROM +devcontainer
     WORKDIR /workspace
     COPY . .
+    RUN mkdir -p crates/octo-assets/dist
     RUN rustup target add x86_64-unknown-linux-musl
     RUN cargo build --workspace --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/octo /octo
