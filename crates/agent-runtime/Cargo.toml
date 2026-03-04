@@ -15,3 +15,4 @@ tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync", "ti
 tool-runtime = { path = "../tool-runtime" }
 tracing.workspace = true
 tracing-subscriber.workspace = true
+uuid = "1.21.0"

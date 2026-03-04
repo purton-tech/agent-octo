@@ -1,15 +1,14 @@
 use std::sync::Arc;
 
 use agent_runtime::config::Config;
+use agent_runtime::provider;
 use agent_runtime::{build_agent, build_system_prompt};
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
     update_channel_message_status,
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
-use rig::client::ProviderClient;
 use rig::completion::{Chat, Message as RigMessage};
-use rig::providers::openai::Client;
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use tokio::sync::Notify;
 use tool_runtime::openapi_actions::OpenApiRegistry;
@@ -37,8 +36,6 @@ async fn main() -> anyhow::Result<()> {
     let openapi_specs = OpenApiRegistry::load_specs_from_dir(&plugin_dir)?;
     let openapi_actions = Arc::new(OpenApiRegistry::from_specs(&openapi_specs));
     let system_prompt = build_system_prompt(SYSTEM_PROMPT, &openapi_actions);
-    let openai_client = Client::from_env();
-    let agent = build_agent(openai_client, system_prompt, Arc::clone(&openapi_actions));
 
     info!(
         plugin_count = openapi_specs.len(),
@@ -92,7 +89,15 @@ async fn main() -> anyhow::Result<()> {
             })
             .collect::<Vec<_>>();
 
-        let (reply, inbound_status) = match agent.chat(&inbound_message.message_text, history).await
+        let (reply, inbound_status) = match process_inbound_message(
+            &client,
+            &inbound_message.conversation_id,
+            &inbound_message.message_text,
+            history,
+            &system_prompt,
+            &openapi_actions,
+        )
+        .await
         {
             Ok(reply) => (reply, ChannelMessageStatus::processed),
             Err(err) => {
@@ -128,6 +133,26 @@ async fn main() -> anyhow::Result<()> {
             "processed inbound message"
         );
     }
+}
+
+async fn process_inbound_message(
+    client: &db::clorinde::deadpool_postgres::Client,
+    conversation_id: &uuid::Uuid,
+    message_text: &str,
+    history: Vec<RigMessage>,
+    system_prompt: &str,
+    openapi_actions: &Arc<OpenApiRegistry>,
+) -> anyhow::Result<String> {
+    let provider_config = provider::load_for_conversation(client, conversation_id).await?;
+    let provider_client = provider::build_client(&provider_config)?;
+    let agent = build_agent(
+        provider_client,
+        &provider_config.model,
+        system_prompt.to_owned(),
+        Arc::clone(openapi_actions),
+    );
+
+    agent.chat(message_text, history).await.map_err(Into::into)
 }
 
 async fn watch_inbound_realtime(config: Config, inbound_notify: Arc<Notify>) {
