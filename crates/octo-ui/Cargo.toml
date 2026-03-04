@@ -7,3 +7,4 @@ edition = "2024"
 clorinde = { path = "../db-gen" }
 dioxus = { version = "0.7.3", default-features = false, features = ["macro", "html", "signals"] }
 dioxus-ssr = { version = "0.7.3", default-features = false }
+octo-assets = { path = "../octo-assets" }

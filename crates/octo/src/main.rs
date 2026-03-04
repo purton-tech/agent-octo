@@ -2,10 +2,12 @@ mod config;
 mod errors;
 mod jwt;
 mod root;
+mod static_files;
 
 use std::net::SocketAddr;
 
 use axum::{Extension, Router, routing::get};
+use axum_extra::routing::RouterExt;
 use clorinde::deadpool_postgres::Manager;
 use clorinde::tokio_postgres::NoTls;
 use tower_livereload::LiveReloadLayer;
@@ -38,6 +40,7 @@ async fn main() {
     // build our application with a route
     let app = Router::new()
         .route("/", get(root::loader))
+        .typed_get(static_files::static_path)
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
