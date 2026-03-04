@@ -28,6 +28,9 @@
 
 CREATE SCHEMA IF NOT EXISTS org;
 
+GRANT USAGE ON SCHEMA org TO application_user;
+GRANT USAGE ON SCHEMA org TO application_readonly;
+
 CREATE TYPE org.org_role AS ENUM (
     'owner',
     'admin',
@@ -36,6 +39,9 @@ CREATE TYPE org.org_role AS ENUM (
 
 COMMENT ON TYPE org.org_role IS
 'Role of a user within an organization. owner is the top-level role; admin can manage most org resources; member is standard access.';
+
+GRANT USAGE ON TYPE org.org_role TO application_user;
+GRANT USAGE ON TYPE org.org_role TO application_readonly;
 
 CREATE TABLE org.orgs (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -219,6 +225,15 @@ COMMENT ON COLUMN org.org_invitations.expires_at IS
 COMMENT ON COLUMN org.org_invitations.created_at IS
 'Creation timestamp.';
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON org.orgs TO application_user;
+GRANT SELECT ON org.orgs TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON org.org_memberships TO application_user;
+GRANT SELECT ON org.org_memberships TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON org.org_invitations TO application_user;
+GRANT SELECT ON org.org_invitations TO application_readonly;
+
 CREATE FUNCTION org.is_org_member(p_org_id UUID)
 RETURNS BOOLEAN
 LANGUAGE SQL
@@ -234,6 +249,9 @@ $$;
 
 COMMENT ON FUNCTION org.is_org_member(UUID) IS
 'Returns true if the current user is a member of the given org. Used in RLS policies.';
+
+GRANT EXECUTE ON FUNCTION org.is_org_member(UUID) TO application_user;
+GRANT EXECUTE ON FUNCTION org.is_org_member(UUID) TO application_readonly;
 
 CREATE FUNCTION org.is_org_admin(p_org_id UUID)
 RETURNS BOOLEAN
@@ -251,6 +269,9 @@ $$;
 
 COMMENT ON FUNCTION org.is_org_admin(UUID) IS
 'Returns true if the current user is an owner or admin of the given org. Used in RLS policies.';
+
+GRANT EXECUTE ON FUNCTION org.is_org_admin(UUID) TO application_user;
+GRANT EXECUTE ON FUNCTION org.is_org_admin(UUID) TO application_readonly;
 
 -- migrate:down
 DROP FUNCTION IF EXISTS org.is_org_admin(UUID);

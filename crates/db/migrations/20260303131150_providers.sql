@@ -14,6 +14,9 @@
 --   - Secrets are referenced, not stored.
 --   - RLS: org members can read; org admins manage.
 
+GRANT USAGE ON SCHEMA public TO application_user;
+GRANT USAGE ON SCHEMA public TO application_readonly;
+
 CREATE TABLE public.provider_connections (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
 
@@ -54,6 +57,12 @@ COMMENT ON TABLE public.provider_models IS
 
 CREATE INDEX provider_models_connection_idx
     ON public.provider_models (connection_id);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.provider_connections TO application_user;
+GRANT SELECT ON public.provider_connections TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.provider_models TO application_user;
+GRANT SELECT ON public.provider_models TO application_readonly;
 
 -- =========================
 -- RLS

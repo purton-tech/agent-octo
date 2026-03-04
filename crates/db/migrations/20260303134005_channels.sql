@@ -22,6 +22,9 @@ CREATE TYPE channel_type AS ENUM (
 COMMENT ON TYPE channel_type IS
 'Supported external channel integration types.';
 
+GRANT USAGE ON TYPE channel_type TO application_user;
+GRANT USAGE ON TYPE channel_type TO application_readonly;
+
 CREATE TYPE public.channel_message_direction AS ENUM (
     'inbound',
     'outbound'
@@ -29,6 +32,9 @@ CREATE TYPE public.channel_message_direction AS ENUM (
 
 COMMENT ON TYPE public.channel_message_direction IS
 'Direction of a channel message in the processing pipeline.';
+
+GRANT USAGE ON TYPE public.channel_message_direction TO application_user;
+GRANT USAGE ON TYPE public.channel_message_direction TO application_readonly;
 
 CREATE TYPE public.channel_message_status AS ENUM (
     'pending',
@@ -40,6 +46,9 @@ CREATE TYPE public.channel_message_status AS ENUM (
 
 COMMENT ON TYPE public.channel_message_status IS
 'Lifecycle state for a channel-driven message in the processing pipeline.';
+
+GRANT USAGE ON TYPE public.channel_message_status TO application_user;
+GRANT USAGE ON TYPE public.channel_message_status TO application_readonly;
 
 CREATE TABLE public.channels (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
@@ -128,6 +137,12 @@ CREATE INDEX messages_channel_queue_idx
 
 CREATE INDEX messages_channel_conversation_idx
     ON public.messages (channel_conversation_id, created_at ASC);
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.channels TO application_user;
+GRANT SELECT ON public.channels TO application_readonly;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.channel_conversations TO application_user;
+GRANT SELECT ON public.channel_conversations TO application_readonly;
 
 -- =========================
 -- RLS
