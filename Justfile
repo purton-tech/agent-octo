@@ -40,6 +40,9 @@ runtime-secrets env_file=".env":
         -o yaml \
         | kubectl apply -f -
 
+dev-db-setup env_file=".env":
+    ./crates/db/dev_setup.sh {{env_file}}
+
 ## Run the code generators
 wd:
     cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen'
