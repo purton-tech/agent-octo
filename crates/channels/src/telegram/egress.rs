@@ -1,62 +1,39 @@
-use crate::config::Config;
-use anyhow::{Context, anyhow};
-use db::clorinde::deadpool_postgres::Pool;
+use std::collections::HashMap;
+use std::time::Duration;
+
 use db::clorinde::queries::channels::{
-    claim_next_channel_message, get_channel_config, update_channel_message_status,
+    claim_next_telegram_outbound_message, update_channel_message_status,
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
-use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
 use teloxide::prelude::*;
 use teloxide::types::ChatId;
-use tokio::sync::Notify;
+use tokio::time::sleep;
 use tracing::{info, warn};
 
-pub async fn run() -> anyhow::Result<()> {
-    let config = Config::new();
-    let pool = db::create_pool(&config.database_url);
-    let bot = Bot::new(load_telegram_bot_token(&pool).await?);
-    let outbound_notify = std::sync::Arc::new(Notify::new());
+const POLL_INTERVAL: Duration = Duration::from_secs(1);
 
-    let outbound_task = tokio::spawn(drive_outbound_messages(
-        bot.clone(),
-        pool.clone(),
-        outbound_notify.clone(),
-    ));
-    tokio::spawn(watch_outbound_realtime(config, outbound_notify));
-
-    match outbound_task.await {
-        Ok(Ok(())) => Err(anyhow!("outbound telegram worker exited unexpectedly")),
-        Ok(Err(err)) => Err(err),
-        Err(err) => Err(err.into()),
-    }
+#[derive(Clone)]
+struct CachedBot {
+    token: String,
+    bot: Bot,
 }
 
-async fn load_telegram_bot_token(pool: &Pool) -> anyhow::Result<String> {
-    let client = pool
-        .get()
-        .await
-        .context("failed to get database connection for telegram bot startup")?;
+pub async fn run() -> anyhow::Result<()> {
+    let database_url = std::env::var("DATABASE_URL").expect("DATABASE_URL not set");
+    let pool = db::create_pool(&database_url);
 
-    let channel_config = get_channel_config()
-        .bind(&client, &ChannelType::telegram)
-        .opt()
-        .await
-        .context("failed to load telegram channel configuration")?;
-
-    let channel_config = channel_config.ok_or_else(|| anyhow!("no telegram channel configured"))?;
-
-    Ok(channel_config.bot_token)
+    drive_outbound_messages(pool).await
 }
 
 async fn drive_outbound_messages(
-    bot: Bot,
-    pool: Pool,
-    outbound_notify: std::sync::Arc<Notify>,
+    pool: db::clorinde::deadpool_postgres::Pool,
 ) -> anyhow::Result<()> {
+    let mut bots = HashMap::<uuid::Uuid, CachedBot>::new();
+
     loop {
         let client = pool.get().await?;
 
-        let next_message = match claim_next_channel_message()
+        let next_message = match claim_next_telegram_outbound_message()
             .bind(
                 &client,
                 &ChannelType::telegram,
@@ -75,9 +52,11 @@ async fn drive_outbound_messages(
         };
 
         let Some(message) = next_message else {
-            outbound_notify.notified().await;
+            sleep(POLL_INTERVAL).await;
             continue;
         };
+
+        let bot = bot_for_channel(&mut bots, message.channel_id, &message.bot_token);
 
         let chat_id = match message.external_conversation_id.parse::<i64>() {
             Ok(chat_id) => chat_id,
@@ -132,40 +111,27 @@ async fn drive_outbound_messages(
     }
 }
 
-async fn watch_outbound_realtime(config: Config, outbound_notify: std::sync::Arc<Notify>) {
-    let realtime = match RealtimeClient::new(config.stack_api_url, config.service_role_jwt) {
-        Ok(realtime) => realtime,
-        Err(err) => {
-            warn!(error = %err, "failed to build realtime client");
-            return;
-        }
-    };
+fn bot_for_channel(
+    bots: &mut HashMap<uuid::Uuid, CachedBot>,
+    channel_id: uuid::Uuid,
+    token: &str,
+) -> Bot {
+    let needs_refresh = bots
+        .get(&channel_id)
+        .map(|cached| cached.token != token)
+        .unwrap_or(true);
 
-    if let Err(err) = realtime.connect().await {
-        warn!(error = %err, "failed to connect to realtime");
-        return;
-    }
-
-    let channel = realtime
-        .channel("telegram-outbound")
-        .on_postgres_changes(
-            PostgresChangesEvent::Insert,
-            PostgresChangesFilter::new("public", "messages"),
-            move |_payload| {
-                outbound_notify.notify_one();
+    if needs_refresh {
+        bots.insert(
+            channel_id,
+            CachedBot {
+                token: token.to_owned(),
+                bot: Bot::new(token.to_owned()),
             },
-        )
-        .subscribe(|status, err| {
-            if let Some(err) = err {
-                warn!(%status, error = %err, "realtime subscription status");
-            } else {
-                info!(%status, "realtime subscription status");
-            }
-        })
-        .await;
-
-    match channel {
-        Ok(_channel) => std::future::pending::<()>().await,
-        Err(err) => warn!(error = %err, "failed to subscribe to outbound realtime"),
+        );
     }
+
+    bots.get(&channel_id)
+        .map(|cached| cached.bot.clone())
+        .expect("bot cache must contain channel")
 }

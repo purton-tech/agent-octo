@@ -183,6 +183,8 @@ LIMIT 1;
 
 --: ChannelMessage()
 
+--: TelegramOutboundMessage()
+
 --! insert_channel_message (external_message_id?) : ChannelMessage
 WITH updated_binding AS (
     UPDATE public.channel_conversations cc
@@ -251,6 +253,41 @@ WHERE m.id = :id::UUID
   AND cc.id = m.channel_conversation_id
 RETURNING
     m.id,
+    m.conversation_id,
+    m.channel_conversation_id,
+    m.channel_message_direction AS direction,
+    cc.external_conversation_id,
+    m.content AS message_text,
+    m.channel_message_status AS status,
+    m.created_at;
+
+--! claim_next_telegram_outbound_message : TelegramOutboundMessage
+WITH next_message AS (
+    SELECT m.id
+    FROM public.messages m
+    INNER JOIN public.channel_conversations cc
+        ON cc.id = m.channel_conversation_id
+    INNER JOIN public.channels c
+        ON c.id = cc.channel_id
+    WHERE c.kind = :channel::channel_type
+      AND m.channel_message_direction = :direction::channel_message_direction
+      AND m.channel_message_status = :from_status::channel_message_status
+    ORDER BY m.created_at ASC
+    LIMIT 1
+    FOR UPDATE OF m SKIP LOCKED
+)
+UPDATE public.messages m
+SET
+    channel_message_status = :to_status::channel_message_status
+FROM public.channel_conversations cc
+INNER JOIN public.channels c
+    ON c.id = cc.channel_id
+WHERE m.id IN (SELECT id FROM next_message)
+  AND cc.id = m.channel_conversation_id
+RETURNING
+    m.id,
+    c.id AS channel_id,
+    c.bot_token,
     m.conversation_id,
     m.channel_conversation_id,
     m.channel_message_direction AS direction,

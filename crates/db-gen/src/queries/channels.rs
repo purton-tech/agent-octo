@@ -29,6 +29,13 @@ pub struct UpdateChannelMessageStatusParams {
     pub id: uuid::Uuid,
 }
 #[derive(Clone, Copy, Debug)]
+pub struct ClaimNextTelegramOutboundMessageParams {
+    pub channel: crate::types::ChannelType,
+    pub direction: crate::types::ChannelMessageDirection,
+    pub from_status: crate::types::ChannelMessageStatus,
+    pub to_status: crate::types::ChannelMessageStatus,
+}
+#[derive(Clone, Copy, Debug)]
 pub struct ClaimNextChannelMessageParams {
     pub channel: crate::types::ChannelType,
     pub direction: crate::types::ChannelMessageDirection,
@@ -146,6 +153,60 @@ impl<'a> From<ChannelMessageBorrowed<'a>> for ChannelMessage {
     ) -> Self {
         Self {
             id,
+            conversation_id,
+            channel_conversation_id,
+            direction,
+            external_conversation_id: external_conversation_id.into(),
+            message_text: message_text.into(),
+            status,
+            created_at,
+        }
+    }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TelegramOutboundMessage {
+    pub id: uuid::Uuid,
+    pub channel_id: uuid::Uuid,
+    pub bot_token: String,
+    pub conversation_id: uuid::Uuid,
+    pub channel_conversation_id: uuid::Uuid,
+    pub direction: crate::types::ChannelMessageDirection,
+    pub external_conversation_id: String,
+    pub message_text: String,
+    pub status: crate::types::ChannelMessageStatus,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
+}
+pub struct TelegramOutboundMessageBorrowed<'a> {
+    pub id: uuid::Uuid,
+    pub channel_id: uuid::Uuid,
+    pub bot_token: &'a str,
+    pub conversation_id: uuid::Uuid,
+    pub channel_conversation_id: uuid::Uuid,
+    pub direction: crate::types::ChannelMessageDirection,
+    pub external_conversation_id: &'a str,
+    pub message_text: &'a str,
+    pub status: crate::types::ChannelMessageStatus,
+    pub created_at: chrono::DateTime<chrono::FixedOffset>,
+}
+impl<'a> From<TelegramOutboundMessageBorrowed<'a>> for TelegramOutboundMessage {
+    fn from(
+        TelegramOutboundMessageBorrowed {
+            id,
+            channel_id,
+            bot_token,
+            conversation_id,
+            channel_conversation_id,
+            direction,
+            external_conversation_id,
+            message_text,
+            status,
+            created_at,
+        }: TelegramOutboundMessageBorrowed<'a>,
+    ) -> Self {
+        Self {
+            id,
+            channel_id,
+            bot_token: bot_token.into(),
             conversation_id,
             channel_conversation_id,
             direction,
@@ -408,6 +469,74 @@ where
         mapper: fn(ChannelMessageBorrowed) -> R,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, R, N> {
         ChannelMessageQuery {
+            client: self.client,
+            params: self.params,
+            query: self.query,
+            cached: self.cached,
+            extractor: self.extractor,
+            mapper,
+        }
+    }
+    pub async fn one(self) -> Result<T, tokio_postgres::Error> {
+        let row =
+            crate::client::async_::one(self.client, self.query, &self.params, self.cached).await?;
+        Ok((self.mapper)((self.extractor)(&row)?))
+    }
+    pub async fn all(self) -> Result<Vec<T>, tokio_postgres::Error> {
+        self.iter().await?.try_collect().await
+    }
+    pub async fn opt(self) -> Result<Option<T>, tokio_postgres::Error> {
+        let opt_row =
+            crate::client::async_::opt(self.client, self.query, &self.params, self.cached).await?;
+        Ok(opt_row
+            .map(|row| {
+                let extracted = (self.extractor)(&row)?;
+                Ok((self.mapper)(extracted))
+            })
+            .transpose()?)
+    }
+    pub async fn iter(
+        self,
+    ) -> Result<
+        impl futures::Stream<Item = Result<T, tokio_postgres::Error>> + 'c,
+        tokio_postgres::Error,
+    > {
+        let stream = crate::client::async_::raw(
+            self.client,
+            self.query,
+            crate::slice_iter(&self.params),
+            self.cached,
+        )
+        .await?;
+        let mapped = stream
+            .map(move |res| {
+                res.and_then(|row| {
+                    let extracted = (self.extractor)(&row)?;
+                    Ok((self.mapper)(extracted))
+                })
+            })
+            .into_stream();
+        Ok(mapped)
+    }
+}
+pub struct TelegramOutboundMessageQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
+    client: &'c C,
+    params: [&'a (dyn postgres_types::ToSql + Sync); N],
+    query: &'static str,
+    cached: Option<&'s tokio_postgres::Statement>,
+    extractor:
+        fn(&tokio_postgres::Row) -> Result<TelegramOutboundMessageBorrowed, tokio_postgres::Error>,
+    mapper: fn(TelegramOutboundMessageBorrowed) -> T,
+}
+impl<'c, 'a, 's, C, T: 'c, const N: usize> TelegramOutboundMessageQuery<'c, 'a, 's, C, T, N>
+where
+    C: GenericClient,
+{
+    pub fn map<R>(
+        self,
+        mapper: fn(TelegramOutboundMessageBorrowed) -> R,
+    ) -> TelegramOutboundMessageQuery<'c, 'a, 's, C, R, N> {
+        TelegramOutboundMessageQuery {
             client: self.client,
             params: self.params,
             query: self.query,
@@ -871,6 +1000,78 @@ impl<'c, 'a, 's, C: GenericClient>
         params: &'a UpdateChannelMessageStatusParams,
     ) -> ChannelMessageQuery<'c, 'a, 's, C, ChannelMessage, 2> {
         self.bind(client, &params.status, &params.id)
+    }
+}
+pub struct ClaimNextTelegramOutboundMessageStmt(&'static str, Option<tokio_postgres::Statement>);
+pub fn claim_next_telegram_outbound_message() -> ClaimNextTelegramOutboundMessageStmt {
+    ClaimNextTelegramOutboundMessageStmt(
+        "WITH next_message AS ( SELECT m.id FROM public.messages m INNER JOIN public.channel_conversations cc ON cc.id = m.channel_conversation_id INNER JOIN public.channels c ON c.id = cc.channel_id WHERE c.kind = $1::channel_type AND m.channel_message_direction = $2::channel_message_direction AND m.channel_message_status = $3::channel_message_status ORDER BY m.created_at ASC LIMIT 1 FOR UPDATE OF m SKIP LOCKED ) UPDATE public.messages m SET channel_message_status = $4::channel_message_status FROM public.channel_conversations cc INNER JOIN public.channels c ON c.id = cc.channel_id WHERE m.id IN (SELECT id FROM next_message) AND cc.id = m.channel_conversation_id RETURNING m.id, c.id AS channel_id, c.bot_token, m.conversation_id, m.channel_conversation_id, m.channel_message_direction AS direction, cc.external_conversation_id, m.content AS message_text, m.channel_message_status AS status, m.created_at",
+        None,
+    )
+}
+impl ClaimNextTelegramOutboundMessageStmt {
+    pub async fn prepare<'a, C: GenericClient>(
+        mut self,
+        client: &'a C,
+    ) -> Result<Self, tokio_postgres::Error> {
+        self.1 = Some(client.prepare(self.0).await?);
+        Ok(self)
+    }
+    pub fn bind<'c, 'a, 's, C: GenericClient>(
+        &'s self,
+        client: &'c C,
+        channel: &'a crate::types::ChannelType,
+        direction: &'a crate::types::ChannelMessageDirection,
+        from_status: &'a crate::types::ChannelMessageStatus,
+        to_status: &'a crate::types::ChannelMessageStatus,
+    ) -> TelegramOutboundMessageQuery<'c, 'a, 's, C, TelegramOutboundMessage, 4> {
+        TelegramOutboundMessageQuery {
+            client,
+            params: [channel, direction, from_status, to_status],
+            query: self.0,
+            cached: self.1.as_ref(),
+            extractor: |
+                row: &tokio_postgres::Row,
+            | -> Result<TelegramOutboundMessageBorrowed, tokio_postgres::Error> {
+                Ok(TelegramOutboundMessageBorrowed {
+                    id: row.try_get(0)?,
+                    channel_id: row.try_get(1)?,
+                    bot_token: row.try_get(2)?,
+                    conversation_id: row.try_get(3)?,
+                    channel_conversation_id: row.try_get(4)?,
+                    direction: row.try_get(5)?,
+                    external_conversation_id: row.try_get(6)?,
+                    message_text: row.try_get(7)?,
+                    status: row.try_get(8)?,
+                    created_at: row.try_get(9)?,
+                })
+            },
+            mapper: |it| TelegramOutboundMessage::from(it),
+        }
+    }
+}
+impl<'c, 'a, 's, C: GenericClient>
+    crate::client::async_::Params<
+        'c,
+        'a,
+        's,
+        ClaimNextTelegramOutboundMessageParams,
+        TelegramOutboundMessageQuery<'c, 'a, 's, C, TelegramOutboundMessage, 4>,
+        C,
+    > for ClaimNextTelegramOutboundMessageStmt
+{
+    fn params(
+        &'s self,
+        client: &'c C,
+        params: &'a ClaimNextTelegramOutboundMessageParams,
+    ) -> TelegramOutboundMessageQuery<'c, 'a, 's, C, TelegramOutboundMessage, 4> {
+        self.bind(
+            client,
+            &params.channel,
+            &params.direction,
+            &params.from_status,
+            &params.to_status,
+        )
     }
 }
 pub struct ClaimNextChannelMessageStmt(&'static str, Option<tokio_postgres::Statement>);
