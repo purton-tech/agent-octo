@@ -1,0 +1,9 @@
+[package]
+name = "octo-ui"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clorinde = { path = "../db-gen" }
+dioxus = { version = "0.7.3", default-features = false, features = ["macro", "html", "signals"] }
+dioxus-ssr = { version = "0.7.3", default-features = false }
