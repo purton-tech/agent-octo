@@ -78,6 +78,10 @@ wci env_file=".env": (_watch "telegram-ingress-polling" env_file)
 
 wce env_file=".env": (_watch "telegram-egress" env_file)
 
+wtw:
+    cd /workspace/crates/octo-assets && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
+
+
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
     k3d kubeconfig write k3d-octo --kubeconfig-merge-default
