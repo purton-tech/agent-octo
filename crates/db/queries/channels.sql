@@ -1,5 +1,16 @@
 --: ChannelConversation()
 
+--: ChannelConfig()
+
+--! get_channel_config : ChannelConfig
+SELECT
+    c.id,
+    c.bot_token
+FROM public.channels c
+WHERE c.kind = :channel::channel_type
+ORDER BY c.created_at ASC
+LIMIT 1;
+
 --! get_or_create_channel_conversation (external_user_id?) : ChannelConversation
 WITH selected_channel AS (
     SELECT

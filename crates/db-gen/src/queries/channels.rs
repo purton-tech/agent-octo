@@ -32,6 +32,23 @@ pub struct ListConversationMessagesParams {
     pub message_limit: i64,
 }
 #[derive(Debug, Clone, PartialEq)]
+pub struct ChannelConfig {
+    pub id: uuid::Uuid,
+    pub bot_token: String,
+}
+pub struct ChannelConfigBorrowed<'a> {
+    pub id: uuid::Uuid,
+    pub bot_token: &'a str,
+}
+impl<'a> From<ChannelConfigBorrowed<'a>> for ChannelConfig {
+    fn from(ChannelConfigBorrowed { id, bot_token }: ChannelConfigBorrowed<'a>) -> Self {
+        Self {
+            id,
+            bot_token: bot_token.into(),
+        }
+    }
+}
+#[derive(Debug, Clone, PartialEq)]
 pub struct ChannelConversation {
     pub id: uuid::Uuid,
     pub channel_id: uuid::Uuid,
@@ -143,6 +160,73 @@ impl<'a> From<ConversationMessageBorrowed<'a>> for ConversationMessage {
 }
 use crate::client::async_::GenericClient;
 use futures::{self, StreamExt, TryStreamExt};
+pub struct ChannelConfigQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
+    client: &'c C,
+    params: [&'a (dyn postgres_types::ToSql + Sync); N],
+    query: &'static str,
+    cached: Option<&'s tokio_postgres::Statement>,
+    extractor: fn(&tokio_postgres::Row) -> Result<ChannelConfigBorrowed, tokio_postgres::Error>,
+    mapper: fn(ChannelConfigBorrowed) -> T,
+}
+impl<'c, 'a, 's, C, T: 'c, const N: usize> ChannelConfigQuery<'c, 'a, 's, C, T, N>
+where
+    C: GenericClient,
+{
+    pub fn map<R>(
+        self,
+        mapper: fn(ChannelConfigBorrowed) -> R,
+    ) -> ChannelConfigQuery<'c, 'a, 's, C, R, N> {
+        ChannelConfigQuery {
+            client: self.client,
+            params: self.params,
+            query: self.query,
+            cached: self.cached,
+            extractor: self.extractor,
+            mapper,
+        }
+    }
+    pub async fn one(self) -> Result<T, tokio_postgres::Error> {
+        let row =
+            crate::client::async_::one(self.client, self.query, &self.params, self.cached).await?;
+        Ok((self.mapper)((self.extractor)(&row)?))
+    }
+    pub async fn all(self) -> Result<Vec<T>, tokio_postgres::Error> {
+        self.iter().await?.try_collect().await
+    }
+    pub async fn opt(self) -> Result<Option<T>, tokio_postgres::Error> {
+        let opt_row =
+            crate::client::async_::opt(self.client, self.query, &self.params, self.cached).await?;
+        Ok(opt_row
+            .map(|row| {
+                let extracted = (self.extractor)(&row)?;
+                Ok((self.mapper)(extracted))
+            })
+            .transpose()?)
+    }
+    pub async fn iter(
+        self,
+    ) -> Result<
+        impl futures::Stream<Item = Result<T, tokio_postgres::Error>> + 'c,
+        tokio_postgres::Error,
+    > {
+        let stream = crate::client::async_::raw(
+            self.client,
+            self.query,
+            crate::slice_iter(&self.params),
+            self.cached,
+        )
+        .await?;
+        let mapped = stream
+            .map(move |res| {
+                res.and_then(|row| {
+                    let extracted = (self.extractor)(&row)?;
+                    Ok((self.mapper)(extracted))
+                })
+            })
+            .into_stream();
+        Ok(mapped)
+    }
+}
 pub struct ChannelConversationQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
     client: &'c C,
     params: [&'a (dyn postgres_types::ToSql + Sync); N],
@@ -344,6 +428,42 @@ where
             })
             .into_stream();
         Ok(mapped)
+    }
+}
+pub struct GetChannelConfigStmt(&'static str, Option<tokio_postgres::Statement>);
+pub fn get_channel_config() -> GetChannelConfigStmt {
+    GetChannelConfigStmt(
+        "SELECT c.id, c.bot_token FROM public.channels c WHERE c.kind = $1::channel_type ORDER BY c.created_at ASC LIMIT 1",
+        None,
+    )
+}
+impl GetChannelConfigStmt {
+    pub async fn prepare<'a, C: GenericClient>(
+        mut self,
+        client: &'a C,
+    ) -> Result<Self, tokio_postgres::Error> {
+        self.1 = Some(client.prepare(self.0).await?);
+        Ok(self)
+    }
+    pub fn bind<'c, 'a, 's, C: GenericClient>(
+        &'s self,
+        client: &'c C,
+        channel: &'a crate::types::ChannelType,
+    ) -> ChannelConfigQuery<'c, 'a, 's, C, ChannelConfig, 1> {
+        ChannelConfigQuery {
+            client,
+            params: [channel],
+            query: self.0,
+            cached: self.1.as_ref(),
+            extractor:
+                |row: &tokio_postgres::Row| -> Result<ChannelConfigBorrowed, tokio_postgres::Error> {
+                    Ok(ChannelConfigBorrowed {
+                        id: row.try_get(0)?,
+                        bot_token: row.try_get(1)?,
+                    })
+                },
+            mapper: |it| ChannelConfig::from(it),
+        }
     }
 }
 pub struct GetOrCreateChannelConversationStmt(&'static str, Option<tokio_postgres::Statement>);

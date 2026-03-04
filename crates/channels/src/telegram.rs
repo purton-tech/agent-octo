@@ -2,8 +2,8 @@ use crate::config::Config;
 use anyhow::{Context, anyhow};
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
-    claim_next_channel_message, get_or_create_channel_conversation, insert_channel_message,
-    update_channel_message_status,
+    claim_next_channel_message, get_channel_config, get_or_create_channel_conversation,
+    insert_channel_message, update_channel_message_status,
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
@@ -118,24 +118,15 @@ async fn load_telegram_bot_token(pool: &Pool) -> anyhow::Result<String> {
         .await
         .context("failed to get database connection for telegram bot startup")?;
 
-    let row = client
-        .query_opt(
-            "
-            SELECT c.bot_token
-            FROM public.channels c
-            WHERE c.kind = $1
-            ORDER BY c.created_at ASC
-            LIMIT 1
-            ",
-            &[&ChannelType::telegram],
-        )
+    let channel_config = get_channel_config()
+        .bind(&client, &ChannelType::telegram)
+        .opt()
         .await
         .context("failed to load telegram channel configuration")?;
 
-    let row = row.ok_or_else(|| anyhow!("no telegram channel configured"))?;
+    let channel_config = channel_config.ok_or_else(|| anyhow!("no telegram channel configured"))?;
 
-    row.try_get("bot_token")
-        .context("telegram channel is missing bot_token")
+    Ok(channel_config.bot_token)
 }
 
 async fn drive_outbound_messages(
