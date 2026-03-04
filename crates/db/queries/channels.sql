@@ -2,6 +2,8 @@
 
 --: ChannelConfig()
 
+--: TelegramChannelConfig()
+
 --! get_channel_config : ChannelConfig
 SELECT
     c.id,
@@ -10,6 +12,14 @@ FROM public.channels c
 WHERE c.kind = :channel::channel_type
 ORDER BY c.created_at ASC
 LIMIT 1;
+
+--! list_telegram_channel_configs : TelegramChannelConfig
+SELECT
+    c.id,
+    c.bot_token
+FROM public.channels c
+WHERE c.kind = :channel::channel_type
+ORDER BY c.created_at ASC;
 
 --! get_or_create_channel_conversation (external_user_id?) : ChannelConversation
 WITH selected_channel AS (
@@ -21,6 +31,86 @@ WITH selected_channel AS (
     FROM public.channels c
     WHERE c.kind = :channel::channel_type
     ORDER BY c.created_at ASC
+    LIMIT 1
+),
+updated_binding AS (
+    UPDATE public.channel_conversations cc
+    SET
+        external_user_id = COALESCE(:external_user_id::TEXT, cc.external_user_id),
+        updated_at = NOW()
+    FROM selected_channel sc
+    WHERE cc.channel_id = sc.id
+      AND cc.external_conversation_id = :external_conversation_id::TEXT
+    RETURNING
+        cc.id,
+        cc.channel_id,
+        cc.conversation_id,
+        cc.external_conversation_id
+),
+inserted_conversation AS (
+    INSERT INTO public.conversations (
+        org_id,
+        created_by_user_id,
+        agent_id,
+        title
+    )
+    SELECT
+        sc.org_id,
+        sc.created_by_user_id,
+        sc.default_agent_id,
+        NULL
+    FROM selected_channel sc
+    WHERE sc.default_agent_id IS NOT NULL
+      AND NOT EXISTS (SELECT 1 FROM updated_binding)
+    RETURNING id
+),
+inserted_binding AS (
+    INSERT INTO public.channel_conversations (
+        channel_id,
+        conversation_id,
+        external_conversation_id,
+        external_user_id
+    )
+    SELECT
+        sc.id,
+        ic.id,
+        :external_conversation_id::TEXT,
+        :external_user_id::TEXT
+    FROM selected_channel sc
+    INNER JOIN inserted_conversation ic
+        ON TRUE
+    RETURNING
+        id,
+        channel_id,
+        conversation_id,
+        external_conversation_id
+),
+resolved_binding AS (
+    SELECT * FROM updated_binding
+    UNION ALL
+    SELECT * FROM inserted_binding
+)
+SELECT
+    rb.id,
+    rb.channel_id,
+    rb.conversation_id,
+    rb.external_conversation_id,
+    c.agent_id
+FROM resolved_binding rb
+INNER JOIN public.conversations c
+    ON c.id = rb.conversation_id
+LIMIT 1;
+
+--! get_or_create_channel_conversation_for_channel (external_user_id?) : ChannelConversation
+WITH selected_channel AS (
+    SELECT
+        c.id,
+        c.org_id,
+        c.created_by_user_id,
+        c.default_agent_id
+    FROM public.channels c
+    WHERE c.id = :channel_id::UUID
+      AND c.kind = 'telegram'::channel_type
     LIMIT 1
 ),
 updated_binding AS (

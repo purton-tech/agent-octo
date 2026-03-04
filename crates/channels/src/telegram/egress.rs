@@ -2,8 +2,7 @@ use crate::config::Config;
 use anyhow::{Context, anyhow};
 use db::clorinde::deadpool_postgres::Pool;
 use db::clorinde::queries::channels::{
-    claim_next_channel_message, get_channel_config, get_or_create_channel_conversation,
-    insert_channel_message, update_channel_message_status,
+    claim_next_channel_message, get_channel_config, update_channel_message_status,
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
 use supabase_client_realtime::{PostgresChangesEvent, PostgresChangesFilter, RealtimeClient};
@@ -23,92 +22,12 @@ pub async fn run() -> anyhow::Result<()> {
         pool.clone(),
         outbound_notify.clone(),
     ));
-    tokio::spawn(watch_outbound_realtime(config.clone(), outbound_notify));
+    tokio::spawn(watch_outbound_realtime(config, outbound_notify));
 
-    info!("telegram ingress started");
-
-    tokio::select! {
-        _ = teloxide::repl(bot, move |_bot: Bot, msg: Message| {
-            let pool = pool.clone();
-
-            async move {
-                let Some(text) = msg.text() else {
-                    return respond(());
-                };
-
-                let chat_id = msg.chat.id.0.to_string();
-                let external_user_id = msg.from.as_ref().map(|user| user.id.0.to_string());
-                let external_message_id = Some(msg.id.0.to_string());
-
-                let client = match pool.get().await {
-                    Ok(client) => client,
-                    Err(err) => {
-                        warn!(error = %err, "failed to get database connection");
-                        return respond(());
-                    }
-                };
-
-                let channel_conversation = match get_or_create_channel_conversation()
-                    .bind(&client, &ChannelType::telegram, &external_user_id, &chat_id)
-                    .opt()
-                    .await
-                {
-                    Ok(Some(channel_conversation)) => channel_conversation,
-                    Ok(None) => {
-                        warn!(
-                            chat_id = msg.chat.id.0,
-                            "no channel routing configured for inbound telegram message"
-                        );
-                        return respond(());
-                    }
-                    Err(err) => {
-                        warn!(
-                            chat_id = msg.chat.id.0,
-                            error = %err,
-                            "failed to resolve channel conversation"
-                        );
-                        return respond(());
-                    }
-                };
-
-                match insert_channel_message()
-                    .bind(
-                        &client,
-                        &external_message_id,
-                        &channel_conversation.id,
-                        &ChannelMessageDirection::inbound,
-                        &text,
-                        &ChannelMessageStatus::pending,
-                    )
-                    .one()
-                    .await
-                {
-                    Ok(message) => {
-                        info!(
-                            message_id = %message.id,
-                            conversation_id = %message.conversation_id,
-                            "stored inbound telegram message"
-                        );
-                    }
-                    Err(err) => {
-                        warn!(
-                            chat_id = msg.chat.id.0,
-                            error = %err,
-                            "failed to store inbound telegram message"
-                        );
-                    }
-                }
-
-                respond(())
-            }
-        }) => Ok(()),
-        outbound_result = outbound_task => {
-            match outbound_result {
-                Ok(Ok(())) => Err(anyhow::anyhow!("outbound telegram worker exited unexpectedly")),
-                Ok(Err(err)) => Err(err),
-                Err(err) => Err(err.into()),
-            }
-        }
+    match outbound_task.await {
+        Ok(Ok(())) => Err(anyhow!("outbound telegram worker exited unexpectedly")),
+        Ok(Err(err)) => Err(err),
+        Err(err) => Err(err.into()),
     }
 }
 
@@ -134,9 +53,6 @@ async fn drive_outbound_messages(
     pool: Pool,
     outbound_notify: std::sync::Arc<Notify>,
 ) -> anyhow::Result<()> {
-    // Long-lived worker loop: claim one pending outbound message, deliver it,
-    // then repeat. If there is no work, block on realtime until a new message
-    // is inserted instead of busy polling.
     loop {
         let client = pool.get().await?;
 
@@ -159,8 +75,6 @@ async fn drive_outbound_messages(
         };
 
         let Some(message) = next_message else {
-            // No pending outbound messages right now, so wait for realtime to
-            // signal that a new outbound row was inserted.
             outbound_notify.notified().await;
             continue;
         };
