@@ -590,6 +590,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "daisy_rsx"
+version = "0.1.54"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f181bc525d2e9391434d8a837893fbdf65e1fdc711660c33f977c50fe83c46d7"
+dependencies = [
+ "dioxus",
+ "dioxus-ssr",
+]
+
+[[package]]
 name = "darling"
 version = "0.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2226,6 +2236,7 @@ name = "octo-ui"
 version = "0.1.0"
 dependencies = [
  "clorinde",
+ "daisy_rsx",
  "dioxus",
  "dioxus-ssr",
  "octo-assets",

@@ -5,6 +5,7 @@ edition = "2024"
 
 [dependencies]
 clorinde = { path = "../db-gen" }
+daisy_rsx = "0.1"
 dioxus = { version = "0.7.3", default-features = false, features = ["macro", "html", "signals"] }
 dioxus-ssr = { version = "0.7.3", default-features = false }
 octo-assets = { path = "../octo-assets" }

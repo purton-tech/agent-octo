@@ -1,4 +1,7 @@
-use crate::{layout::Layout, render};
+use crate::{
+    layout::{Layout, SideBar},
+    render,
+};
 use clorinde::queries::auth::User;
 use dioxus::prelude::*;
 use octo_assets::files::favicon_svg;
@@ -7,7 +10,9 @@ pub fn index(users: Vec<User>) -> String {
     let page = rsx! {
         Layout {
             title: "Users".to_string(),
+            selected_item: SideBar::Users,
             table {
+                class: "users-table",
                 thead {
                     tr {
                         th { "ID" }
@@ -18,12 +23,15 @@ pub fn index(users: Vec<User>) -> String {
                     for user in users {
                         tr {
                             td {
-                                img {
-                                    src: favicon_svg.name,
-                                    width: "16",
-                                    height: "16"
+                                span {
+                                    class: "user-id",
+                                    img {
+                                        src: favicon_svg.name,
+                                        width: "16",
+                                        height: "16"
+                                    }
+                                    strong { "{user.id}" }
                                 }
-                                strong { "{user.id}" }
                             }
                             td { "{user.email}" }
                         }
