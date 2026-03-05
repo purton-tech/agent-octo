@@ -19,7 +19,7 @@ pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Eleme
     rsx! {
         BaseLayout {
             title,
-            stylesheets: vec![tailwind_css.name.to_string()],
+            stylesheets: vec![tailwind_css.name.to_string(), "https://cdn.jsdelivr.net/npm/daisyui@5".into()],
             header: rsx!(
                 nav {
                     aria_label: "breadcrumb",
