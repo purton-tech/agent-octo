@@ -26,7 +26,13 @@ impl SideBar {
 }
 
 #[component]
-pub fn Layout(title: String, org_id: String, children: Element, selected_item: SideBar) -> Element {
+pub fn Layout(
+    title: String,
+    org_id: String,
+    children: Element,
+    selected_item: SideBar,
+    content_class: Option<String>,
+) -> Element {
     let users_href = routes::users::Index {
         org_id: org_id.clone(),
     }
@@ -35,6 +41,7 @@ pub fn Layout(title: String, org_id: String, children: Element, selected_item: S
         org_id: org_id.clone(),
     }
     .to_string();
+    let content_class = content_class.unwrap_or_else(|| "p-4 max-w-3xl w-full mx-auto".to_string());
 
     rsx! {
         BaseLayout {
@@ -127,7 +134,7 @@ pub fn Layout(title: String, org_id: String, children: Element, selected_item: S
                 }
             ),
             div {
-                class: "px-4 h-full",
+                class: "{content_class}",
                 {children}
             }
         }

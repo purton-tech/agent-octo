@@ -3,3 +3,13 @@
 @plugin "daisyui";
 
 @source '../octo-ui/**/*.rs';
+
+.card {
+    @apply bg-base-100 border border-base-300;
+    > .card-header {
+        @apply border-b border-base-300 p-4
+    }
+    > .card-body {
+        @apply p-4;
+    }
+}

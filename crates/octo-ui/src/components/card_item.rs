@@ -24,7 +24,7 @@ pub fn CardItem(props: CardItemProps) -> Element {
     rsx! {
         Card {
             class: {
-                let base = "p-4 mt-4 flex flex-row justify-between items-stretch";
+                let base = "card-border p-4 mt-4 flex flex-row justify-between items-stretch";
                 match props.class.clone() {
                     Some(extra) => format!("{base} {extra}"),
                     None => base.to_string(),
