@@ -1,7 +1,6 @@
 pub mod agents;
 pub mod components;
 mod layout;
-pub mod root;
 pub mod routes;
 
 use dioxus::prelude::*;

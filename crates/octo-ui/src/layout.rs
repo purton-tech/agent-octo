@@ -6,7 +6,6 @@ use octo_assets::files::*;
 
 #[derive(PartialEq, Clone, Eq, Debug)]
 pub enum SideBar {
-    Users,
     Agents,
 }
 
@@ -19,7 +18,6 @@ impl std::fmt::Display for SideBar {
 impl SideBar {
     fn label(&self) -> &str {
         match self {
-            SideBar::Users => "Users",
             SideBar::Agents => "Agents",
         }
     }
@@ -33,10 +31,6 @@ pub fn Layout(
     selected_item: SideBar,
     content_class: Option<String>,
 ) -> Element {
-    let users_href = routes::users::Index {
-        org_id: org_id.clone(),
-    }
-    .to_string();
     let agents_href = routes::agents::Index {
         org_id: org_id.clone(),
     }
@@ -69,13 +63,6 @@ pub fn Layout(
                 NavGroup {
                     heading: "Your Menu",
                     content:  rsx!(
-                        NavItem {
-                            id: SideBar::Users.to_string(),
-                            selected_item_id: selected_item.to_string(),
-                            href: users_href,
-                            icon: favicon_svg.name,
-                            title: "Users"
-                        }
                         NavItem {
                             id: SideBar::Agents.to_string(),
                             selected_item_id: selected_item.to_string(),

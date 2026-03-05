@@ -4,9 +4,7 @@ use clorinde::tokio_postgres::Transaction;
 
 #[derive(Debug, Clone)]
 pub struct RequestContext {
-    pub user_id: String,
     pub org_id: String,
-    pub email: String,
 }
 
 pub async fn init_request(
@@ -57,8 +55,6 @@ pub async fn init_request(
         .await?;
 
     Ok(RequestContext {
-        user_id,
         org_id: org.org_public_id,
-        email: user.email,
     })
 }
