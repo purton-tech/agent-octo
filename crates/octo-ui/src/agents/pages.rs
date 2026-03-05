@@ -2,11 +2,11 @@
 
 use crate::{
     components::card_item::{CardItem, CountLabel},
+    components::section_introduction::SectionIntroduction,
     layout::{Layout, SideBar},
     render,
 };
 use clorinde::queries::agents::AgentCard;
-use daisy_rsx::*;
 use dioxus::prelude::*;
 
 pub fn page(agents: Vec<AgentCard>) -> String {
@@ -16,15 +16,13 @@ pub fn page(agents: Vec<AgentCard>) -> String {
             selected_item: SideBar::Agents,
             div {
                 class: "mx-auto w-full max-w-4xl py-4",
-                if agents.is_empty() {
-                    Card {
-                        class: "p-6 mt-4",
-                        CardBody {
-                            h2 { class: "card-title", "No Agents Yet" }
-                            p { class: "text-base-content/70", "You have not created any agents yet." }
-                        }
-                    }
-                } else {
+                SectionIntroduction {
+                    header: "Agents".to_string(),
+                    subtitle: "Manage the assistants you created.".to_string(),
+                    is_empty: agents.is_empty(),
+                    empty_text: "You have not created any agents yet.".to_string()
+                }
+                if !agents.is_empty() {
                     for agent in agents {
                         CardItem {
                             class: None,
