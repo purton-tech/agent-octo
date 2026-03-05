@@ -53,6 +53,10 @@ impl<'a> From<AuthUserBorrowed<'a>> for AuthUser {
 pub struct EnsureOrgMembership {
     pub ensured: bool,
 }
+#[derive(Debug, Clone, PartialEq, Copy)]
+pub struct UserOrg {
+    pub org_id: uuid::Uuid,
+}
 #[derive(Debug, Clone, PartialEq)]
 pub struct User {
     pub id: uuid::Uuid,
@@ -153,6 +157,70 @@ where
         mapper: fn(EnsureOrgMembership) -> R,
     ) -> EnsureOrgMembershipQuery<'c, 'a, 's, C, R, N> {
         EnsureOrgMembershipQuery {
+            client: self.client,
+            params: self.params,
+            query: self.query,
+            cached: self.cached,
+            extractor: self.extractor,
+            mapper,
+        }
+    }
+    pub async fn one(self) -> Result<T, tokio_postgres::Error> {
+        let row =
+            crate::client::async_::one(self.client, self.query, &self.params, self.cached).await?;
+        Ok((self.mapper)((self.extractor)(&row)?))
+    }
+    pub async fn all(self) -> Result<Vec<T>, tokio_postgres::Error> {
+        self.iter().await?.try_collect().await
+    }
+    pub async fn opt(self) -> Result<Option<T>, tokio_postgres::Error> {
+        let opt_row =
+            crate::client::async_::opt(self.client, self.query, &self.params, self.cached).await?;
+        Ok(opt_row
+            .map(|row| {
+                let extracted = (self.extractor)(&row)?;
+                Ok((self.mapper)(extracted))
+            })
+            .transpose()?)
+    }
+    pub async fn iter(
+        self,
+    ) -> Result<
+        impl futures::Stream<Item = Result<T, tokio_postgres::Error>> + 'c,
+        tokio_postgres::Error,
+    > {
+        let stream = crate::client::async_::raw(
+            self.client,
+            self.query,
+            crate::slice_iter(&self.params),
+            self.cached,
+        )
+        .await?;
+        let mapped = stream
+            .map(move |res| {
+                res.and_then(|row| {
+                    let extracted = (self.extractor)(&row)?;
+                    Ok((self.mapper)(extracted))
+                })
+            })
+            .into_stream();
+        Ok(mapped)
+    }
+}
+pub struct UserOrgQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
+    client: &'c C,
+    params: [&'a (dyn postgres_types::ToSql + Sync); N],
+    query: &'static str,
+    cached: Option<&'s tokio_postgres::Statement>,
+    extractor: fn(&tokio_postgres::Row) -> Result<UserOrg, tokio_postgres::Error>,
+    mapper: fn(UserOrg) -> T,
+}
+impl<'c, 'a, 's, C, T: 'c, const N: usize> UserOrgQuery<'c, 'a, 's, C, T, N>
+where
+    C: GenericClient,
+{
+    pub fn map<R>(self, mapper: fn(UserOrg) -> R) -> UserOrgQuery<'c, 'a, 's, C, R, N> {
+        UserOrgQuery {
             client: self.client,
             params: self.params,
             query: self.query,
@@ -507,6 +575,40 @@ impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
         params: &'a EnsureDefaultOrgMembershipForUserParams<T1>,
     ) -> EnsureOrgMembershipQuery<'c, 'a, 's, C, EnsureOrgMembership, 2> {
         self.bind(client, &params.user_id, &params.org_name)
+    }
+}
+pub struct GetFirstOrgForUserStmt(&'static str, Option<tokio_postgres::Statement>);
+pub fn get_first_org_for_user() -> GetFirstOrgForUserStmt {
+    GetFirstOrgForUserStmt(
+        "SELECT org_id FROM org.org_memberships WHERE user_id = $1::UUID ORDER BY joined_at ASC LIMIT 1",
+        None,
+    )
+}
+impl GetFirstOrgForUserStmt {
+    pub async fn prepare<'a, C: GenericClient>(
+        mut self,
+        client: &'a C,
+    ) -> Result<Self, tokio_postgres::Error> {
+        self.1 = Some(client.prepare(self.0).await?);
+        Ok(self)
+    }
+    pub fn bind<'c, 'a, 's, C: GenericClient>(
+        &'s self,
+        client: &'c C,
+        user_id: &'a uuid::Uuid,
+    ) -> UserOrgQuery<'c, 'a, 's, C, UserOrg, 1> {
+        UserOrgQuery {
+            client,
+            params: [user_id],
+            query: self.0,
+            cached: self.1.as_ref(),
+            extractor: |row: &tokio_postgres::Row| -> Result<UserOrg, tokio_postgres::Error> {
+                Ok(UserOrg {
+                    org_id: row.try_get(0)?,
+                })
+            },
+            mapper: |it| UserOrg::from(it),
+        }
     }
 }
 pub struct SetRequestClaimSubStmt(&'static str, Option<tokio_postgres::Statement>);

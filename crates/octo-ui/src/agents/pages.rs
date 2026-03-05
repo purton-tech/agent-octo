@@ -9,10 +9,11 @@ use crate::{
 use clorinde::queries::agents::AgentCard;
 use dioxus::prelude::*;
 
-pub fn page(agents: Vec<AgentCard>) -> String {
+pub fn page(org_id: String, agents: Vec<AgentCard>) -> String {
     let page = rsx! {
         Layout {
             title: "Agents".to_string(),
+            org_id,
             selected_item: SideBar::Agents,
             div {
                 class: "mx-auto w-full max-w-4xl py-4",

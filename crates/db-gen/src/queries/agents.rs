@@ -103,7 +103,7 @@ where
 pub struct ListMyAgentsStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn list_my_agents() -> ListMyAgentsStmt {
     ListMyAgentsStmt(
-        "SELECT id, name, visibility::TEXT AS visibility, COALESCE(description, '') AS description, updated_at FROM public.agents WHERE created_by_user_id = auth.uid() ORDER BY updated_at DESC",
+        "SELECT id, name, visibility::TEXT AS visibility, COALESCE(description, '') AS description, updated_at FROM public.agents WHERE created_by_user_id = auth.uid() AND org_id = $1::UUID ORDER BY updated_at DESC",
         None,
     )
 }
@@ -118,10 +118,11 @@ impl ListMyAgentsStmt {
     pub fn bind<'c, 'a, 's, C: GenericClient>(
         &'s self,
         client: &'c C,
-    ) -> AgentCardQuery<'c, 'a, 's, C, AgentCard, 0> {
+        org_id: &'a uuid::Uuid,
+    ) -> AgentCardQuery<'c, 'a, 's, C, AgentCard, 1> {
         AgentCardQuery {
             client,
-            params: [],
+            params: [org_id],
             query: self.0,
             cached: self.1.as_ref(),
             extractor:

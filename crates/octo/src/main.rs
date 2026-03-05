@@ -41,8 +41,9 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/", get(root::loader))
-        .route("/agents", get(agents::loader))
+        .route("/", get(root::home))
+        .typed_get(root::loader)
+        .typed_get(agents::loader)
         .typed_get(static_files::static_path)
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))

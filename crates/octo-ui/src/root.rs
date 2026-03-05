@@ -6,10 +6,11 @@ use clorinde::queries::auth::User;
 use dioxus::prelude::*;
 use octo_assets::files::favicon_svg;
 
-pub fn index(users: Vec<User>) -> String {
+pub fn index(org_id: String, users: Vec<User>) -> String {
     let page = rsx! {
         Layout {
             title: "Users".to_string(),
+            org_id,
             selected_item: SideBar::Users,
             table {
                 class: "users-table",

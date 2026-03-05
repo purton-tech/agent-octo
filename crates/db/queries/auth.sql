@@ -2,6 +2,7 @@
 
 --: AuthUser()
 --: EnsureOrgMembership()
+--: UserOrg()
 
 --! upsert_user_by_issuer_sub (first_name?, last_name?) : AuthUser
 INSERT INTO auth.users (
@@ -60,6 +61,14 @@ inserted_membership AS (
     RETURNING 1
 )
 SELECT EXISTS(SELECT 1 FROM inserted_membership) AS ensured;
+
+--! get_first_org_for_user : UserOrg
+SELECT
+    org_id
+FROM org.org_memberships
+WHERE user_id = :user_id::UUID
+ORDER BY joined_at ASC
+LIMIT 1;
 
 --! set_request_claim_sub
 SELECT set_config(

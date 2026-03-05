@@ -5,6 +5,7 @@ use clorinde::tokio_postgres::Transaction;
 #[derive(Debug, Clone)]
 pub struct RequestContext {
     pub user_id: String,
+    pub org_id: String,
     pub email: String,
 }
 
@@ -32,6 +33,11 @@ pub async fn init_request(
         .one()
         .await?;
 
+    let org = auth::get_first_org_for_user()
+        .bind(transaction, &user.id)
+        .one()
+        .await?;
+
     auth::set_request_claim_sub()
         .bind(transaction, &user_id)
         .one()
@@ -47,6 +53,7 @@ pub async fn init_request(
 
     Ok(RequestContext {
         user_id,
+        org_id: org.org_id.to_string(),
         email: user.email,
     })
 }

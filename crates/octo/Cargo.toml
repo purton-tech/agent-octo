@@ -20,3 +20,4 @@ tokio-util = { version = "0.7", default-features = false, features = ["io"] }
 tower-livereload = "0.10"
 tracing.workspace = true
 tracing-subscriber.workspace = true
+uuid = "1"

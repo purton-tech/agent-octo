@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use crate::routes;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 use octo_assets::files::*;
@@ -25,7 +26,16 @@ impl SideBar {
 }
 
 #[component]
-pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Element {
+pub fn Layout(title: String, org_id: String, children: Element, selected_item: SideBar) -> Element {
+    let users_href = routes::users::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+    let agents_href = routes::agents::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+
     rsx! {
         BaseLayout {
             title,
@@ -55,14 +65,14 @@ pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Eleme
                         NavItem {
                             id: SideBar::Users.to_string(),
                             selected_item_id: selected_item.to_string(),
-                            href: "/",
+                            href: users_href,
                             icon: favicon_svg.name,
                             title: "Users"
                         }
                         NavItem {
                             id: SideBar::Agents.to_string(),
                             selected_item_id: selected_item.to_string(),
-                            href: "/agents",
+                            href: agents_href,
                             icon: favicon_svg.name,
                             title: "Agents"
                         }
