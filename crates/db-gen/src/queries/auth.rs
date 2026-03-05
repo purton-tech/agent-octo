@@ -53,9 +53,27 @@ impl<'a> From<AuthUserBorrowed<'a>> for AuthUser {
 pub struct EnsureOrgMembership {
     pub ensured: bool,
 }
-#[derive(Debug, Clone, PartialEq, Copy)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct UserOrg {
     pub org_id: uuid::Uuid,
+    pub org_public_id: String,
+}
+pub struct UserOrgBorrowed<'a> {
+    pub org_id: uuid::Uuid,
+    pub org_public_id: &'a str,
+}
+impl<'a> From<UserOrgBorrowed<'a>> for UserOrg {
+    fn from(
+        UserOrgBorrowed {
+            org_id,
+            org_public_id,
+        }: UserOrgBorrowed<'a>,
+    ) -> Self {
+        Self {
+            org_id,
+            org_public_id: org_public_id.into(),
+        }
+    }
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct User {
@@ -212,14 +230,14 @@ pub struct UserOrgQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
     params: [&'a (dyn postgres_types::ToSql + Sync); N],
     query: &'static str,
     cached: Option<&'s tokio_postgres::Statement>,
-    extractor: fn(&tokio_postgres::Row) -> Result<UserOrg, tokio_postgres::Error>,
-    mapper: fn(UserOrg) -> T,
+    extractor: fn(&tokio_postgres::Row) -> Result<UserOrgBorrowed, tokio_postgres::Error>,
+    mapper: fn(UserOrgBorrowed) -> T,
 }
 impl<'c, 'a, 's, C, T: 'c, const N: usize> UserOrgQuery<'c, 'a, 's, C, T, N>
 where
     C: GenericClient,
 {
-    pub fn map<R>(self, mapper: fn(UserOrg) -> R) -> UserOrgQuery<'c, 'a, 's, C, R, N> {
+    pub fn map<R>(self, mapper: fn(UserOrgBorrowed) -> R) -> UserOrgQuery<'c, 'a, 's, C, R, N> {
         UserOrgQuery {
             client: self.client,
             params: self.params,
@@ -580,7 +598,7 @@ impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
 pub struct GetFirstOrgForUserStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn get_first_org_for_user() -> GetFirstOrgForUserStmt {
     GetFirstOrgForUserStmt(
-        "SELECT org_id FROM org.org_memberships WHERE user_id = $1::UUID ORDER BY joined_at ASC LIMIT 1",
+        "SELECT org_id, public.uuid_to_b64url(org_id) AS org_public_id FROM org.org_memberships WHERE user_id = $1::UUID ORDER BY joined_at ASC LIMIT 1",
         None,
     )
 }
@@ -602,11 +620,13 @@ impl GetFirstOrgForUserStmt {
             params: [user_id],
             query: self.0,
             cached: self.1.as_ref(),
-            extractor: |row: &tokio_postgres::Row| -> Result<UserOrg, tokio_postgres::Error> {
-                Ok(UserOrg {
-                    org_id: row.try_get(0)?,
-                })
-            },
+            extractor:
+                |row: &tokio_postgres::Row| -> Result<UserOrgBorrowed, tokio_postgres::Error> {
+                    Ok(UserOrgBorrowed {
+                        org_id: row.try_get(0)?,
+                        org_public_id: row.try_get(1)?,
+                    })
+                },
             mapper: |it| UserOrg::from(it),
         }
     }

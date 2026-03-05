@@ -9,5 +9,5 @@ SELECT
     updated_at
 FROM public.agents
 WHERE created_by_user_id = auth.uid()
-  AND org_id = :org_id::UUID
+  AND org_id = public.b64url_to_uuid(:org_id::TEXT)
 ORDER BY updated_at DESC;

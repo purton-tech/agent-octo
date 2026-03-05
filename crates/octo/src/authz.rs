@@ -53,7 +53,7 @@ pub async fn init_request(
 
     Ok(RequestContext {
         user_id,
-        org_id: org.org_id.to_string(),
+        org_id: org.org_public_id,
         email: user.email,
     })
 }

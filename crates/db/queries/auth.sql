@@ -64,7 +64,8 @@ SELECT EXISTS(SELECT 1 FROM inserted_membership) AS ensured;
 
 --! get_first_org_for_user : UserOrg
 SELECT
-    org_id
+    org_id,
+    public.uuid_to_b64url(org_id) AS org_public_id
 FROM org.org_memberships
 WHERE user_id = :user_id::UUID
 ORDER BY joined_at ASC

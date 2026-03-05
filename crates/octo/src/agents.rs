@@ -19,10 +19,8 @@ pub async fn loader(
         ));
     }
 
-    let org_uuid = uuid::Uuid::parse_str(&org_id)
-        .map_err(|e| CustomError::FaultySetup(format!("Invalid org_id: {e}")))?;
     let agents = clorinde::queries::agents::list_my_agents()
-        .bind(&transaction, &org_uuid)
+        .bind(&transaction, &org_id)
         .all()
         .await?;
 
