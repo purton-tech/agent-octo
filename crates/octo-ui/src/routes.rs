@@ -8,3 +8,14 @@ pub mod agents {
         pub org_id: String,
     }
 }
+
+pub mod channels {
+    use axum_extra::routing::TypedPath;
+    use serde::Deserialize;
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/channels")]
+    pub struct Index {
+        pub org_id: String,
+    }
+}

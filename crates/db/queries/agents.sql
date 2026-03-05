@@ -38,4 +38,8 @@ SELECT
 FROM public.agents
 WHERE created_by_user_id = auth.uid()
   AND org_id = public.b64url_to_uuid(:org_id::TEXT)
+  AND (
+      visibility = 'org'
+      OR created_by_user_id = auth.uid()
+  )
 ORDER BY updated_at DESC;

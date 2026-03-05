@@ -233,7 +233,7 @@ impl<'c, 'a, 's, C: GenericClient>
 pub struct ListMyAgentsStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn list_my_agents() -> ListMyAgentsStmt {
     ListMyAgentsStmt(
-        "SELECT id, name, visibility::TEXT AS visibility, COALESCE(description, '') AS description, updated_at FROM public.agents WHERE created_by_user_id = auth.uid() AND org_id = public.b64url_to_uuid($1::TEXT) ORDER BY updated_at DESC",
+        "SELECT id, name, visibility::TEXT AS visibility, COALESCE(description, '') AS description, updated_at FROM public.agents WHERE created_by_user_id = auth.uid() AND org_id = public.b64url_to_uuid($1::TEXT) AND ( visibility = 'org' OR created_by_user_id = auth.uid() ) ORDER BY updated_at DESC",
         None,
     )
 }

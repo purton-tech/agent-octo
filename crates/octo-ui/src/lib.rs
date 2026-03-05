@@ -1,4 +1,5 @@
 pub mod agents;
+pub mod channels;
 pub mod components;
 mod layout;
 pub mod routes;
