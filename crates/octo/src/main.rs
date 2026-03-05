@@ -1,3 +1,4 @@
+mod authz;
 mod config;
 mod errors;
 mod jwt;
