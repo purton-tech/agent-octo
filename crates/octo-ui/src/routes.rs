@@ -18,4 +18,10 @@ pub mod channels {
     pub struct Index {
         pub org_id: String,
     }
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/channels/connect-telegram")]
+    pub struct ConnectTelegram {
+        pub org_id: String,
+    }
 }

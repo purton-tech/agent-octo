@@ -11,11 +11,24 @@ pub async fn home(
     let transaction = client.transaction().await?;
 
     let context = authz::init_request(&transaction, &current_user).await?;
+
+    let channel_setup = clorinde::queries::channels_list::has_telegram_channel()
+        .bind(&transaction, &context.org_id)
+        .one()
+        .await?;
+
     transaction.commit().await?;
 
-    let href = routes::agents::Index {
-        org_id: context.org_id,
-    }
-    .to_string();
+    let href = if channel_setup.configured {
+        routes::agents::Index {
+            org_id: context.org_id,
+        }
+        .to_string()
+    } else {
+        routes::channels::Index {
+            org_id: context.org_id,
+        }
+        .to_string()
+    };
     Ok(Redirect::to(&href))
 }

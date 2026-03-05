@@ -43,6 +43,7 @@ async fn main() {
         .route("/", get(handlers::root::home))
         .typed_get(handlers::agents::loader)
         .typed_get(handlers::channels::loader)
+        .typed_post(handlers::channels::action_connect_telegram)
         .typed_get(static_files::static_path)
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))
