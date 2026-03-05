@@ -32,6 +32,7 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 
 ### Clorinde SQL Guidelines
 
+* Never embed raw SQL in Rust code; all SQL must live in crates/db/queries/*.sql and be executed only via generated Clorinde query functions.
 * **Struct Definitions**: Add `--: StructName` before queries to define return types
 * **Query Naming**: Use `--! query_name` to name queries
 * **Parameters**: Parameters are inferred automatically; do not declare them manually
