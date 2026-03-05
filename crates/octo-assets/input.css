@@ -13,3 +13,15 @@
         @apply p-4;
     }
 }
+
+#sidebar ul.menu {
+    @apply w-full;
+}
+
+#sidebar ul.menu > li {
+    @apply w-full;
+}
+
+#sidebar ul.menu > li > a {
+    @apply flex w-full;
+}
