@@ -1,5 +1,5 @@
 use crate::{CustomError, Jwt};
-use clorinde::queries::auth;
+use clorinde::queries::{agents, auth};
 use clorinde::tokio_postgres::Transaction;
 
 #[derive(Debug, Clone)]
@@ -48,6 +48,11 @@ pub async fn init_request(
         .await?;
     auth::set_request_claim_external_sub()
         .bind(transaction, &jwt.sub)
+        .one()
+        .await?;
+
+    agents::ensure_default_agent_for_user()
+        .bind(transaction, &org.org_id, &user.id)
         .one()
         .await?;
 

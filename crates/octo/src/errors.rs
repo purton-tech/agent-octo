@@ -33,6 +33,11 @@ impl IntoResponse for CustomError {
             CustomError::FaultySetup(message) => (StatusCode::UNPROCESSABLE_ENTITY, message),
         };
 
+        tracing::error!(
+            "request failed: status={}, message={}",
+            status,
+            error_message
+        );
         format!("status = {}, message = {}", status, error_message).into_response()
     }
 }
