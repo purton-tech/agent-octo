@@ -2,6 +2,7 @@ pub mod agents;
 pub mod channels;
 pub mod components;
 mod layout;
+pub mod providers;
 pub mod routes;
 
 use dioxus::prelude::*;

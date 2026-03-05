@@ -8,6 +8,7 @@ use octo_assets::files::*;
 pub enum SideBar {
     Agents,
     Channels,
+    Providers,
 }
 
 impl std::fmt::Display for SideBar {
@@ -21,6 +22,7 @@ impl SideBar {
         match self {
             SideBar::Agents => "Agents",
             SideBar::Channels => "Channels",
+            SideBar::Providers => "Providers",
         }
     }
 }
@@ -43,12 +45,21 @@ pub fn Layout(
     } else {
         channels_svg.name
     };
+    let providers_icon = if selected_item == SideBar::Providers {
+        providers_active_svg.name
+    } else {
+        providers_svg.name
+    };
 
     let agents_href = routes::agents::Index {
         org_id: org_id.clone(),
     }
     .to_string();
     let channels_href = routes::channels::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+    let providers_href = routes::providers::Index {
         org_id: org_id.clone(),
     }
     .to_string();
@@ -93,6 +104,13 @@ pub fn Layout(
                             href: channels_href,
                             icon: channels_icon,
                             title: "Channels"
+                        }
+                        NavItem {
+                            id: SideBar::Providers.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: providers_href,
+                            icon: providers_icon,
+                            title: "Providers"
                         }
                     )
                 }
