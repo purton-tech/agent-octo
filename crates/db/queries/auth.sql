@@ -2,7 +2,6 @@
 
 --: AuthUser()
 --: EnsureOrgMembership()
---: ClaimValue()
 
 --! upsert_user_by_issuer_sub (first_name?, last_name?) : AuthUser
 INSERT INTO auth.users (
@@ -62,26 +61,26 @@ inserted_membership AS (
 )
 SELECT EXISTS(SELECT 1 FROM inserted_membership) AS ensured;
 
---! set_request_claim_sub : ClaimValue
+--! set_request_claim_sub
 SELECT set_config(
     'request.jwt.claim.sub',
     :claim_sub::TEXT,
     true
-) AS value;
+);
 
---! set_request_claim_iss : ClaimValue
+--! set_request_claim_iss
 SELECT set_config(
     'request.jwt.claim.iss',
     :claim_iss::TEXT,
     true
-) AS value;
+);
 
---! set_request_claim_external_sub : ClaimValue
+--! set_request_claim_external_sub
 SELECT set_config(
     'request.jwt.claim.external_sub',
     :claim_external_sub::TEXT,
     true
-) AS value;
+);
 
 --! get_users : User
 SELECT 

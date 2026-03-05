@@ -54,20 +54,6 @@ pub struct EnsureOrgMembership {
     pub ensured: bool,
 }
 #[derive(Debug, Clone, PartialEq)]
-pub struct ClaimValue {
-    pub value: String,
-}
-pub struct ClaimValueBorrowed<'a> {
-    pub value: &'a str,
-}
-impl<'a> From<ClaimValueBorrowed<'a>> for ClaimValue {
-    fn from(ClaimValueBorrowed { value }: ClaimValueBorrowed<'a>) -> Self {
-        Self {
-            value: value.into(),
-        }
-    }
-}
-#[derive(Debug, Clone, PartialEq)]
 pub struct User {
     pub id: uuid::Uuid,
     pub email: String,
@@ -217,23 +203,20 @@ where
         Ok(mapped)
     }
 }
-pub struct ClaimValueQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
+pub struct StringQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
     client: &'c C,
     params: [&'a (dyn postgres_types::ToSql + Sync); N],
     query: &'static str,
     cached: Option<&'s tokio_postgres::Statement>,
-    extractor: fn(&tokio_postgres::Row) -> Result<ClaimValueBorrowed, tokio_postgres::Error>,
-    mapper: fn(ClaimValueBorrowed) -> T,
+    extractor: fn(&tokio_postgres::Row) -> Result<&str, tokio_postgres::Error>,
+    mapper: fn(&str) -> T,
 }
-impl<'c, 'a, 's, C, T: 'c, const N: usize> ClaimValueQuery<'c, 'a, 's, C, T, N>
+impl<'c, 'a, 's, C, T: 'c, const N: usize> StringQuery<'c, 'a, 's, C, T, N>
 where
     C: GenericClient,
 {
-    pub fn map<R>(
-        self,
-        mapper: fn(ClaimValueBorrowed) -> R,
-    ) -> ClaimValueQuery<'c, 'a, 's, C, R, N> {
-        ClaimValueQuery {
+    pub fn map<R>(self, mapper: fn(&str) -> R) -> StringQuery<'c, 'a, 's, C, R, N> {
+        StringQuery {
             client: self.client,
             params: self.params,
             query: self.query,
@@ -529,7 +512,7 @@ impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
 pub struct SetRequestClaimSubStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn set_request_claim_sub() -> SetRequestClaimSubStmt {
     SetRequestClaimSubStmt(
-        "SELECT set_config( 'request.jwt.claim.sub', $1::TEXT, true ) AS value",
+        "SELECT set_config( 'request.jwt.claim.sub', $1::TEXT, true )",
         None,
     )
 }
@@ -545,26 +528,21 @@ impl SetRequestClaimSubStmt {
         &'s self,
         client: &'c C,
         claim_sub: &'a T1,
-    ) -> ClaimValueQuery<'c, 'a, 's, C, ClaimValue, 1> {
-        ClaimValueQuery {
+    ) -> StringQuery<'c, 'a, 's, C, String, 1> {
+        StringQuery {
             client,
             params: [claim_sub],
             query: self.0,
             cached: self.1.as_ref(),
-            extractor:
-                |row: &tokio_postgres::Row| -> Result<ClaimValueBorrowed, tokio_postgres::Error> {
-                    Ok(ClaimValueBorrowed {
-                        value: row.try_get(0)?,
-                    })
-                },
-            mapper: |it| ClaimValue::from(it),
+            extractor: |row| Ok(row.try_get(0)?),
+            mapper: |it| it.into(),
         }
     }
 }
 pub struct SetRequestClaimIssStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn set_request_claim_iss() -> SetRequestClaimIssStmt {
     SetRequestClaimIssStmt(
-        "SELECT set_config( 'request.jwt.claim.iss', $1::TEXT, true ) AS value",
+        "SELECT set_config( 'request.jwt.claim.iss', $1::TEXT, true )",
         None,
     )
 }
@@ -580,26 +558,21 @@ impl SetRequestClaimIssStmt {
         &'s self,
         client: &'c C,
         claim_iss: &'a T1,
-    ) -> ClaimValueQuery<'c, 'a, 's, C, ClaimValue, 1> {
-        ClaimValueQuery {
+    ) -> StringQuery<'c, 'a, 's, C, String, 1> {
+        StringQuery {
             client,
             params: [claim_iss],
             query: self.0,
             cached: self.1.as_ref(),
-            extractor:
-                |row: &tokio_postgres::Row| -> Result<ClaimValueBorrowed, tokio_postgres::Error> {
-                    Ok(ClaimValueBorrowed {
-                        value: row.try_get(0)?,
-                    })
-                },
-            mapper: |it| ClaimValue::from(it),
+            extractor: |row| Ok(row.try_get(0)?),
+            mapper: |it| it.into(),
         }
     }
 }
 pub struct SetRequestClaimExternalSubStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn set_request_claim_external_sub() -> SetRequestClaimExternalSubStmt {
     SetRequestClaimExternalSubStmt(
-        "SELECT set_config( 'request.jwt.claim.external_sub', $1::TEXT, true ) AS value",
+        "SELECT set_config( 'request.jwt.claim.external_sub', $1::TEXT, true )",
         None,
     )
 }
@@ -615,19 +588,14 @@ impl SetRequestClaimExternalSubStmt {
         &'s self,
         client: &'c C,
         claim_external_sub: &'a T1,
-    ) -> ClaimValueQuery<'c, 'a, 's, C, ClaimValue, 1> {
-        ClaimValueQuery {
+    ) -> StringQuery<'c, 'a, 's, C, String, 1> {
+        StringQuery {
             client,
             params: [claim_external_sub],
             query: self.0,
             cached: self.1.as_ref(),
-            extractor:
-                |row: &tokio_postgres::Row| -> Result<ClaimValueBorrowed, tokio_postgres::Error> {
-                    Ok(ClaimValueBorrowed {
-                        value: row.try_get(0)?,
-                    })
-                },
-            mapper: |it| ClaimValue::from(it),
+            extractor: |row| Ok(row.try_get(0)?),
+            mapper: |it| it.into(),
         }
     }
 }
