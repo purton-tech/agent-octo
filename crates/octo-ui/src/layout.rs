@@ -6,11 +6,21 @@ use octo_assets::files::*;
 #[derive(PartialEq, Clone, Eq, Debug)]
 pub enum SideBar {
     Users,
+    Agents,
 }
 
 impl std::fmt::Display for SideBar {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         std::fmt::Debug::fmt(self, f)
+    }
+}
+
+impl SideBar {
+    fn label(&self) -> &str {
+        match self {
+            SideBar::Users => "Users",
+            SideBar::Agents => "Agents",
+        }
     }
 }
 
@@ -33,7 +43,7 @@ pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Eleme
                             ">"
                         }
                         li {
-                            "Users"
+                            "{selected_item.label()}"
                         }
                     }
                 }
@@ -48,6 +58,13 @@ pub fn Layout(title: String, children: Element, selected_item: SideBar) -> Eleme
                             href: "/",
                             icon: favicon_svg.name,
                             title: "Users"
+                        }
+                        NavItem {
+                            id: SideBar::Agents.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: "/agents",
+                            icon: favicon_svg.name,
+                            title: "Agents"
                         }
                     )
                 }

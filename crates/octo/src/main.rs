@@ -1,3 +1,4 @@
+mod agents;
 mod authz;
 mod config;
 mod errors;
@@ -41,6 +42,7 @@ async fn main() {
     // build our application with a route
     let app = Router::new()
         .route("/", get(root::loader))
+        .route("/agents", get(agents::loader))
         .typed_get(static_files::static_path)
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))
