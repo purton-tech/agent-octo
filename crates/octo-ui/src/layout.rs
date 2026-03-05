@@ -33,6 +33,17 @@ pub fn Layout(
     selected_item: SideBar,
     content_class: Option<String>,
 ) -> Element {
+    let agents_icon = if selected_item == SideBar::Agents {
+        agents_active_svg.name
+    } else {
+        agents_svg.name
+    };
+    let channels_icon = if selected_item == SideBar::Channels {
+        channels_active_svg.name
+    } else {
+        channels_svg.name
+    };
+
     let agents_href = routes::agents::Index {
         org_id: org_id.clone(),
     }
@@ -73,14 +84,14 @@ pub fn Layout(
                             id: SideBar::Agents.to_string(),
                             selected_item_id: selected_item.to_string(),
                             href: agents_href,
-                            icon: favicon_svg.name,
+                            icon: agents_icon,
                             title: "Agents"
                         }
                         NavItem {
                             id: SideBar::Channels.to_string(),
                             selected_item_id: selected_item.to_string(),
                             href: channels_href,
-                            icon: favicon_svg.name,
+                            icon: channels_icon,
                             title: "Channels"
                         }
                     )
