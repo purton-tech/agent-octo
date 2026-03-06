@@ -2,42 +2,45 @@ use js_sys::{Function, Reflect};
 use wasm_bindgen::{JsCast, JsValue, closure::Closure};
 use web_sys::{Document, Element, Event, console};
 
-pub fn hydrate_data_target_popovers(doc: &Document) -> Result<(), JsValue> {
+pub fn hydrate_modal_triggers(doc: &Document) -> Result<(), JsValue> {
     if doc.query_selector("[data-target]")?.is_none() {
-        console::log_1(
-            &"[octo-islands] data-target hydrator: no [data-target] elements found".into(),
-        );
         return Ok(());
     }
-    console::log_1(&"[octo-islands] data-target hydrator: attached click listener".into());
 
     let doc_for_handler = doc.clone();
     let click_handler = Closure::<dyn FnMut(_)>::new(move |event: Event| {
         let Some(event_target) = event.target() else {
-            console::log_1(&"[octo-islands] click event without target".into());
             return;
         };
 
         let Ok(element) = event_target.dyn_into::<Element>() else {
-            console::log_1(&"[octo-islands] click target is not an element".into());
             return;
         };
 
+        // Close modals from explicit cancel controls.
+        if let Ok(Some(cancel_trigger)) = element.closest(".cancel-modal, [data-cancel-modal]") {
+            if let Ok(Some(dialog)) = cancel_trigger.closest("dialog") {
+                event.prevent_default();
+                if let Err(error) = call_method(&dialog, "close") {
+                    console::error_1(&error);
+                }
+            }
+            return;
+        }
+
         let Ok(Some(trigger)) = element.closest("[data-target]") else {
-            console::log_1(&"[octo-islands] click did not hit [data-target] trigger".into());
             return;
         };
-        console::log_1(&"[octo-islands] found [data-target] trigger".into());
+
+        event.prevent_default();
 
         let Some(target_id) = trigger
             .get_attribute("data-target")
             .map(|id| id.trim().to_string())
             .filter(|id| !id.is_empty())
         else {
-            console::warn_1(&"[octo-islands] trigger had empty data-target".into());
             return;
         };
-        console::log_1(&format!("[octo-islands] opening target id='{target_id}'").into());
 
         let Some(target) = doc_for_handler.get_element_by_id(&target_id) else {
             console::warn_1(&format!("No element found for data-target='{target_id}'").into());
@@ -45,12 +48,7 @@ pub fn hydrate_data_target_popovers(doc: &Document) -> Result<(), JsValue> {
         };
 
         if let Err(error) = open_target_element(&target) {
-            console::error_1(
-                &format!("[octo-islands] failed to open target id='{target_id}'").into(),
-            );
             console::error_1(&error);
-        } else {
-            console::log_1(&format!("[octo-islands] opened target id='{target_id}'").into());
         }
     });
 
@@ -62,21 +60,17 @@ pub fn hydrate_data_target_popovers(doc: &Document) -> Result<(), JsValue> {
 
 fn open_target_element(target: &Element) -> Result<(), JsValue> {
     if target.tag_name().eq_ignore_ascii_case("dialog") && call_method(target, "showModal")? {
-        console::log_1(&"[octo-islands] used showModal() for <dialog>".into());
         return Ok(());
     }
 
     if call_method(target, "showPopover")? {
-        console::log_1(&"[octo-islands] used showPopover()".into());
         return Ok(());
     }
 
     if call_method(target, "showModal")? {
-        console::log_1(&"[octo-islands] used showModal()".into());
         return Ok(());
     }
 
-    console::log_1(&"[octo-islands] fallback to setting open attribute".into());
     target.set_attribute("open", "")?;
     Ok(())
 }

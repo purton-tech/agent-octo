@@ -1,7 +1,7 @@
 use wasm_bindgen::prelude::*;
 use web_sys::{Document, window};
 
-mod hydrators;
+mod modal;
 
 // A simple helper function to get the document from the global window.
 fn document() -> Document {
@@ -14,7 +14,7 @@ fn document() -> Document {
 #[wasm_bindgen]
 pub fn hydrate() -> Result<(), JsValue> {
     let doc = document();
-    hydrators::data_target::hydrate_data_target_popovers(&doc)?;
+    modal::hydrate_modal_triggers(&doc)?;
 
     Ok(())
 }
