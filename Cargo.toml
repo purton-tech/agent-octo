@@ -14,7 +14,7 @@ resolver = "3"
 anyhow = "1.0.98"
 axum = "0.8.4"
 dotenvy = "0.15.7"
-monty = { git = "https://github.com/pydantic/monty" }
+monty = { git = "https://github.com/pydantic/monty", rev = "24dad05" }
 native-tls = { version = "0.2.18", features = ["vendored"] }
 oas3 = { version = "0.20.1", features = ["yaml-spec"] }
 reqwest = { version = "0.12.28", default-features = false, features = ["rustls-tls"] }

@@ -67,6 +67,8 @@ _watch binary env_file=".env":
         -w crates/db \
         -w crates/db-gen \
         -w crates/octo \
+        -w crates/octo-ui \
+        -w crates/octo-assets/dist \
         -w crates/tool-runtime \
         --no-gitignore -x "run --bin {{binary}}"
 

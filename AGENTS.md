@@ -32,13 +32,14 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 
 ### Clorinde SQL Guidelines
 
+* Never embed raw SQL in Rust code; all SQL must live in crates/db/queries/*.sql and be executed only via generated Clorinde query functions.
 * **Struct Definitions**: Add `--: StructName` before queries to define return types
 * **Query Naming**: Use `--! query_name` to name queries
 * **Parameters**: Parameters are inferred automatically; do not declare them manually
 * **Intervals**: Use `($1 || ' days')::INTERVAL` for dynamic intervals
 * **Optional Fields**: Use `field_name?` for nullable fields when required
 
-## Folder: web-assets (sometimes a different name in different projects)
+## Folder: octo-assets
 
 * Any images that are needed by the application are stored in a sub folder called images
 * Also the tailwind config is stored here.
@@ -48,24 +49,25 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 * It takes the hash of the files and crates a struct that gives us the ability to access the images by name in a typesafe way.
 * For example the `tailwind.css` will be exported as `web_assets::files::tailwind_css` in the app and we reference it by calling `web_assets::files::tailwind.name`.
 
-## Folder: web-pages (sometimes a different name in different projects)
+## Folder: octo-ui
 
-* Every route has its own folder under `crates/web-pages`.
+* Every route has its own folder under `crates/octo-ui`.
 * The main page for a route lives in a file called `page.rs` inside that folder.
 * Additional components are stored either alongside `page.rs` or in a `components/` folder.
 * Shared widgets such as confirmation dialogs live under `components/` at the crate root.
-* Each page corresponds to a typed route defined in `crates/web-pages/routes.rs` and is called from the matching handler in `crates/web-server/handlers`.
+* Each page corresponds to a typed route defined in `crates/octo-ui/routes.rs` and is called from the matching handler in `crates/octo/handlers`.
 * We use Tailwind and Daisy UI. Only use Daisy UI colors and when possible the provided Daisy RSX library.
 * Buttons can open modals by setting `popover_target` to the modal's `trigger_id`.
 
-## Folder: web-server (sometimes a different name in different projects)
+## Folder: octo
 
-* Every route lives in its own folder under `crates/web-server/handlers`.
+* Every route lives in its own folder under `crates/octo/handlers`.
 * GET endpoints are implemented in `loader.rs`.
 * POST endpoints are implemented in `actions.rs` with functions prefixed by `action_`.
 * `mod.rs` re-exports the loader and actions and defines the `routes()` helper used by `main.rs`.
 * Each loader function fetches data from the database and renders the page.
 * Actions call the appropriate database functions before redirecting the browser.
+
 ## Running the unit tests
 
 * Use `just test` or `cargo test --workspace --exclude integration-testing`

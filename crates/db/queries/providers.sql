@@ -1,4 +1,39 @@
 --: ResolvedProviderConfig()
+--: ProviderConnectionCard()
+--: ProviderConnectionSetup()
+
+--! list_provider_connections : ProviderConnectionCard
+SELECT
+    id,
+    provider_kind,
+    display_name,
+    COALESCE(base_url, '') AS base_url,
+    updated_at
+FROM public.provider_connections
+WHERE org_id = public.b64url_to_uuid(:org_id::TEXT)
+ORDER BY updated_at DESC;
+
+--! create_provider_connection (base_url?) : ProviderConnectionSetup
+WITH inserted AS (
+    INSERT INTO public.provider_connections (
+        org_id,
+        created_by_user_id,
+        provider_kind,
+        display_name,
+        api_key,
+        base_url
+    )
+    VALUES (
+        public.b64url_to_uuid(:org_id::TEXT),
+        auth.uid(),
+        :provider_kind::TEXT,
+        :display_name::TEXT,
+        :api_key::TEXT,
+        :base_url::TEXT
+    )
+    RETURNING 1
+)
+SELECT EXISTS(SELECT 1 FROM inserted) AS configured;
 
 --! get_provider_for_conversation : ResolvedProviderConfig
 WITH target_conversation AS (

@@ -1,7 +1,8 @@
+mod authz;
 mod config;
 mod errors;
+mod handlers;
 mod jwt;
-mod root;
 mod static_files;
 
 use std::net::SocketAddr;
@@ -39,7 +40,13 @@ async fn main() {
 
     // build our application with a route
     let app = Router::new()
-        .route("/", get(root::loader))
+        .route("/", get(handlers::root::home))
+        .typed_get(handlers::agents::loader)
+        .typed_get(handlers::channels::loader)
+        .typed_get(handlers::providers::loader)
+        .typed_get(handlers::providers::loader_new)
+        .typed_post(handlers::channels::action_connect_telegram)
+        .typed_post(handlers::providers::action_create)
         .typed_get(static_files::static_path)
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))

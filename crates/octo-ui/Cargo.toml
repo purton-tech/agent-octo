@@ -4,8 +4,11 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+axum = "0.8"
+axum-extra = { version = "0.12", features = ["typed-routing"] }
 clorinde = { path = "../db-gen" }
-daisy_rsx = "0.1"
+daisy_rsx = "0.1.56"
 dioxus = { version = "0.7.3", default-features = false, features = ["macro", "html", "signals"] }
 dioxus-ssr = { version = "0.7.3", default-features = false }
 octo-assets = { path = "../octo-assets" }
+serde = { version = "1", features = ["derive"] }

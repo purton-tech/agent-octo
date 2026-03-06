@@ -212,6 +212,7 @@ checksum = "8b52af3cb4058c895d37317bb27508dccc8e5f2d39454016b297bf4a400597b8"
 dependencies = [
  "axum-core",
  "bytes",
+ "form_urlencoded",
  "futures-util",
  "http",
  "http-body",
@@ -227,6 +228,7 @@ dependencies = [
  "serde_core",
  "serde_json",
  "serde_path_to_error",
+ "serde_urlencoded",
  "sync_wrapper",
  "tokio",
  "tower",
@@ -298,21 +300,6 @@ name = "base64"
 version = "0.22.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
-
-[[package]]
-name = "bit-set"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08807e080ed7f9d5433fa9b275196cfc35414f66a0c79d864dc51a0d825231a3"
-dependencies = [
- "bit-vec",
-]
-
-[[package]]
-name = "bit-vec"
-version = "0.8.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e764a1d40d510daf35e07be9eb06e75770908c27d411ee6c92109c9840eaaf7"
 
 [[package]]
 name = "bitflags"
@@ -594,9 +581,9 @@ dependencies = [
 
 [[package]]
 name = "daisy_rsx"
-version = "0.1.54"
+version = "0.1.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f181bc525d2e9391434d8a837893fbdf65e1fdc711660c33f977c50fe83c46d7"
+checksum = "c28e3c883fb8472bb5fb3f5d1e58a05b6c788fe04f42112c4e683a48231f1c4f"
 dependencies = [
  "dioxus",
  "dioxus-ssr",
@@ -1073,17 +1060,6 @@ name = "fallible-iterator"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4443176a9f2c162692bd3d352d745ef9413eec5782a80d8fd6f8a1ac692a07f7"
-
-[[package]]
-name = "fancy-regex"
-version = "0.17.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "72cf461f865c862bb7dc573f643dd6a2b6842f7c30b07882b56bd148cc2761b8"
-dependencies = [
- "bit-set",
- "regex-automata",
- "regex-syntax",
-]
 
 [[package]]
 name = "fastrand"
@@ -2026,10 +2002,9 @@ dependencies = [
 [[package]]
 name = "monty"
 version = "0.0.7"
-source = "git+https://github.com/pydantic/monty#bf7c7ef4262055f2b55ab75bf1fe83d2ace674f2"
+source = "git+https://github.com/pydantic/monty?rev=24dad05#24dad053ac36cef25951370001c57a5c5bc5a64d"
 dependencies = [
  "ahash",
- "fancy-regex",
  "hashbrown 0.16.1",
  "indexmap 2.13.0",
  "itertools 0.14.0",
@@ -2037,7 +2012,6 @@ dependencies = [
  "num-integer",
  "num-traits",
  "postcard",
- "pyo3-build-config",
  "ruff_python_ast",
  "ruff_python_parser",
  "ruff_text_size",
@@ -2201,6 +2175,7 @@ dependencies = [
  "tower-livereload",
  "tracing",
  "tracing-subscriber",
+ "uuid",
 ]
 
 [[package]]
@@ -2214,11 +2189,14 @@ dependencies = [
 name = "octo-ui"
 version = "0.1.0"
 dependencies = [
+ "axum",
+ "axum-extra",
  "clorinde",
  "daisy_rsx",
  "dioxus",
  "dioxus-ssr",
  "octo-assets",
+ "serde",
 ]
 
 [[package]]
@@ -2590,15 +2568,6 @@ checksum = "3852766467df634d74f0b2d7819bf8dc483a0eb2e3b0f50f756f9cfe8b0d18d8"
 dependencies = [
  "ar_archive_writer",
  "cc",
-]
-
-[[package]]
-name = "pyo3-build-config"
-version = "0.28.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8bf94ee265674bf76c09fa430b0e99c26e319c945d96ca0d5a8215f31bf81cf7"
-dependencies = [
- "target-lexicon",
 ]
 
 [[package]]
@@ -3594,12 +3563,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "20f34339676cdcab560c9a82300c4c2581f68b9369aedf0fae86f2ff9565ff3e"
 
 [[package]]
-name = "target-lexicon"
-version = "0.13.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "adb6935a6f5c20170eeceb1a3835a49e12e19d792f6dd344ccc76a985ca5a6ca"
-
-[[package]]
 name = "teloxide"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3889,6 +3852,7 @@ dependencies = [
  "tokio",
  "tower-layer",
  "tower-service",
+ "tracing",
 ]
 
 [[package]]
@@ -3941,6 +3905,7 @@ version = "0.1.44"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "63e71662fa4b2a2c3a26f570f037eb95bb1f85397f3cd8076caed2f026a6d100"
 dependencies = [
+ "log",
  "pin-project-lite",
  "tracing-attributes",
  "tracing-core",
