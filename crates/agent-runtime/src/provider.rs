@@ -15,7 +15,7 @@ pub async fn load_for_conversation(
 
     if provider.model.is_empty() {
         return Err(anyhow!(
-            "no model configured for provider connection {}",
+            "no model configured for provider connection {}: set agent.default_model or provider_connection.default_model",
             provider.connection_id
         ));
     }

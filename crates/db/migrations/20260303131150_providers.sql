@@ -28,6 +28,7 @@ CREATE TABLE public.provider_connections (
 
     api_key TEXT NOT NULL,
     base_url TEXT,                            -- optional (proxy/self-hosted/azure)
+    default_model TEXT,                       -- optional provider-level fallback model
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -35,6 +36,9 @@ CREATE TABLE public.provider_connections (
 
 COMMENT ON TABLE public.provider_connections IS
 'Configured LLM provider connections (credentials/config) scoped to an org.';
+
+COMMENT ON COLUMN public.provider_connections.default_model IS
+'Optional default model identifier used when an agent does not specify one.';
 
 CREATE INDEX provider_connections_org_idx
     ON public.provider_connections (org_id);

@@ -14,6 +14,7 @@ pub struct CreateProviderForm {
     pub display_name: String,
     pub api_key: String,
     pub base_url: Option<String>,
+    pub default_model: Option<String>,
 }
 
 pub async fn loader(
@@ -76,6 +77,11 @@ pub async fn action_create(
         .as_ref()
         .map(|s| s.trim().to_string())
         .filter(|s| !s.is_empty());
+    let default_model = form
+        .default_model
+        .as_ref()
+        .map(|s| s.trim().to_string())
+        .filter(|s| !s.is_empty());
 
     if provider_kind.is_empty() || display_name.is_empty() || api_key.is_empty() {
         return Err(CustomError::FaultySetup(
@@ -101,6 +107,7 @@ pub async fn action_create(
             &display_name,
             &api_key,
             &base_url,
+            &default_model,
         )
         .one()
         .await?;

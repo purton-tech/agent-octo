@@ -60,9 +60,20 @@ pub fn index_page(org_id: String, providers: Vec<ProviderConnectionCard>) -> Str
                         class: None,
                         title: provider.display_name,
                         description: Some(rsx!(
-                            p {
-                                class: "capitalize",
-                                "{provider.provider_kind}"
+                            div {
+                                class: "flex flex-col gap-1",
+                                p {
+                                    class: "capitalize",
+                                    "{provider.provider_kind}"
+                                }
+                                p {
+                                    class: "text-sm text-base-content/70",
+                                    if provider.default_model.is_empty() {
+                                        "Default model: not set"
+                                    } else {
+                                        "Default model: {provider.default_model}"
+                                    }
+                                }
                             }
                         )),
                         footer: Some(rsx!(
@@ -168,6 +179,12 @@ pub fn new_page(org_id: String) -> String {
                                     class: "input input-bordered w-full",
                                     name: "base_url",
                                     placeholder: "https://..."
+                                }
+                                label { class: "label", "Default Model (optional)" }
+                                input {
+                                    class: "input input-bordered w-full",
+                                    name: "default_model",
+                                    placeholder: "gpt-4o-mini"
                                 }
                             }
                             ModalAction {

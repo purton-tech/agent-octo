@@ -8,12 +8,13 @@ SELECT
     provider_kind,
     display_name,
     COALESCE(base_url, '') AS base_url,
+    COALESCE(default_model, '') AS default_model,
     updated_at
 FROM public.provider_connections
 WHERE org_id = public.b64url_to_uuid(:org_id::TEXT)
 ORDER BY updated_at DESC;
 
---! create_provider_connection (base_url?) : ProviderConnectionSetup
+--! create_provider_connection (base_url?, default_model?) : ProviderConnectionSetup
 WITH inserted AS (
     INSERT INTO public.provider_connections (
         org_id,
@@ -21,7 +22,8 @@ WITH inserted AS (
         provider_kind,
         display_name,
         api_key,
-        base_url
+        base_url,
+        default_model
     )
     VALUES (
         public.b64url_to_uuid(:org_id::TEXT),
@@ -29,7 +31,8 @@ WITH inserted AS (
         :provider_kind::TEXT,
         :display_name::TEXT,
         :api_key::TEXT,
-        :base_url::TEXT
+        :base_url::TEXT,
+        :default_model::TEXT
     )
     RETURNING 1
 )
@@ -52,14 +55,16 @@ resolved_connection AS (
         pc.id,
         pc.provider_kind,
         pc.api_key,
-        pc.base_url
+        pc.base_url,
+        pc.default_model
     FROM target_conversation tc
     INNER JOIN LATERAL (
         SELECT
             c.id,
             c.provider_kind,
             c.api_key,
-            c.base_url
+            c.base_url,
+            c.default_model
         FROM public.provider_connections c
         WHERE c.id = tc.default_connection_id
            OR (
@@ -80,17 +85,20 @@ resolved_model AS (
     SELECT
         COALESCE(
             tc.default_model,
+            rc.default_model,
             (
                 SELECT pm.model
                 FROM public.provider_models pm
-                INNER JOIN resolved_connection rc
-                    ON rc.id = pm.connection_id
+                INNER JOIN resolved_connection rc2
+                    ON rc2.id = pm.connection_id
                 WHERE pm.is_enabled = TRUE
                 ORDER BY pm.created_at ASC
                 LIMIT 1
             )
         ) AS model
     FROM target_conversation tc
+    INNER JOIN resolved_connection rc
+        ON TRUE
 )
 SELECT
     rc.id AS connection_id,
