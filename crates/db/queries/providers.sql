@@ -4,108 +4,71 @@
 
 --! list_provider_connections : ProviderConnectionCard
 SELECT
-    id,
-    provider_kind,
-    display_name,
-    COALESCE(base_url, '') AS base_url,
-    COALESCE(default_model, '') AS default_model,
-    updated_at
-FROM public.provider_connections
-WHERE org_id = public.b64url_to_uuid(:org_id::TEXT)
+    p.id,
+    p.name AS provider_kind,
+    p.default_model_display_name AS display_name,
+    p.base_url,
+    p.default_model_name AS default_model,
+    MAX(al.created_at) AS updated_at
+FROM public.agent_llm al
+INNER JOIN public.agents a
+    ON a.id = al.agent_id
+INNER JOIN public.providers p
+    ON p.id = al.provider_id
+WHERE a.org_id = public.b64url_to_uuid(:org_id::TEXT)
+GROUP BY
+    p.id,
+    p.name,
+    p.default_model_display_name,
+    p.base_url,
+    p.default_model_name
 ORDER BY updated_at DESC;
 
---! create_provider_connection (base_url?, default_model?) : ProviderConnectionSetup
-WITH inserted AS (
-    INSERT INTO public.provider_connections (
-        org_id,
-        created_by_user_id,
-        provider_kind,
-        display_name,
+--! create_provider_connection : ProviderConnectionSetup
+WITH selected_provider AS (
+    SELECT p.id
+    FROM public.providers p
+    WHERE p.name = :provider_kind::TEXT
+    LIMIT 1
+),
+target_agents AS (
+    SELECT a.id
+    FROM public.agents a
+    WHERE a.org_id = public.b64url_to_uuid(:org_id::TEXT)
+      AND NOT EXISTS (
+          SELECT 1
+          FROM public.agent_llm al
+          WHERE al.agent_id = a.id
+      )
+),
+inserted AS (
+    INSERT INTO public.agent_llm (
+        agent_id,
+        provider_id,
         api_key,
-        base_url,
-        default_model
+        model_name
     )
-    VALUES (
-        public.b64url_to_uuid(:org_id::TEXT),
-        auth.uid(),
-        :provider_kind::TEXT,
-        :display_name::TEXT,
+    SELECT
+        ta.id,
+        sp.id,
         :api_key::TEXT,
-        :base_url::TEXT,
-        :default_model::TEXT
-    )
+        NULL
+    FROM target_agents ta
+    CROSS JOIN selected_provider sp
     RETURNING 1
 )
 SELECT EXISTS(SELECT 1 FROM inserted) AS configured;
 
 --! get_provider_for_conversation : ResolvedProviderConfig
-WITH target_conversation AS (
-    SELECT
-        c.id,
-        c.org_id,
-        a.default_connection_id,
-        a.default_model
-    FROM public.conversations c
-    LEFT JOIN public.agents a
-        ON a.id = c.agent_id
-    WHERE c.id = :conversation_id::UUID
-),
-resolved_connection AS (
-    SELECT
-        pc.id,
-        pc.provider_kind,
-        pc.api_key,
-        pc.base_url,
-        pc.default_model
-    FROM target_conversation tc
-    INNER JOIN LATERAL (
-        SELECT
-            c.id,
-            c.provider_kind,
-            c.api_key,
-            c.base_url,
-            c.default_model
-        FROM public.provider_connections c
-        WHERE c.id = tc.default_connection_id
-           OR (
-                tc.default_connection_id IS NULL
-                AND c.org_id = tc.org_id
-           )
-        ORDER BY
-            CASE
-                WHEN c.id = tc.default_connection_id THEN 0
-                ELSE 1
-            END,
-            c.created_at ASC
-        LIMIT 1
-    ) pc
-        ON TRUE
-),
-resolved_model AS (
-    SELECT
-        COALESCE(
-            tc.default_model,
-            rc.default_model,
-            (
-                SELECT pm.model
-                FROM public.provider_models pm
-                INNER JOIN resolved_connection rc2
-                    ON rc2.id = pm.connection_id
-                WHERE pm.is_enabled = TRUE
-                ORDER BY pm.created_at ASC
-                LIMIT 1
-            )
-        ) AS model
-    FROM target_conversation tc
-    INNER JOIN resolved_connection rc
-        ON TRUE
-)
 SELECT
-    rc.id AS connection_id,
-    rc.provider_kind,
-    rc.api_key,
-    COALESCE(rc.base_url, '') AS base_url,
-    COALESCE(rm.model, '') AS model
-FROM resolved_connection rc
-INNER JOIN resolved_model rm
-    ON TRUE;
+    p.id AS connection_id,
+    p.name AS provider_kind,
+    al.api_key,
+    p.base_url,
+    COALESCE(al.model_name, p.default_model_name) AS model
+FROM public.conversations c
+INNER JOIN public.agent_llm al
+    ON al.agent_id = c.agent_id
+INNER JOIN public.providers p
+    ON p.id = al.provider_id
+WHERE c.id = :conversation_id::UUID;

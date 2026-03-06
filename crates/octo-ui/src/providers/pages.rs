@@ -118,7 +118,7 @@ pub fn new_page(org_id: String) -> String {
                 class: "flex items-start justify-between gap-4",
                 SectionIntroduction {
                     header: "Add Provider".to_string(),
-                    subtitle: "Pick a provider and add credentials in the popup form.".to_string(),
+                    subtitle: "Pick a provider and add an API key. Agents without LLM config will be attached automatically.".to_string(),
                     is_empty: false,
                     empty_text: "".to_string()
                 }
@@ -160,13 +160,6 @@ pub fn new_page(org_id: String) -> String {
                             }
                             div {
                                 class: "mt-4 flex flex-col gap-3",
-                                label { class: "label", "Display Name" }
-                                input {
-                                    class: "input input-bordered w-full",
-                                    name: "display_name",
-                                    value: title,
-                                    required: true
-                                }
                                 label { class: "label", "API Key" }
                                 input {
                                     class: "input input-bordered w-full",
@@ -174,18 +167,7 @@ pub fn new_page(org_id: String) -> String {
                                     placeholder: "sk-...",
                                     required: true
                                 }
-                                label { class: "label", "Base URL (optional)" }
-                                input {
-                                    class: "input input-bordered w-full",
-                                    name: "base_url",
-                                    placeholder: "https://..."
-                                }
-                                label { class: "label", "Default Model (optional)" }
-                                input {
-                                    class: "input input-bordered w-full",
-                                    name: "default_model",
-                                    placeholder: "gpt-4o-mini"
-                                }
+                                p { class: "text-xs text-base-content/70", "Uses the provider's required default model metadata." }
                             }
                             ModalAction {
                                 Button {

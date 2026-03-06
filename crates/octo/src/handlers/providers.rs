@@ -11,10 +11,7 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct CreateProviderForm {
     pub provider_kind: String,
-    pub display_name: String,
     pub api_key: String,
-    pub base_url: Option<String>,
-    pub default_model: Option<String>,
 }
 
 pub async fn loader(
@@ -70,22 +67,11 @@ pub async fn action_create(
     Form(form): Form<CreateProviderForm>,
 ) -> Result<Redirect, CustomError> {
     let provider_kind = form.provider_kind.trim().to_string();
-    let display_name = form.display_name.trim().to_string();
     let api_key = form.api_key.trim().to_string();
-    let base_url = form
-        .base_url
-        .as_ref()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty());
-    let default_model = form
-        .default_model
-        .as_ref()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty());
 
-    if provider_kind.is_empty() || display_name.is_empty() || api_key.is_empty() {
+    if provider_kind.is_empty() || api_key.is_empty() {
         return Err(CustomError::FaultySetup(
-            "Provider kind, display name and API key are required".to_string(),
+            "Provider kind and API key are required".to_string(),
         ));
     }
 
@@ -99,18 +85,34 @@ pub async fn action_create(
         ));
     }
 
-    clorinde::queries::providers::create_provider_connection()
-        .bind(
-            &transaction,
-            &org_id,
-            &provider_kind,
-            &display_name,
-            &api_key,
-            &base_url,
-            &default_model,
-        )
+    let setup = clorinde::queries::providers::create_provider_connection()
+        .bind(&transaction, &org_id, &provider_kind, &api_key)
         .one()
-        .await?;
+        .await
+        .map_err(|err| {
+            let db_detail = if let Some(db_err) = err.as_db_error() {
+                format!(
+                    "message='{}' code={:?} detail='{}' hint='{}' table='{}' constraint='{}'",
+                    db_err.message(),
+                    db_err.code(),
+                    db_err.detail().unwrap_or(""),
+                    db_err.hint().unwrap_or(""),
+                    db_err.table().unwrap_or(""),
+                    db_err.constraint().unwrap_or("")
+                )
+            } else {
+                format!("{err:?}")
+            };
+            CustomError::Database(format!(
+                "Failed to save API key for provider '{provider_kind}' in org '{org_id}': {db_detail}"
+            ))
+        })?;
+
+    if !setup.configured {
+        return Err(CustomError::FaultySetup(format!(
+            "Provider '{provider_kind}' was not connected. Make sure it is a supported provider and there is at least one agent without provider configuration."
+        )));
+    }
 
     transaction.commit().await?;
 

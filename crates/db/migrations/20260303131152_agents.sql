@@ -9,7 +9,7 @@
 --   - Scoped to an org (tenant isolation).
 --   - Created by a user.
 --   - Private by default; can be shared to org.
---   - Optionally pinned to a provider connection + model.
+--   - LLM wiring is stored in public.agent_llm.
 --
 -- Note:
 --   - Secrets are never stored here.
@@ -27,9 +27,6 @@ CREATE TABLE public.agents (
     description TEXT,
     system_prompt TEXT NOT NULL,
 
-    default_connection_id UUID REFERENCES public.provider_connections(id) ON DELETE SET NULL,
-    default_model TEXT,
-
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -43,12 +40,6 @@ COMMENT ON COLUMN public.agents.visibility IS
 COMMENT ON COLUMN public.agents.system_prompt IS
 'System prompt defining the agent behavior and instructions.';
 
-COMMENT ON COLUMN public.agents.default_connection_id IS
-'Optional default provider connection for this agent.';
-
-COMMENT ON COLUMN public.agents.default_model IS
-'Optional default model identifier (provider-specific string).';
-
 CREATE INDEX agents_org_visibility_idx
     ON public.agents (org_id, visibility);
 
@@ -58,11 +49,18 @@ CREATE INDEX agents_creator_idx
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.agents TO application_user;
 GRANT SELECT ON public.agents TO application_readonly;
 
+ALTER TABLE public.agent_llm
+ADD CONSTRAINT agent_llm_agent_id_fkey
+FOREIGN KEY (agent_id)
+REFERENCES public.agents(id)
+ON DELETE CASCADE;
+
 -- =========================
 -- RLS
 -- =========================
 
 ALTER TABLE public.agents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.agent_llm ENABLE ROW LEVEL SECURITY;
 
 -- Read: org members can see org-visible agents, plus their own private agents.
 CREATE POLICY agents_select
@@ -120,7 +118,71 @@ USING (
     )
 );
 
+CREATE POLICY agent_llm_select
+ON public.agent_llm
+FOR SELECT
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.agents a
+        WHERE a.id = agent_id
+          AND org.is_org_member(a.org_id)
+    )
+);
+
+CREATE POLICY agent_llm_insert
+ON public.agent_llm
+FOR INSERT
+WITH CHECK (
+    EXISTS (
+        SELECT 1
+        FROM public.agents a
+        WHERE a.id = agent_id
+          AND org.is_org_admin(a.org_id)
+    )
+);
+
+CREATE POLICY agent_llm_update
+ON public.agent_llm
+FOR UPDATE
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.agents a
+        WHERE a.id = agent_id
+          AND org.is_org_admin(a.org_id)
+    )
+)
+WITH CHECK (
+    EXISTS (
+        SELECT 1
+        FROM public.agents a
+        WHERE a.id = agent_id
+          AND org.is_org_admin(a.org_id)
+    )
+);
+
+CREATE POLICY agent_llm_delete
+ON public.agent_llm
+FOR DELETE
+USING (
+    EXISTS (
+        SELECT 1
+        FROM public.agents a
+        WHERE a.id = agent_id
+          AND org.is_org_admin(a.org_id)
+    )
+);
+
 -- migrate:down
+DROP POLICY IF EXISTS agent_llm_delete ON public.agent_llm;
+DROP POLICY IF EXISTS agent_llm_update ON public.agent_llm;
+DROP POLICY IF EXISTS agent_llm_insert ON public.agent_llm;
+DROP POLICY IF EXISTS agent_llm_select ON public.agent_llm;
+
+ALTER TABLE IF EXISTS public.agent_llm
+DROP CONSTRAINT IF EXISTS agent_llm_agent_id_fkey;
+
 DROP POLICY IF EXISTS agents_delete ON public.agents;
 DROP POLICY IF EXISTS agents_update ON public.agents;
 DROP POLICY IF EXISTS agents_insert ON public.agents;
