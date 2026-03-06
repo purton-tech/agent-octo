@@ -13,28 +13,26 @@ spec:
   profiles:
     dev:
       components:
+        oidc:
+          hostname-url: http://localhost:30060
         ingress:
           port: 30060
         db:
           expose_db_port: 30061
-      services:
-        web:
-          image: ghcr.io/purton-tech/octo:1.0.1
-          port: 8080
-    prod:
-      services:
-        web:
-          image: ghcr.io/purton-tech/octo:1.0.1
-          port: 8080
-          database_url: APPLICATION_URL
-          init:
-            image: ghcr.io/purton-tech/octo-migrations:1.0.1
-            migrations_database_url: DATABASE_URL
-        channels:
-          image: ghcr.io/purton-tech/channels:1.0.1
-          database_url: APPLICATION_URL
-          service_role_jwt: SERVICE_ROLE_JWT
-        agent-runtime:
-          image: ghcr.io/purton-tech/agent-runtime:1.0.1
-          database_url: APPLICATION_URL
-          service_role_jwt: SERVICE_ROLE_JWT
+  services:
+    web:
+      image: ghcr.io/purton-tech/octo:1.0.1
+      port: 3000
+      database_url: APPLICATION_URL
+      init:
+        image: ghcr.io/purton-tech/octo-migrations:1.0.1
+        migrations_database_url: DATABASE_URL
+    agent-runtime:
+      image: ghcr.io/purton-tech/agent-runtime:1.0.1
+      database_url: DATABASE_URL
+    telegram-egress:
+      image: ghcr.io/purton-tech/telegram-egress:1.0.1
+      database_url: DATABASE_URL
+    telegram-ingress-polling:
+      image: ghcr.io/purton-tech/telegram-ingress-polling:1.0.1
+      database_url: DATABASE_URL:Ex

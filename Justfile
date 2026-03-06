@@ -7,7 +7,7 @@ dev-init:
     just get-config
 
 dev-setup:
-    stack init
+    stack init --install-keycloak
     stack deploy --manifest infra-as-code/stack.yaml --profile dev
 
 dev-secrets:
