@@ -83,6 +83,16 @@ wce env_file=".env": (_watch "telegram-egress" env_file)
 wtw:
     cd /workspace/crates/octo-assets && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
 
+wi:
+    cargo watch \
+      -w crates/octo-islands \
+      -s 'cargo build -p octo-islands --target wasm32-unknown-unknown --release && \
+          wasm-bindgen \
+            target/wasm32-unknown-unknown/release/octo_islands.wasm \
+            --target web \
+            --out-dir crates/octo-assets/dist'
+
+
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
 get-config:
