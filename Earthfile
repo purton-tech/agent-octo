@@ -17,6 +17,12 @@ checks:
     WORKDIR /workspace
     COPY . .
     RUN cd /workspace/crates/octo-assets && mkdir -p dist && tailwind-extra -i ./input.css -o ./dist/tailwind.css
+    RUN rustup target add wasm32-unknown-unknown
+    RUN cargo build -p octo-islands --target wasm32-unknown-unknown --release && \
+        wasm-bindgen \
+          target/wasm32-unknown-unknown/release/octo_islands.wasm \
+          --target web \
+          --out-dir crates/octo-assets/dist
     RUN cargo fmt --check
     RUN cargo clippy --workspace --all-targets -- -D warnings
 
@@ -27,12 +33,20 @@ build:
     WORKDIR /workspace
     COPY . .
     RUN cd /workspace/crates/octo-assets && mkdir -p dist && tailwind-extra -i ./input.css -o ./dist/tailwind.css
+    RUN rustup target add wasm32-unknown-unknown
+    RUN cargo build -p octo-islands --target wasm32-unknown-unknown --release && \
+        wasm-bindgen \
+          target/wasm32-unknown-unknown/release/octo_islands.wasm \
+          --target web \
+          --out-dir crates/octo-assets/dist
     RUN rustup target add x86_64-unknown-linux-musl
-    RUN cargo build --workspace --release --target x86_64-unknown-linux-musl
+    RUN cargo build --workspace --exclude octo-islands --release --target x86_64-unknown-linux-musl
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/octo /octo
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/telegram-ingress-polling /telegram-ingress-polling
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/telegram-egress /telegram-egress
     SAVE ARTIFACT target/x86_64-unknown-linux-musl/release/agent-runtime /agent-runtime
+    SAVE ARTIFACT crates/octo-assets/dist /workspace/crates/octo-assets/dist
+    SAVE ARTIFACT crates/octo-assets/images /workspace/crates/octo-assets/images
 
 # Package a selected binary into a scratch image tagged with the binary name.
 image:
@@ -42,6 +56,8 @@ image:
     FROM scratch
     COPY +certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
     COPY +build/$BINARY /app
+    COPY +build/workspace/crates/octo-assets/dist /workspace/crates/octo-assets/dist
+    COPY +build/workspace/crates/octo-assets/images /workspace/crates/octo-assets/images
     USER 65532:65532
     ENTRYPOINT ["/app"]
     SAVE IMAGE --push $REGISTRY/$BINARY:$TAG

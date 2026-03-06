@@ -11,11 +11,11 @@ pub async fn load_for_conversation(
         .opt()
         .await
         .context("failed to load provider configuration")?
-        .ok_or_else(|| anyhow!("no provider connection configured for conversation"))?;
+        .ok_or_else(|| anyhow!("no agent_llm configured for conversation"))?;
 
     if provider.model.is_empty() {
         return Err(anyhow!(
-            "no model configured for provider connection {}",
+            "no model configured for provider {}: set agent_llm.model_name or provider default",
             provider.connection_id
         ));
     }

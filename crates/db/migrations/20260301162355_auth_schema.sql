@@ -61,8 +61,8 @@ COMMENT ON COLUMN auth.users.email IS
 -- Postgres does NOT validate the JWT itself.
 -- It only reads claims that have already been verified upstream.
 --
--- auth.uid() returns the authenticated user's UUID
--- from the JWT "sub" claim.
+-- auth.uid() resolves the authenticated internal user UUID
+-- from JWT claims (iss + sub).
 --
 -- If the claim is missing, NULL is returned.
 
@@ -71,11 +71,15 @@ RETURNS uuid
 LANGUAGE sql
 STABLE
 AS $$
-  SELECT current_setting('request.jwt.claim.sub', true)::uuid
+  SELECT u.id
+  FROM auth.users u
+  WHERE u.issuer = current_setting('request.jwt.claim.iss', true)
+    AND u.sub = current_setting('request.jwt.claim.sub', true)
+  LIMIT 1
 $$;
 
 COMMENT ON FUNCTION auth.uid() IS
-'Returns the authenticated user ID (JWT "sub" claim) from the current session. 
+'Returns the authenticated internal user ID (auth.users.id) by resolving JWT (iss, sub) from the current session. 
 Requires the API layer to validate the JWT and inject claims via request.jwt.claim.* settings.';
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON auth.users TO application_user;

@@ -11,9 +11,7 @@ use serde::Deserialize;
 #[derive(Deserialize)]
 pub struct CreateProviderForm {
     pub provider_kind: String,
-    pub display_name: String,
     pub api_key: String,
-    pub base_url: Option<String>,
 }
 
 pub async fn loader(
@@ -69,17 +67,11 @@ pub async fn action_create(
     Form(form): Form<CreateProviderForm>,
 ) -> Result<Redirect, CustomError> {
     let provider_kind = form.provider_kind.trim().to_string();
-    let display_name = form.display_name.trim().to_string();
     let api_key = form.api_key.trim().to_string();
-    let base_url = form
-        .base_url
-        .as_ref()
-        .map(|s| s.trim().to_string())
-        .filter(|s| !s.is_empty());
 
-    if provider_kind.is_empty() || display_name.is_empty() || api_key.is_empty() {
+    if provider_kind.is_empty() || api_key.is_empty() {
         return Err(CustomError::FaultySetup(
-            "Provider kind, display name and API key are required".to_string(),
+            "Provider kind and API key are required".to_string(),
         ));
     }
 
@@ -93,17 +85,16 @@ pub async fn action_create(
         ));
     }
 
-    clorinde::queries::providers::create_provider_connection()
-        .bind(
-            &transaction,
-            &org_id,
-            &provider_kind,
-            &display_name,
-            &api_key,
-            &base_url,
-        )
+    let setup = clorinde::queries::providers::create_provider_connection()
+        .bind(&transaction, &provider_kind, &org_id, &api_key)
         .one()
         .await?;
+
+    if !setup.configured {
+        return Err(CustomError::FaultySetup(format!(
+            "Provider '{provider_kind}' was not connected. Make sure it is a supported provider and there is at least one agent without provider configuration."
+        )));
+    }
 
     transaction.commit().await?;
 

@@ -68,6 +68,10 @@ pub fn Layout(
     rsx! {
         BaseLayout {
             title,
+            web_assembly: (
+                octo_islands_js.name.into(),
+                octo_islands_bg_wasm.name.into()
+            ),
             stylesheets: vec![tailwind_css.name.to_string(), "https://cdn.jsdelivr.net/npm/daisyui@5".into()],
             header: rsx!(
                 nav {
@@ -174,6 +178,7 @@ pub fn Layout(
 pub struct BaseLayoutProps {
     title: String,
     fav_icon_src: Option<String>,
+    web_assembly: Option<(String, String)>,
     stylesheets: Vec<String>,
     js_href: Option<String>,
     header: Element,
@@ -184,6 +189,15 @@ pub struct BaseLayoutProps {
 }
 
 pub fn BaseLayout(props: BaseLayoutProps) -> Element {
+    // Do we need to handle web assembly?
+    let hydrate: Option<String> = if let Some((js, wasm)) = props.web_assembly {
+        Some(format!(
+            "import init, {{ hydrate }} from '{}'; await init('{}');hydrate();",
+            js, wasm
+        ))
+    } else {
+        None
+    };
     rsx!(
         head {
             title {
@@ -218,6 +232,12 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
                     rel: "icon",
                     "type": "image/svg+xml",
                     href: "{fav_icon_src}"
+                }
+            }
+            if let Some(hydrate) = hydrate {
+                script {
+                    "type": "module",
+                    dangerous_inner_html: hydrate
                 }
             }
         }

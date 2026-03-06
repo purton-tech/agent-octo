@@ -5,14 +5,10 @@ pub struct CreateProviderConnectionParams<
     T1: crate::StringSql,
     T2: crate::StringSql,
     T3: crate::StringSql,
-    T4: crate::StringSql,
-    T5: crate::StringSql,
 > {
-    pub org_id: T1,
-    pub provider_kind: T2,
-    pub display_name: T3,
-    pub api_key: T4,
-    pub base_url: Option<T5>,
+    pub provider_kind: T1,
+    pub org_id: T2,
+    pub api_key: T3,
 }
 #[derive(Debug, Clone, PartialEq)]
 pub struct ProviderConnectionCard {
@@ -20,6 +16,7 @@ pub struct ProviderConnectionCard {
     pub provider_kind: String,
     pub display_name: String,
     pub base_url: String,
+    pub default_model: String,
     pub updated_at: chrono::DateTime<chrono::FixedOffset>,
 }
 pub struct ProviderConnectionCardBorrowed<'a> {
@@ -27,6 +24,7 @@ pub struct ProviderConnectionCardBorrowed<'a> {
     pub provider_kind: &'a str,
     pub display_name: &'a str,
     pub base_url: &'a str,
+    pub default_model: &'a str,
     pub updated_at: chrono::DateTime<chrono::FixedOffset>,
 }
 impl<'a> From<ProviderConnectionCardBorrowed<'a>> for ProviderConnectionCard {
@@ -36,6 +34,7 @@ impl<'a> From<ProviderConnectionCardBorrowed<'a>> for ProviderConnectionCard {
             provider_kind,
             display_name,
             base_url,
+            default_model,
             updated_at,
         }: ProviderConnectionCardBorrowed<'a>,
     ) -> Self {
@@ -44,6 +43,7 @@ impl<'a> From<ProviderConnectionCardBorrowed<'a>> for ProviderConnectionCard {
             provider_kind: provider_kind.into(),
             display_name: display_name.into(),
             base_url: base_url.into(),
+            default_model: default_model.into(),
             updated_at,
         }
     }
@@ -294,7 +294,7 @@ where
 pub struct ListProviderConnectionsStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn list_provider_connections() -> ListProviderConnectionsStmt {
     ListProviderConnectionsStmt(
-        "SELECT id, provider_kind, display_name, COALESCE(base_url, '') AS base_url, updated_at FROM public.provider_connections WHERE org_id = public.b64url_to_uuid($1::TEXT) ORDER BY updated_at DESC",
+        "SELECT p.id, p.name AS provider_kind, p.default_model_display_name AS display_name, p.base_url, p.default_model_name AS default_model, MAX(al.created_at) AS updated_at FROM public.agent_llm al INNER JOIN public.agents a ON a.id = al.agent_id INNER JOIN public.providers p ON p.id = al.provider_id WHERE a.org_id = public.b64url_to_uuid($1::TEXT) GROUP BY p.id, p.name, p.default_model_display_name, p.base_url, p.default_model_name ORDER BY updated_at DESC",
         None,
     )
 }
@@ -324,7 +324,8 @@ impl ListProviderConnectionsStmt {
                     provider_kind: row.try_get(1)?,
                     display_name: row.try_get(2)?,
                     base_url: row.try_get(3)?,
-                    updated_at: row.try_get(4)?,
+                    default_model: row.try_get(4)?,
+                    updated_at: row.try_get(5)?,
                 })
             },
             mapper: |it| ProviderConnectionCard::from(it),
@@ -334,7 +335,7 @@ impl ListProviderConnectionsStmt {
 pub struct CreateProviderConnectionStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn create_provider_connection() -> CreateProviderConnectionStmt {
     CreateProviderConnectionStmt(
-        "WITH inserted AS ( INSERT INTO public.provider_connections ( org_id, created_by_user_id, provider_kind, display_name, api_key, base_url ) VALUES ( public.b64url_to_uuid($1::TEXT), auth.uid(), $2::TEXT, $3::TEXT, $4::TEXT, $5::TEXT ) RETURNING 1 ) SELECT EXISTS(SELECT 1 FROM inserted) AS configured",
+        "WITH selected_provider AS ( SELECT p.id FROM public.providers p WHERE p.name = $1::TEXT LIMIT 1 ), target_agents AS ( SELECT a.id FROM public.agents a WHERE a.org_id = public.b64url_to_uuid($2::TEXT) AND NOT EXISTS ( SELECT 1 FROM public.agent_llm al WHERE al.agent_id = a.id ) ), inserted AS ( INSERT INTO public.agent_llm ( agent_id, provider_id, api_key, model_name ) SELECT ta.id, sp.id, $3::TEXT, NULL FROM target_agents ta CROSS JOIN selected_provider sp RETURNING 1 ) SELECT EXISTS(SELECT 1 FROM inserted) AS configured",
         None,
     )
 }
@@ -354,20 +355,16 @@ impl CreateProviderConnectionStmt {
         T1: crate::StringSql,
         T2: crate::StringSql,
         T3: crate::StringSql,
-        T4: crate::StringSql,
-        T5: crate::StringSql,
     >(
         &'s self,
         client: &'c C,
-        org_id: &'a T1,
-        provider_kind: &'a T2,
-        display_name: &'a T3,
-        api_key: &'a T4,
-        base_url: &'a Option<T5>,
-    ) -> ProviderConnectionSetupQuery<'c, 'a, 's, C, ProviderConnectionSetup, 5> {
+        provider_kind: &'a T1,
+        org_id: &'a T2,
+        api_key: &'a T3,
+    ) -> ProviderConnectionSetupQuery<'c, 'a, 's, C, ProviderConnectionSetup, 3> {
         ProviderConnectionSetupQuery {
             client,
-            params: [org_id, provider_kind, display_name, api_key, base_url],
+            params: [provider_kind, org_id, api_key],
             query: self.0,
             cached: self.1.as_ref(),
             extractor: |
@@ -389,37 +386,33 @@ impl<
         T1: crate::StringSql,
         T2: crate::StringSql,
         T3: crate::StringSql,
-        T4: crate::StringSql,
-        T5: crate::StringSql,
     >
     crate::client::async_::Params<
         'c,
         'a,
         's,
-        CreateProviderConnectionParams<T1, T2, T3, T4, T5>,
-        ProviderConnectionSetupQuery<'c, 'a, 's, C, ProviderConnectionSetup, 5>,
+        CreateProviderConnectionParams<T1, T2, T3>,
+        ProviderConnectionSetupQuery<'c, 'a, 's, C, ProviderConnectionSetup, 3>,
         C,
     > for CreateProviderConnectionStmt
 {
     fn params(
         &'s self,
         client: &'c C,
-        params: &'a CreateProviderConnectionParams<T1, T2, T3, T4, T5>,
-    ) -> ProviderConnectionSetupQuery<'c, 'a, 's, C, ProviderConnectionSetup, 5> {
+        params: &'a CreateProviderConnectionParams<T1, T2, T3>,
+    ) -> ProviderConnectionSetupQuery<'c, 'a, 's, C, ProviderConnectionSetup, 3> {
         self.bind(
             client,
-            &params.org_id,
             &params.provider_kind,
-            &params.display_name,
+            &params.org_id,
             &params.api_key,
-            &params.base_url,
         )
     }
 }
 pub struct GetProviderForConversationStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn get_provider_for_conversation() -> GetProviderForConversationStmt {
     GetProviderForConversationStmt(
-        "WITH target_conversation AS ( SELECT c.id, c.org_id, a.default_connection_id, a.default_model FROM public.conversations c LEFT JOIN public.agents a ON a.id = c.agent_id WHERE c.id = $1::UUID ), resolved_connection AS ( SELECT pc.id, pc.provider_kind, pc.api_key, pc.base_url FROM target_conversation tc INNER JOIN LATERAL ( SELECT c.id, c.provider_kind, c.api_key, c.base_url FROM public.provider_connections c WHERE c.id = tc.default_connection_id OR ( tc.default_connection_id IS NULL AND c.org_id = tc.org_id ) ORDER BY CASE WHEN c.id = tc.default_connection_id THEN 0 ELSE 1 END, c.created_at ASC LIMIT 1 ) pc ON TRUE ), resolved_model AS ( SELECT COALESCE( tc.default_model, ( SELECT pm.model FROM public.provider_models pm INNER JOIN resolved_connection rc ON rc.id = pm.connection_id WHERE pm.is_enabled = TRUE ORDER BY pm.created_at ASC LIMIT 1 ) ) AS model FROM target_conversation tc ) SELECT rc.id AS connection_id, rc.provider_kind, rc.api_key, COALESCE(rc.base_url, '') AS base_url, COALESCE(rm.model, '') AS model FROM resolved_connection rc INNER JOIN resolved_model rm ON TRUE",
+        "SELECT p.id AS connection_id, p.name AS provider_kind, al.api_key, p.base_url, COALESCE(al.model_name, p.default_model_name) AS model FROM public.conversations c INNER JOIN public.agent_llm al ON al.agent_id = c.agent_id INNER JOIN public.providers p ON p.id = al.provider_id WHERE c.id = $1::UUID",
         None,
     )
 }

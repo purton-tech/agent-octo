@@ -6,7 +6,7 @@ members = [
     "crates/octo-assets",
     "crates/octo-ui",
     "crates/octo",
-    "crates/db",
+    "crates/db", "crates/octo-islands",
 ]
 resolver = "3"
 

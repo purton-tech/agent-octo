@@ -691,36 +691,6 @@ impl SetRequestClaimIssStmt {
         }
     }
 }
-pub struct SetRequestClaimExternalSubStmt(&'static str, Option<tokio_postgres::Statement>);
-pub fn set_request_claim_external_sub() -> SetRequestClaimExternalSubStmt {
-    SetRequestClaimExternalSubStmt(
-        "SELECT set_config( 'request.jwt.claim.external_sub', $1::TEXT, true )",
-        None,
-    )
-}
-impl SetRequestClaimExternalSubStmt {
-    pub async fn prepare<'a, C: GenericClient>(
-        mut self,
-        client: &'a C,
-    ) -> Result<Self, tokio_postgres::Error> {
-        self.1 = Some(client.prepare(self.0).await?);
-        Ok(self)
-    }
-    pub fn bind<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>(
-        &'s self,
-        client: &'c C,
-        claim_external_sub: &'a T1,
-    ) -> StringQuery<'c, 'a, 's, C, String, 1> {
-        StringQuery {
-            client,
-            params: [claim_external_sub],
-            query: self.0,
-            cached: self.1.as_ref(),
-            extractor: |row| Ok(row.try_get(0)?),
-            mapper: |it| it.into(),
-        }
-    }
-}
 pub struct GetUsersStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn get_users() -> GetUsersStmt {
     GetUsersStmt("SELECT id, email FROM auth.users", None)

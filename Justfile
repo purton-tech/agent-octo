@@ -16,50 +16,11 @@ dev-secrets:
     stack secrets --manifest infra-as-code/stack.yaml --profile dev --db-host host.docker.internal --db-port 30061 >> .env
     sed -i 's/^MIGRATIONS_URL=/DATABASE_URL=/' .env
 
-runtime-secrets env_file=".env":
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    if [ ! -f "{{env_file}}" ]; then
-        echo "Missing env file: {{env_file}}" >&2
-        exit 1
-    fi
-
-    set -a
-    . "{{env_file}}"
-    set +a
-
-    : "${TELEGRAM_BOT_TOKEN:?TELEGRAM_BOT_TOKEN not set in {{env_file}}}"
-    : "${OPENAI_API_KEY:?OPENAI_API_KEY not set in {{env_file}}}"
-
-    kubectl create secret generic octo-runtime \
-        --namespace agent-octo \
-        --from-literal=telegram-bot-token="${TELEGRAM_BOT_TOKEN}" \
-        --from-literal=openai-api-key="${OPENAI_API_KEY}" \
-        --dry-run=client \
-        -o yaml \
-        | kubectl apply -f -
-
-dev-db-setup env_file=".env":
-    ./crates/db/dev_setup.sh {{env_file}}
-
 ## Run the code generators
 wd:
     cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen && cargo fmt'
 
-_watch binary env_file=".env":
-    #!/usr/bin/env bash
-    set -euo pipefail
-
-    if [ ! -f "{{env_file}}" ]; then
-        echo "Missing env file: {{env_file}}  run just dot-env" >&2
-        exit 1
-    fi
-
-    set -a
-    . "{{env_file}}"
-    set +a
-
+_watch binary:
     mold -run cargo watch \
         --workdir /workspace/ \
         -w crates/agent-runtime \
@@ -72,16 +33,23 @@ _watch binary env_file=".env":
         -w crates/tool-runtime \
         --no-gitignore -x "run --bin {{binary}}"
 
-wo env_file=".env": (_watch "octo" env_file)
-
-wa env_file=".env": (_watch "agent-runtime" env_file)
-
-wci env_file=".env": (_watch "telegram-ingress-polling" env_file)
-
-wce env_file=".env": (_watch "telegram-egress" env_file)
+wo: (_watch "octo")
+wa: (_watch "agent-runtime")
+wci: (_watch "telegram-ingress-polling")
+wce: (_watch "telegram-egress")
 
 wtw:
     cd /workspace/crates/octo-assets && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
+
+wi:
+    cargo watch \
+      -w crates/octo-islands \
+      -s 'cargo build -p octo-islands --target wasm32-unknown-unknown --release && \
+          wasm-bindgen \
+            target/wasm32-unknown-unknown/release/octo_islands.wasm \
+            --target web \
+            --out-dir crates/octo-assets/dist'
+
 
 
 # Retrieve the cluster kube config - so kubectl and k9s work.
@@ -95,6 +63,9 @@ get-config:
 
 codex: 
     sudo npm install -g @openai/codex
+
+tk:
+    tmux kill-server
 
 octo:
     cargo binstall --no-confirm zellij

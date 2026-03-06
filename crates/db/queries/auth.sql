@@ -85,13 +85,6 @@ SELECT set_config(
     true
 );
 
---! set_request_claim_external_sub
-SELECT set_config(
-    'request.jwt.claim.external_sub',
-    :claim_external_sub::TEXT,
-    true
-);
-
 --! get_users : User
 SELECT 
     id, 

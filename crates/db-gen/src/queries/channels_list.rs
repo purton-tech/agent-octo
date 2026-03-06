@@ -4,6 +4,7 @@
 pub struct ConnectTelegramChannelParams<T1: crate::StringSql, T2: crate::StringSql> {
     pub org_id: T1,
     pub bot_token: T2,
+    pub default_agent_id: uuid::Uuid,
 }
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub struct ChannelSetup {
@@ -213,7 +214,7 @@ impl HasTelegramChannelStmt {
 pub struct ConnectTelegramChannelStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn connect_telegram_channel() -> ConnectTelegramChannelStmt {
     ConnectTelegramChannelStmt(
-        "WITH inserted AS ( INSERT INTO public.channels ( org_id, created_by_user_id, visibility, kind, name, bot_token ) SELECT public.b64url_to_uuid($1::TEXT), auth.uid(), 'private'::resource_visibility, 'telegram'::channel_type, 'Telegram', $2::TEXT WHERE NOT EXISTS ( SELECT 1 FROM public.channels c WHERE c.org_id = public.b64url_to_uuid($1::TEXT) AND c.kind = 'telegram'::channel_type ) RETURNING 1 ) SELECT EXISTS(SELECT 1 FROM inserted) AS configured",
+        "WITH inserted AS ( INSERT INTO public.channels ( org_id, created_by_user_id, visibility, kind, name, bot_token, default_agent_id ) SELECT public.b64url_to_uuid($1::TEXT), auth.uid(), 'private'::resource_visibility, 'telegram'::channel_type, 'Telegram', $2::TEXT, a.id FROM public.agents a WHERE a.id = $3::UUID AND a.org_id = public.b64url_to_uuid($1::TEXT) AND ( a.visibility = 'org' OR a.created_by_user_id = auth.uid() ) AND NOT EXISTS ( SELECT 1 FROM public.channels c WHERE c.org_id = public.b64url_to_uuid($1::TEXT) AND c.kind = 'telegram'::channel_type ) RETURNING 1 ) SELECT EXISTS(SELECT 1 FROM inserted) AS configured",
         None,
     )
 }
@@ -230,10 +231,11 @@ impl ConnectTelegramChannelStmt {
         client: &'c C,
         org_id: &'a T1,
         bot_token: &'a T2,
-    ) -> ChannelSetupQuery<'c, 'a, 's, C, ChannelSetup, 2> {
+        default_agent_id: &'a uuid::Uuid,
+    ) -> ChannelSetupQuery<'c, 'a, 's, C, ChannelSetup, 3> {
         ChannelSetupQuery {
             client,
-            params: [org_id, bot_token],
+            params: [org_id, bot_token, default_agent_id],
             query: self.0,
             cached: self.1.as_ref(),
             extractor: |row: &tokio_postgres::Row| -> Result<ChannelSetup, tokio_postgres::Error> {
@@ -251,7 +253,7 @@ impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql, T2: crate::StringSql>
         'a,
         's,
         ConnectTelegramChannelParams<T1, T2>,
-        ChannelSetupQuery<'c, 'a, 's, C, ChannelSetup, 2>,
+        ChannelSetupQuery<'c, 'a, 's, C, ChannelSetup, 3>,
         C,
     > for ConnectTelegramChannelStmt
 {
@@ -259,8 +261,13 @@ impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql, T2: crate::StringSql>
         &'s self,
         client: &'c C,
         params: &'a ConnectTelegramChannelParams<T1, T2>,
-    ) -> ChannelSetupQuery<'c, 'a, 's, C, ChannelSetup, 2> {
-        self.bind(client, &params.org_id, &params.bot_token)
+    ) -> ChannelSetupQuery<'c, 'a, 's, C, ChannelSetup, 3> {
+        self.bind(
+            client,
+            &params.org_id,
+            &params.bot_token,
+            &params.default_agent_id,
+        )
     }
 }
 pub struct ListOrgChannelsStmt(&'static str, Option<tokio_postgres::Statement>);

@@ -23,7 +23,6 @@ pub async fn init_request(
         .one()
         .await?;
 
-    let user_id = user.id.to_string();
     let org_name = format!("{}'s Org", user.email);
 
     auth::ensure_default_org_membership_for_user()
@@ -37,15 +36,11 @@ pub async fn init_request(
         .await?;
 
     auth::set_request_claim_sub()
-        .bind(transaction, &user_id)
+        .bind(transaction, &jwt.sub)
         .one()
         .await?;
     auth::set_request_claim_iss()
         .bind(transaction, &jwt.iss)
-        .one()
-        .await?;
-    auth::set_request_claim_external_sub()
-        .bind(transaction, &jwt.sub)
         .one()
         .await?;
 
