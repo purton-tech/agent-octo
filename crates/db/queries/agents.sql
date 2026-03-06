@@ -13,16 +13,18 @@ WITH inserted AS (
     )
     SELECT
         :org_id::UUID,
-        :user_id::UUID,
+        auth.uid(),
         'private'::resource_visibility,
         'My First Agent',
         'Your default assistant.',
         'You are a helpful assistant.'
-    WHERE NOT EXISTS (
+    WHERE auth.uid() IS NOT NULL
+      AND org.is_org_member(:org_id::UUID)
+      AND NOT EXISTS (
         SELECT 1
         FROM public.agents a
         WHERE a.org_id = :org_id::UUID
-          AND a.created_by_user_id = :user_id::UUID
+          AND a.created_by_user_id = auth.uid()
     )
     RETURNING 1
 )
