@@ -86,27 +86,9 @@ pub async fn action_create(
     }
 
     let setup = clorinde::queries::providers::create_provider_connection()
-        .bind(&transaction, &org_id, &provider_kind, &api_key)
+        .bind(&transaction, &provider_kind, &org_id, &api_key)
         .one()
-        .await
-        .map_err(|err| {
-            let db_detail = if let Some(db_err) = err.as_db_error() {
-                format!(
-                    "message='{}' code={:?} detail='{}' hint='{}' table='{}' constraint='{}'",
-                    db_err.message(),
-                    db_err.code(),
-                    db_err.detail().unwrap_or(""),
-                    db_err.hint().unwrap_or(""),
-                    db_err.table().unwrap_or(""),
-                    db_err.constraint().unwrap_or("")
-                )
-            } else {
-                format!("{err:?}")
-            };
-            CustomError::Database(format!(
-                "Failed to save API key for provider '{provider_kind}' in org '{org_id}': {db_detail}"
-            ))
-        })?;
+        .await?;
 
     if !setup.configured {
         return Err(CustomError::FaultySetup(format!(
