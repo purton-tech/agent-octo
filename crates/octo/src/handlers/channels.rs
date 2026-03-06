@@ -7,10 +7,12 @@ use clorinde::deadpool_postgres::Pool;
 use octo_ui::channels::pages;
 use octo_ui::routes;
 use serde::Deserialize;
+use uuid::Uuid;
 
 #[derive(Deserialize)]
 pub struct ConnectTelegramForm {
     pub bot_token: String,
+    pub default_agent_id: String,
 }
 
 pub async fn loader(
@@ -36,10 +38,14 @@ pub async fn loader(
         .bind(&transaction, &org_id)
         .all()
         .await?;
+    let agents = clorinde::queries::agents::list_my_agents()
+        .bind(&transaction, &org_id)
+        .all()
+        .await?;
 
     transaction.commit().await?;
 
-    let html = pages::page(org_id, channels, channel_setup.configured);
+    let html = pages::page(org_id, channels, channel_setup.configured, agents);
     Ok(Html(html))
 }
 
@@ -55,6 +61,8 @@ pub async fn action_connect_telegram(
             "Bot token is required".to_string(),
         ));
     }
+    let default_agent_id = Uuid::parse_str(form.default_agent_id.trim())
+        .map_err(|_| CustomError::FaultySetup("A valid default agent is required".to_string()))?;
 
     let mut client = pool.get().await?;
     let transaction = client.transaction().await?;
@@ -67,7 +75,7 @@ pub async fn action_connect_telegram(
     }
 
     clorinde::queries::channels_list::connect_telegram_channel()
-        .bind(&transaction, &org_id, &bot_token)
+        .bind(&transaction, &org_id, &bot_token, &default_agent_id)
         .one()
         .await?;
 

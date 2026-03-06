@@ -17,7 +17,8 @@ WITH inserted AS (
         visibility,
         kind,
         name,
-        bot_token
+        bot_token,
+        default_agent_id
     )
     SELECT
         public.b64url_to_uuid(:org_id::TEXT),
@@ -25,13 +26,21 @@ WITH inserted AS (
         'private'::resource_visibility,
         'telegram'::channel_type,
         'Telegram',
-        :bot_token::TEXT
-    WHERE NOT EXISTS (
-        SELECT 1
-        FROM public.channels c
-        WHERE c.org_id = public.b64url_to_uuid(:org_id::TEXT)
-          AND c.kind = 'telegram'::channel_type
-    )
+        :bot_token::TEXT,
+        a.id
+    FROM public.agents a
+    WHERE a.id = :default_agent_id::UUID
+      AND a.org_id = public.b64url_to_uuid(:org_id::TEXT)
+      AND (
+          a.visibility = 'org'
+          OR a.created_by_user_id = auth.uid()
+      )
+      AND NOT EXISTS (
+          SELECT 1
+          FROM public.channels c
+          WHERE c.org_id = public.b64url_to_uuid(:org_id::TEXT)
+            AND c.kind = 'telegram'::channel_type
+      )
     RETURNING 1
 )
 SELECT EXISTS(SELECT 1 FROM inserted) AS configured;

@@ -6,11 +6,18 @@ use crate::{
     layout::{Layout, SideBar},
     render, routes,
 };
+use clorinde::queries::agents::AgentCard;
 use clorinde::queries::channels_list::ChannelCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, channels: Vec<ChannelCard>, has_telegram_channel: bool) -> String {
+pub fn page(
+    org_id: String,
+    channels: Vec<ChannelCard>,
+    has_telegram_channel: bool,
+    agents: Vec<AgentCard>,
+) -> String {
+    let no_agents = agents.is_empty();
     let connect_action = routes::channels::ConnectTelegram {
         org_id: org_id.clone(),
     }
@@ -45,6 +52,31 @@ pub fn page(org_id: String, channels: Vec<ChannelCard>, has_telegram_channel: bo
                             method: "post",
                             action: connect_action,
                             class: "mt-4 flex flex-col gap-3",
+                            if no_agents {
+                                p {
+                                    class: "text-sm text-warning",
+                                    "No agents available. Create an agent first."
+                                }
+                            } else {
+                                label { class: "label", "Default Agent" }
+                                select {
+                                    class: "select select-bordered w-full",
+                                    name: "default_agent_id",
+                                    required: true,
+                                    option {
+                                        disabled: true,
+                                        selected: true,
+                                        value: "",
+                                        "Select an agent"
+                                    }
+                                    for agent in agents.clone() {
+                                        option {
+                                            value: "{agent.id}",
+                                            "{agent.name}"
+                                        }
+                                    }
+                                }
+                            }
                             input {
                                 class: "input input-bordered w-full",
                                 name: "bot_token",
@@ -54,6 +86,7 @@ pub fn page(org_id: String, channels: Vec<ChannelCard>, has_telegram_channel: bo
                             button {
                                 class: "btn btn-primary w-fit",
                                 r#type: "submit",
+                                disabled: no_agents,
                                 "Connect Bot"
                             }
                         }
