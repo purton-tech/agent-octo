@@ -48,7 +48,7 @@ jobs:
       - name: Verify RC images exist
         run: |
           set -euo pipefail
-          images=(octo channels agent-runtime octo-migrations)
+          images=(octo agent-runtime octo-migrations telegram-egress telegram-ingress-polling)
           for image in "${images[@]}"; do
             ref="ghcr.io/purton-tech/${image}:${{ steps.release.outputs.rc_tag }}"
             if ! docker manifest inspect "${ref}" >/dev/null 2>&1; then
@@ -61,7 +61,7 @@ jobs:
       - name: Promote RC images to stable tags
         run: |
           set -euo pipefail
-          images=(octo channels agent-runtime octo-migrations)
+          images=(octo agent-runtime octo-migrations telegram-egress telegram-ingress-polling)
           for image in "${images[@]}"; do
             rc_image="ghcr.io/purton-tech/${image}:${{ steps.release.outputs.rc_tag }}"
             stable_image="ghcr.io/purton-tech/${image}:${{ steps.release.outputs.base }}"
