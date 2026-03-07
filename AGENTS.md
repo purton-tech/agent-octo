@@ -62,7 +62,7 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 ## Folder: octo
 
 * Every route lives in its own folder under `crates/octo/handlers`.
-* GET endpoints are implemented in `loader.rs`.
+* Handler convention: each route domain in `crates/octo/src/handlers/<domain>/` must use `loaders.rs` for GET handlers, `actions.rs` for POST handlers, and `mod.rs` to re-export both.
 * POST endpoints are implemented in `actions.rs` with functions prefixed by `action_`.
 * `mod.rs` re-exports the loader and actions and defines the `routes()` helper used by `main.rs`.
 * Each loader function fetches data from the database and renders the page.
