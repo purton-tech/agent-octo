@@ -9,12 +9,17 @@ in_devcontainer() {
 }
 
 start_tmux() {
-  sudo apt update
-  sudo apt install -y tmux curl
+
+  command -v tmux >/dev/null 2>&1 || (sudo apt update && sudo apt install -y tmux)
 
   if ! command -v gitui >/dev/null 2>&1; then
     curl -L https://github.com/gitui-org/gitui/releases/download/v0.28.0/gitui-linux-x86_64.tar.gz \
       | sudo tar -xz -C /usr/local/bin --wildcards --strip-components=1 '*/gitui'
+  fi
+
+  if ! command -v hx >/dev/null 2>&1; then
+    curl -L https://github.com/helix-editor/helix/releases/download/25.07.1/helix-25.07.1-x86_64-linux.tar.xz | sudo tar -xJ -C /opt \
+      && sudo ln -sf /opt/helix-25.07.1-x86_64-linux/hx /usr/local/bin/hx
   fi
 
   cat > ~/.tmux.conf <<'EOF'
@@ -23,6 +28,11 @@ set -g status-position bottom
 set -g pane-border-status top
 set -g pane-border-format "#{pane_title}"
 set-option -g mouse on
+bind -n F1 select-window -t 0
+bind -n F2 select-window -t 1
+bind -n F3 select-window -t 2
+bind -n F4 select-window -t 3
+bind -n F5 select-window -t 4
 EOF
 
   if tmux has-session -t "$SESSION" 2>/dev/null; then
@@ -55,6 +65,11 @@ EOF
   tmux new-window -t "$SESSION" -n gitui -c "$ROOT"
   tmux send-keys -t "$SESSION:1" "gitui" C-m
 
+  tmux new-window -t "$SESSION" -n helix -c "$ROOT"
+  tmux send-keys -t "$SESSION:2" "hx" C-m
+
+  tmux new-window -t "$SESSION" -n bash -c "$ROOT"
+
   tmux select-window -t "$SESSION:0"
   exec tmux attach -t "$SESSION"
 }
@@ -69,5 +84,5 @@ else
   }
 
   devcontainer up --workspace-folder "$ROOT" >/dev/null
-  exec devcontainer exec --workspace-folder "$ROOT" bash
+  exec devcontainer exec --workspace-folder "$ROOT" bash -lc "./octo-tmux.sh"
 fi
