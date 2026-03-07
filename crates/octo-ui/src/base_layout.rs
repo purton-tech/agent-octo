@@ -49,6 +49,12 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
                     "type": "text/css"
                 }
             }
+            script {
+                src: "https://unpkg.com/@digicreon/mujs/dist/mu.min.js"
+            }
+            script {
+                dangerous_inner_html: "mu.init({{ processForms: false }});"
+            }
             if let Some(js_href) = props.js_href {
                 script {
                     "type": "module",
