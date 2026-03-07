@@ -21,18 +21,18 @@ spec:
           expose_db_port: 30061
   services:
     web:
-      image: ghcr.io/purton-tech/octo:1.0.1
+      image: ghcr.io/purton-tech/octo:1.0.2
       port: 3000
       database_url: APPLICATION_URL
       init:
-        image: ghcr.io/purton-tech/octo-migrations:1.0.1
+        image: ghcr.io/purton-tech/octo-migrations:1.0.2
         migrations_database_url: DATABASE_URL
     agent-runtime:
-      image: ghcr.io/purton-tech/agent-runtime:1.0.1
+      image: ghcr.io/purton-tech/agent-runtime:1.0.2
       migrations_database_url: DATABASE_URL
     telegram-egress:
-      image: ghcr.io/purton-tech/telegram-egress:1.0.1
+      image: ghcr.io/purton-tech/telegram-egress:1.0.2
       migrations_database_url: DATABASE_URL
     telegram-ingress-polling:
-      image: ghcr.io/purton-tech/telegram-ingress-polling:1.0.1
+      image: ghcr.io/purton-tech/telegram-ingress-polling:1.0.2
       migrations_database_url: DATABASE_URL:Ex
