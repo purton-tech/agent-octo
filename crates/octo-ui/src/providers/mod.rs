@@ -1,1 +1,2 @@
-pub mod pages;
+pub mod r#new;
+pub mod page;

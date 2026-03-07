@@ -1,7 +1,7 @@
 use crate::{CustomError, Jwt, authz};
 use axum::{Extension, response::Html};
 use clorinde::deadpool_postgres::Pool;
-use octo_ui::agents::pages;
+use octo_ui::agents::page;
 use octo_ui::routes;
 
 pub async fn loader(
@@ -26,6 +26,6 @@ pub async fn loader(
 
     transaction.commit().await?;
 
-    let html = pages::page(org_id, agents);
+    let html = page::page(org_id, agents);
     Ok(Html(html))
 }
