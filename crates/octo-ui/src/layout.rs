@@ -68,6 +68,7 @@ pub fn Layout(
     rsx! {
         BaseLayout {
             title,
+            fav_icon_src: Some(favicon_svg.name.into()),
             web_assembly: (
                 octo_islands_js.name.into(),
                 octo_islands_bg_wasm.name.into()
@@ -121,31 +122,11 @@ pub fn Layout(
             ),
             sidebar_header: rsx!(
                 div {
-                    class: "flex aspect-square size-8 items-center justify-center rounded-lg bg-neutral text-neutral-content",
-                    svg {
-                        xmlns: "http://www.w3.org/2000/svg",
-                        width: "24",
-                        height: "24",
-                        view_box: "0 0 24 24",
-                        fill: "none",
-                        stroke: "currentColor",
-                        stroke_width: "2",
-                        stroke_linecap: "round",
-                        stroke_linejoin: "round",
-                        class: "lucide lucide-gallery-vertical-end size-4",
-                        path {
-                            d: "M7 2h10",
-                        }
-                        path {
-                            d: "M5 6h14",
-                        }
-                        rect {
-                            width: "18",
-                            height: "12",
-                            x: "3",
-                            y: "10",
-                            rx: "2",
-                        }
+                    class: "flex aspect-square size-8 items-center justify-center rounded-lg overflow-hidden",
+                    img {
+                        src: logo_svg.name,
+                        alt: "App logo",
+                        class: "size-8 object-contain"
                     }
                 }
                 div {
