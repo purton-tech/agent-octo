@@ -13,7 +13,7 @@ pub fn SectionIntroduction(
     rsx! {
         div {
             h1 {
-                class: "text-xl font-semibold",
+                class: "text-xl font-semibold mt-8",
                 "{header}"
             }
             p {

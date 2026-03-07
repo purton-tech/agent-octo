@@ -41,7 +41,6 @@ pub fn page(org_id: String) -> String {
             title: "Add Provider".to_string(),
             org_id,
             selected_item: SideBar::Providers,
-            content_class: Some("p-4 max-w-5xl w-full mx-auto".to_string()),
             header: rsx!(
                 div {
                     class: "flex items-center justify-between gap-4",
