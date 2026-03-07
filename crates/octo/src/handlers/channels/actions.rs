@@ -1,10 +1,6 @@
 use crate::{CustomError, Jwt, authz};
-use axum::{
-    Extension, Form,
-    response::{Html, Redirect},
-};
+use axum::{Extension, Form, response::Redirect};
 use clorinde::deadpool_postgres::Pool;
-use octo_ui::channels::page;
 use octo_ui::routes;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -13,40 +9,6 @@ use uuid::Uuid;
 pub struct ConnectTelegramForm {
     pub bot_token: String,
     pub default_agent_id: String,
-}
-
-pub async fn loader(
-    routes::channels::Index { org_id }: routes::channels::Index,
-    Extension(pool): Extension<Pool>,
-    current_user: Jwt,
-) -> Result<Html<String>, CustomError> {
-    let mut client = pool.get().await?;
-    let transaction = client.transaction().await?;
-
-    let context = authz::init_request(&transaction, &current_user).await?;
-    if context.org_id != org_id {
-        return Err(CustomError::FaultySetup(
-            "Requested org_id is not available for current user".to_string(),
-        ));
-    }
-    let channel_setup = clorinde::queries::channels_list::has_telegram_channel()
-        .bind(&transaction, &org_id)
-        .one()
-        .await?;
-
-    let channels = clorinde::queries::channels_list::list_org_channels()
-        .bind(&transaction, &org_id)
-        .all()
-        .await?;
-    let agents = clorinde::queries::agents::list_my_agents()
-        .bind(&transaction, &org_id)
-        .all()
-        .await?;
-
-    transaction.commit().await?;
-
-    let html = page::page(org_id, channels, channel_setup.configured, agents);
-    Ok(Html(html))
 }
 
 pub async fn action_connect_telegram(
