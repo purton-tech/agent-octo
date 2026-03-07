@@ -15,6 +15,23 @@ pub fn page(org_id: String, agents: Vec<AgentCard>) -> String {
             title: "Agents".to_string(),
             org_id,
             selected_item: SideBar::Agents,
+            header: rsx!(
+                div {
+                    class: "flex items-center justify-between gap-4",
+                    nav {
+                        aria_label: "breadcrumb",
+                        ol {
+                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
+                            li {
+                                class: "items-center gap-1.5 hidden md:block",
+                                "Agent Octo"
+                            }
+                            li { ">" }
+                            li { "Agents" }
+                        }
+                    }
+                }
+            ),
             SectionIntroduction {
                 header: "Agents".to_string(),
                 subtitle: "Manage the assistants you created.".to_string(),

@@ -39,20 +39,34 @@ pub fn index_page(org_id: String, providers: Vec<ProviderConnectionCard>) -> Str
             title: "Providers".to_string(),
             org_id,
             selected_item: SideBar::Providers,
-            div {
-                class: "flex items-start justify-between gap-4",
-                SectionIntroduction {
-                    header: "Model Providers".to_string(),
-                    subtitle: "Manage provider connections used by your agents.".to_string(),
-                    is_empty: providers.is_empty(),
-                    empty_text: "No providers configured yet.".to_string()
+            header: rsx!(
+                div {
+                    class: "flex items-center justify-between gap-4",
+                    nav {
+                        aria_label: "breadcrumb",
+                        ol {
+                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
+                            li {
+                                class: "items-center gap-1.5 hidden md:block",
+                                "Agent Octo"
+                            }
+                            li { ">" }
+                            li { "Providers" }
+                        }
+                    }
+                    Button {
+                        button_type: ButtonType::Link,
+                        href: new_href,
+                        button_scheme: ButtonScheme::Primary,
+                        "Add Provider"
+                    }
                 }
-                Button {
-                    button_type: ButtonType::Link,
-                    href: new_href,
-                    button_scheme: ButtonScheme::Primary,
-                    "Add Provider"
-                }
+            ),
+            SectionIntroduction {
+                header: "Model Providers".to_string(),
+                subtitle: "Manage provider connections used by your agents.".to_string(),
+                is_empty: providers.is_empty(),
+                empty_text: "No providers configured yet.".to_string()
             }
             if !providers.is_empty() {
                 for provider in providers {
@@ -114,20 +128,42 @@ pub fn new_page(org_id: String) -> String {
             org_id,
             selected_item: SideBar::Providers,
             content_class: Some("p-4 max-w-5xl w-full mx-auto".to_string()),
-            div {
-                class: "flex items-start justify-between gap-4",
-                SectionIntroduction {
-                    header: "Add Provider".to_string(),
-                    subtitle: "Pick a provider and add an API key. Agents without LLM config will be attached automatically.".to_string(),
-                    is_empty: false,
-                    empty_text: "".to_string()
+            header: rsx!(
+                div {
+                    class: "flex items-center justify-between gap-4",
+                    nav {
+                        aria_label: "breadcrumb",
+                        ol {
+                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
+                            li {
+                                class: "items-center gap-1.5 hidden md:block",
+                                "Agent Octo"
+                            }
+                            li { ">" }
+                            li {
+                                a {
+                                    class: "link link-hover",
+                                    href: back_href.clone(),
+                                    "Providers"
+                                }
+                            }
+                            li { ">" }
+                            li { "Add Provider" }
+                        }
+                    }
+                    Button {
+                        button_type: ButtonType::Link,
+                        href: back_href.clone(),
+                        button_style: ButtonStyle::Outline,
+                        "Back"
+                    }
                 }
-                Button {
-                    button_type: ButtonType::Link,
-                    href: back_href,
-                    button_style: ButtonStyle::Outline,
-                    "Back"
-                }
+            ),
+            SectionIntroduction {
+                header: "Add Provider".to_string(),
+                subtitle: "Pick a provider and add an API key. Agents without LLM config will be attached automatically.".to_string(),
+                is_empty: false,
+                empty_text: "".to_string()
             }
             div {
                 class: "grid grid-cols-1 md:grid-cols-2 gap-4 mt-4",
