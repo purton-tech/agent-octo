@@ -4,7 +4,7 @@ use axum::{
     response::{Html, Redirect},
 };
 use clorinde::deadpool_postgres::Pool;
-use octo_ui::providers::pages;
+use octo_ui::providers::{r#new, page};
 use octo_ui::routes;
 use serde::Deserialize;
 
@@ -36,7 +36,7 @@ pub async fn loader(
 
     transaction.commit().await?;
 
-    let html = pages::index_page(org_id, providers);
+    let html = page::page(org_id, providers);
     Ok(Html(html))
 }
 
@@ -56,7 +56,7 @@ pub async fn loader_new(
     }
 
     transaction.commit().await?;
-    let html = pages::new_page(org_id);
+    let html = r#new::page(org_id);
     Ok(Html(html))
 }
 

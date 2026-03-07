@@ -4,7 +4,7 @@ use axum::{
     response::{Html, Redirect},
 };
 use clorinde::deadpool_postgres::Pool;
-use octo_ui::channels::pages;
+use octo_ui::channels::page;
 use octo_ui::routes;
 use serde::Deserialize;
 use uuid::Uuid;
@@ -45,7 +45,7 @@ pub async fn loader(
 
     transaction.commit().await?;
 
-    let html = pages::page(org_id, channels, channel_setup.configured, agents);
+    let html = page::page(org_id, channels, channel_setup.configured, agents);
     Ok(Html(html))
 }
 

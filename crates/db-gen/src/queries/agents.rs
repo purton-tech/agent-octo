@@ -1,10 +1,5 @@
 // This file was generated with `clorinde`. Do not modify.
 
-#[derive(Clone, Copy, Debug)]
-pub struct EnsureDefaultAgentForUserParams {
-    pub org_id: uuid::Uuid,
-    pub user_id: uuid::Uuid,
-}
 #[derive(Debug, Clone, PartialEq, Copy)]
 pub struct EnsureDefaultAgent {
     pub inserted: bool,
@@ -179,7 +174,7 @@ where
 pub struct EnsureDefaultAgentForUserStmt(&'static str, Option<tokio_postgres::Statement>);
 pub fn ensure_default_agent_for_user() -> EnsureDefaultAgentForUserStmt {
     EnsureDefaultAgentForUserStmt(
-        "WITH inserted AS ( INSERT INTO public.agents ( org_id, created_by_user_id, visibility, name, description, system_prompt ) SELECT $1::UUID, $2::UUID, 'private'::resource_visibility, 'My First Agent', 'Your default assistant.', 'You are a helpful assistant.' WHERE NOT EXISTS ( SELECT 1 FROM public.agents a WHERE a.org_id = $1::UUID AND a.created_by_user_id = $2::UUID ) RETURNING 1 ) SELECT EXISTS(SELECT 1 FROM inserted) AS inserted",
+        "WITH inserted AS ( INSERT INTO public.agents ( org_id, created_by_user_id, visibility, name, description, system_prompt ) SELECT $1::UUID, auth.uid(), 'private'::resource_visibility, 'My First Agent', 'Your default assistant.', 'You are a helpful assistant.' WHERE auth.uid() IS NOT NULL AND org.is_org_member($1::UUID) AND NOT EXISTS ( SELECT 1 FROM public.agents a WHERE a.org_id = $1::UUID AND a.created_by_user_id = auth.uid() ) RETURNING 1 ) SELECT EXISTS(SELECT 1 FROM inserted) AS inserted",
         None,
     )
 }
@@ -195,11 +190,10 @@ impl EnsureDefaultAgentForUserStmt {
         &'s self,
         client: &'c C,
         org_id: &'a uuid::Uuid,
-        user_id: &'a uuid::Uuid,
-    ) -> EnsureDefaultAgentQuery<'c, 'a, 's, C, EnsureDefaultAgent, 2> {
+    ) -> EnsureDefaultAgentQuery<'c, 'a, 's, C, EnsureDefaultAgent, 1> {
         EnsureDefaultAgentQuery {
             client,
-            params: [org_id, user_id],
+            params: [org_id],
             query: self.0,
             cached: self.1.as_ref(),
             extractor:
@@ -210,24 +204,6 @@ impl EnsureDefaultAgentForUserStmt {
                 },
             mapper: |it| EnsureDefaultAgent::from(it),
         }
-    }
-}
-impl<'c, 'a, 's, C: GenericClient>
-    crate::client::async_::Params<
-        'c,
-        'a,
-        's,
-        EnsureDefaultAgentForUserParams,
-        EnsureDefaultAgentQuery<'c, 'a, 's, C, EnsureDefaultAgent, 2>,
-        C,
-    > for EnsureDefaultAgentForUserStmt
-{
-    fn params(
-        &'s self,
-        client: &'c C,
-        params: &'a EnsureDefaultAgentForUserParams,
-    ) -> EnsureDefaultAgentQuery<'c, 'a, 's, C, EnsureDefaultAgent, 2> {
-        self.bind(client, &params.org_id, &params.user_id)
     }
 }
 pub struct ListMyAgentsStmt(&'static str, Option<tokio_postgres::Statement>);

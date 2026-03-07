@@ -45,7 +45,7 @@ pub async fn init_request(
         .await?;
 
     agents::ensure_default_agent_for_user()
-        .bind(transaction, &org.org_id, &user.id)
+        .bind(transaction, &org.org_id)
         .one()
         .await?;
 
