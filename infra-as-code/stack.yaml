@@ -35,4 +35,4 @@ spec:
       migrations_database_url: DATABASE_URL
     telegram-ingress-polling:
       image: ghcr.io/purton-tech/telegram-ingress-polling:1.0.2
-      migrations_database_url: DATABASE_URL:Ex
+      migrations_database_url: DATABASE_URL
