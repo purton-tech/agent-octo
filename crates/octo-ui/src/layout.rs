@@ -10,6 +10,7 @@ pub enum SideBar {
     Agents,
     Channels,
     Providers,
+    Integrations,
 }
 
 impl std::fmt::Display for SideBar {
@@ -42,6 +43,11 @@ pub fn Layout(
     } else {
         providers_svg.name
     };
+    let integrations_icon = if selected_item == SideBar::Integrations {
+        integrations_active_svg.name
+    } else {
+        integrations_svg.name
+    };
 
     let agents_href = routes::agents::Index {
         org_id: org_id.clone(),
@@ -52,6 +58,10 @@ pub fn Layout(
     }
     .to_string();
     let providers_href = routes::providers::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+    let integrations_href = routes::integrations::Index {
         org_id: org_id.clone(),
     }
     .to_string();
@@ -91,6 +101,13 @@ pub fn Layout(
                             href: providers_href,
                             icon: providers_icon,
                             title: "Providers"
+                        }
+                        NavItem {
+                            id: SideBar::Integrations.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: integrations_href,
+                            icon: integrations_icon,
+                            title: "Integrations"
                         }
                     )
                 }

@@ -41,9 +41,6 @@ CREATE TABLE public.integrations (
 
     visibility resource_visibility NOT NULL DEFAULT 'private',
 
-    name TEXT NOT NULL,
-    description TEXT,
-
     openapi_spec JSONB NOT NULL,
 
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -57,7 +54,7 @@ COMMENT ON COLUMN public.integrations.visibility IS
 'private = only creator can see/use; org = visible to org members (RLS enforced).';
 
 COMMENT ON COLUMN public.integrations.openapi_spec IS
-'OpenAPI specification JSON used to generate tools (endpoints/operations).';
+'OpenAPI specification JSON used to generate tools (endpoints/operations). Title/description should come from info.* in the spec.';
 
 CREATE INDEX integrations_org_visibility_idx
     ON public.integrations (org_id, visibility);

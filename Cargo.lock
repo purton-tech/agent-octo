@@ -445,6 +445,8 @@ dependencies = [
  "postgres",
  "postgres-protocol",
  "postgres-types",
+ "serde",
+ "serde_json",
  "tokio-postgres",
  "uuid",
 ]
@@ -2211,6 +2213,7 @@ dependencies = [
  "clorinde",
  "db",
  "dotenvy",
+ "oas3",
  "octo-assets",
  "octo-ui",
  "serde",
@@ -2532,6 +2535,8 @@ dependencies = [
  "fallible-iterator",
  "postgres-derive",
  "postgres-protocol",
+ "serde_core",
+ "serde_json",
  "uuid",
 ]
 
@@ -4180,6 +4185,7 @@ checksum = "a68d3c8f01c0cfa54a75291d83601161799e4a89a39e0929f4b0354d88757a37"
 dependencies = [
  "getrandom 0.4.1",
  "js-sys",
+ "serde_core",
  "wasm-bindgen",
 ]
 
