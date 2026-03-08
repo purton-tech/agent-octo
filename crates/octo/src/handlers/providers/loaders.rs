@@ -46,6 +46,6 @@ pub async fn loader_new(
     }
 
     transaction.commit().await?;
-    let html = r#new::page(org_id);
+    let html = r#new::page(org_id, None, None);
     Ok(Html(html))
 }

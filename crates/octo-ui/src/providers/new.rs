@@ -26,7 +26,17 @@ const PROVIDER_OPTIONS: [(&str, &str, &str); 3] = [
     ),
 ];
 
-pub fn page(org_id: String) -> String {
+#[derive(Debug, Clone, PartialEq)]
+pub struct CreateProviderDraft {
+    pub provider_kind: String,
+    pub api_key: String,
+}
+
+pub fn page(
+    org_id: String,
+    draft: Option<CreateProviderDraft>,
+    error_message: Option<String>,
+) -> String {
     let create_action = routes::providers::Create {
         org_id: org_id.clone(),
     }
@@ -73,6 +83,13 @@ pub fn page(org_id: String) -> String {
                 is_empty: false,
                 empty_text: "".to_string()
             }
+            if let Some(message) = error_message {
+                Alert {
+                    class: "mt-4".to_string(),
+                    alert_color: Some(AlertColor::Error),
+                    span { "{message}" }
+                }
+            }
             div {
                 class: "grid grid-cols-1 md:grid-cols-2 gap-4 mt-4",
                 for (kind, title, desc) in PROVIDER_OPTIONS {
@@ -109,6 +126,10 @@ pub fn page(org_id: String) -> String {
                                     class: "input input-bordered w-full",
                                     name: "api_key",
                                     placeholder: "sk-...",
+                                    value: draft
+                                        .as_ref()
+                                        .and_then(|d| if d.provider_kind == kind { Some(d.api_key.clone()) } else { None })
+                                        .unwrap_or_default(),
                                     required: true
                                 }
                                 p { class: "text-xs text-base-content/70", "Uses the provider's required default model metadata." }

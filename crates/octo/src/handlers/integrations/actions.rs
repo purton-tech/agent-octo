@@ -1,40 +1,79 @@
 use crate::{CustomError, Jwt, authz};
-use axum::{Extension, Form, response::Redirect};
+use axum::{
+    Extension, Form,
+    response::{Html, IntoResponse, Redirect, Response},
+};
 use clorinde::deadpool_postgres::Pool;
 use clorinde::types::ResourceVisibility;
 use oas3::OpenApiV3Spec;
+use octo_ui::integrations::upsert::UpsertDraft;
 use octo_ui::routes;
 use serde::Deserialize;
 use uuid::Uuid;
+use validator::{Validate, ValidationError, ValidationErrors};
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize, Validate, Clone)]
 pub struct UpsertIntegrationForm {
     pub id: Option<String>,
+    #[validate(custom(function = "validate_visibility"))]
     pub visibility: String,
+    #[validate(length(min = 1, message = "OpenAPI spec is required"))]
     pub openapi_spec: String,
 }
 
-fn parse_visibility(value: &str) -> Result<ResourceVisibility, CustomError> {
+fn validate_visibility(value: &str) -> Result<(), ValidationError> {
     match value {
-        "private" => Ok(ResourceVisibility::private),
-        "org" => Ok(ResourceVisibility::org),
-        _ => Err(CustomError::FaultySetup(
-            "Visibility must be either 'private' or 'org'".to_string(),
-        )),
+        "private" | "org" => Ok(()),
+        _ => {
+            let mut err = ValidationError::new("invalid_visibility");
+            err.message = Some("Visibility must be either 'private' or 'org'".into());
+            Err(err)
+        }
     }
 }
 
-fn normalize_openapi_spec(raw: &str) -> Result<String, CustomError> {
-    let spec: OpenApiV3Spec = oas3::from_yaml(raw)
-        .map_err(|err| CustomError::FaultySetup(format!("Invalid OpenAPI specification: {err}")))?;
+fn validation_message(errors: &ValidationErrors) -> String {
+    for (field, field_errors) in errors.field_errors() {
+        if let Some(err) = field_errors.first() {
+            if let Some(message) = &err.message {
+                return message.to_string();
+            }
+            return format!("Invalid value for '{field}'");
+        }
+    }
+    "Invalid form submission".to_string()
+}
+
+fn parse_visibility(value: &str) -> Result<ResourceVisibility, String> {
+    match value {
+        "private" => Ok(ResourceVisibility::private),
+        "org" => Ok(ResourceVisibility::org),
+        _ => Err("Visibility must be either 'private' or 'org'".to_string()),
+    }
+}
+
+fn normalize_openapi_spec(raw: &str) -> Result<String, String> {
+    let spec: OpenApiV3Spec =
+        oas3::from_yaml(raw).map_err(|err| format!("Invalid OpenAPI specification: {err}"))?;
     if spec.info.title.trim().is_empty() {
-        return Err(CustomError::FaultySetup(
-            "OpenAPI info.title is required".to_string(),
-        ));
+        return Err("OpenAPI info.title is required".to_string());
     }
 
-    serde_json::to_string_pretty(&spec)
-        .map_err(|err| CustomError::FaultySetup(format!("Failed to serialize spec: {err}")))
+    serde_json::to_string_pretty(&spec).map_err(|err| format!("Failed to serialize spec: {err}"))
+}
+
+fn render_upsert_error(org_id: String, form: &UpsertIntegrationForm, message: String) -> Response {
+    let html = octo_ui::integrations::upsert::page(
+        org_id,
+        None,
+        Some(UpsertDraft {
+            id: form.id.clone(),
+            visibility: form.visibility.clone(),
+            openapi_spec: form.openapi_spec.clone(),
+        }),
+        Some(message),
+    );
+    Html(html).into_response()
 }
 
 pub async fn action_upsert(
@@ -42,9 +81,23 @@ pub async fn action_upsert(
     Extension(pool): Extension<Pool>,
     current_user: Jwt,
     Form(form): Form<UpsertIntegrationForm>,
-) -> Result<Redirect, CustomError> {
-    let visibility = parse_visibility(form.visibility.trim())?;
-    let normalized_spec = normalize_openapi_spec(form.openapi_spec.trim())?;
+) -> Result<Response, CustomError> {
+    if let Err(errors) = form.validate() {
+        return Ok(render_upsert_error(
+            org_id,
+            &form,
+            validation_message(&errors),
+        ));
+    }
+
+    let visibility = match parse_visibility(form.visibility.trim()) {
+        Ok(v) => v,
+        Err(message) => return Ok(render_upsert_error(org_id, &form, message)),
+    };
+    let normalized_spec = match normalize_openapi_spec(form.openapi_spec.trim()) {
+        Ok(spec) => spec,
+        Err(message) => return Ok(render_upsert_error(org_id, &form, message)),
+    };
     let normalized_spec_json: serde_json::Value =
         serde_json::from_str(&normalized_spec).map_err(|err| {
             CustomError::FaultySetup(format!("Failed to prepare OpenAPI spec JSON: {err}"))
@@ -101,7 +154,7 @@ pub async fn action_upsert(
     transaction.commit().await?;
 
     let href = routes::integrations::Index { org_id }.to_string();
-    Ok(Redirect::to(&href))
+    Ok(Redirect::to(&href).into_response())
 }
 
 pub async fn action_delete(

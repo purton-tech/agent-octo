@@ -48,7 +48,7 @@ pub async fn loader_new(
 
     transaction.commit().await?;
 
-    let html = integrations::upsert::page(org_id, None);
+    let html = integrations::upsert::page(org_id, None, None, None);
     Ok(Html(html))
 }
 
@@ -78,6 +78,6 @@ pub async fn loader_edit(
 
     transaction.commit().await?;
 
-    let html = integrations::upsert::page(org_id, Some(integration));
+    let html = integrations::upsert::page(org_id, Some(integration), None, None);
     Ok(Html(html))
 }

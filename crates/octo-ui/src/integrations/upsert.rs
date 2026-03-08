@@ -9,8 +9,20 @@ use clorinde::queries::integrations::IntegrationForm;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, integration: Option<IntegrationForm>) -> String {
-    let is_edit = integration.is_some();
+#[derive(Debug, Clone, PartialEq)]
+pub struct UpsertDraft {
+    pub id: Option<String>,
+    pub visibility: String,
+    pub openapi_spec: String,
+}
+
+pub fn page(
+    org_id: String,
+    integration: Option<IntegrationForm>,
+    draft: Option<UpsertDraft>,
+    error_message: Option<String>,
+) -> String {
+    let is_edit = integration.is_some() || draft.as_ref().and_then(|d| d.id.clone()).is_some();
     let back_href = routes::integrations::Index {
         org_id: org_id.clone(),
     }
@@ -20,17 +32,20 @@ pub fn page(org_id: String, integration: Option<IntegrationForm>) -> String {
     }
     .to_string();
 
-    let id_value = integration
+    let id_value = draft
         .as_ref()
-        .map(|it| it.id.to_string())
+        .and_then(|it| it.id.clone())
+        .or_else(|| integration.as_ref().map(|it| it.id.to_string()))
         .unwrap_or_default();
-    let visibility_value = integration
+    let visibility_value = draft
         .as_ref()
         .map(|it| it.visibility.clone())
+        .or_else(|| integration.as_ref().map(|it| it.visibility.clone()))
         .unwrap_or_else(|| "private".to_string());
-    let spec_value = integration
+    let spec_value = draft
         .as_ref()
         .map(|it| it.openapi_spec.clone())
+        .or_else(|| integration.as_ref().map(|it| it.openapi_spec.clone()))
         .unwrap_or_default();
 
     let page_title = if is_edit {
@@ -76,6 +91,13 @@ pub fn page(org_id: String, integration: Option<IntegrationForm>) -> String {
                 subtitle: "Paste an OpenAPI JSON or YAML document. We validate it before saving.".to_string(),
                 is_empty: false,
                 empty_text: "".to_string()
+            }
+            if let Some(message) = error_message {
+                Alert {
+                    class: "mt-4".to_string(),
+                    alert_color: Some(AlertColor::Error),
+                    span { "{message}" }
+                }
             }
             Card {
                 class: "mt-4",

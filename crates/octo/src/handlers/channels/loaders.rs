@@ -34,6 +34,13 @@ pub async fn loader(
 
     transaction.commit().await?;
 
-    let html = page::page(org_id, channels, channel_setup.configured, agents);
+    let html = page::page(
+        org_id,
+        channels,
+        channel_setup.configured,
+        agents,
+        None,
+        None,
+    );
     Ok(Html(html))
 }
