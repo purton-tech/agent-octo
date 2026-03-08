@@ -43,7 +43,6 @@ pub fn page(org_id: String, integrations: Vec<IntegrationCard>) -> String {
                     }
             )),
             div {
-                class: "p-4 max-w-5xl w-full mx-auto flex flex-col gap-6",
                 SectionIntroduction {
                     header: "OpenAPI Specs".to_string(),
                     subtitle: "Manage the OpenAPI specifications available to your organization.".to_string(),
@@ -53,7 +52,7 @@ pub fn page(org_id: String, integrations: Vec<IntegrationCard>) -> String {
 
                 if !integrations.is_empty() {
                     Card {
-                        class: "has-data-table",
+                        class: "mt-4 has-data-table",
                         CardHeader { title: "Available Specs" }
                         CardBody {
                             table {
