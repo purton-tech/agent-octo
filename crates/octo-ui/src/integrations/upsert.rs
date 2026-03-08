@@ -91,30 +91,32 @@ pub fn page(org_id: String, integration: Option<IntegrationForm>) -> String {
                                 value: id_value
                             }
                         }
-                        div {
-                            label { class: "label", "Visibility" }
-                            select {
-                                class: "select select-bordered w-full max-w-xs",
-                                name: "visibility",
-                                option {
-                                    value: "private",
-                                    selected: visibility_value == "private",
+                        Fieldset {
+                            legend: "Visibility".to_string(),
+                            help_text: Some("Choose who can access this OpenAPI spec.".to_string()),
+                            Select {
+                                name: "visibility".to_string(),
+                                value: Some(visibility_value.clone()),
+                                SelectOption {
+                                    value: "private".to_string(),
+                                    selected_value: Some(visibility_value.clone()),
                                     "private"
                                 }
-                                option {
-                                    value: "org",
-                                    selected: visibility_value == "org",
+                                SelectOption {
+                                    value: "org".to_string(),
+                                    selected_value: Some(visibility_value.clone()),
                                     "org"
                                 }
                             }
                         }
-                        div {
-                            label { class: "label", "OpenAPI Spec (JSON or YAML)" }
-                            textarea {
-                                class: "textarea textarea-bordered w-full min-h-72 font-mono text-sm",
-                                name: "openapi_spec",
-                                required: true,
-                                "{spec_value}"
+                        Fieldset {
+                            legend: "OpenAPI Spec (JSON or YAML)".to_string(),
+                            help_text: Some("info.title in the spec is used as the display name.".to_string()),
+                            TextArea {
+                                name: "openapi_spec".to_string(),
+                                class: Some("w-full min-h-72 font-mono text-sm".to_string()),
+                                value: Some(spec_value),
+                                required: Some(true),
                             }
                         }
                         div {
