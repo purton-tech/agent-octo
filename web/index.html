@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scroll Story Demo</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main>
+      <section class="hero">
+        <h1>Telegram Story Scroll</h1>
+        <p>Scroll down to watch three chat scenes unfold.</p>
+      </section>
+
+      <section class="story" data-scene="1">
+        <div class="story-sticky">
+          <div class="chat-box">
+            <h2>Scene 1: First Contact</h2>
+            <div class="chat-viewport">
+              <div class="messages">
+                <div class="msg left">Hey, can you help with support replies?</div>
+                <div class="msg right">Yes. Connect me to Telegram first.</div>
+                <div class="msg left">Done. Can you triage by urgency?</div>
+                <div class="msg right">I can route urgent issues to humans.</div>
+                <div class="msg left">Great, launch it.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="story" data-scene="2">
+        <div class="story-sticky">
+          <div class="chat-box">
+            <h2>Scene 2: Team Handoff</h2>
+            <div class="chat-viewport">
+              <div class="messages">
+                <div class="msg left">Payment issue from a VIP customer.</div>
+                <div class="msg right">Marked high priority. Paging billing team.</div>
+                <div class="msg left">Can we keep context in the thread?</div>
+                <div class="msg right">Yes, summary pinned and assigned.</div>
+                <div class="msg left">Nice. We are much faster now.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="story" data-scene="3">
+        <div class="story-sticky">
+          <div class="chat-box">
+            <h2>Scene 3: Automated Workflow</h2>
+            <div class="chat-viewport">
+              <div class="messages">
+                <div class="msg left">New lead asked for pricing.</div>
+                <div class="msg right">Sent pricing guide and qualification form.</div>
+                <div class="msg left">They completed it.</div>
+                <div class="msg right">Created CRM record and alerted sales.</div>
+                <div class="msg left">That used to take 20 minutes.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="outro">
+        <h2>End</h2>
+        <p>Each section pins, plays the chat, then releases to the next scene.</p>
+      </section>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>

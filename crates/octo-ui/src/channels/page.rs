@@ -11,13 +11,29 @@ use clorinde::queries::channels_list::ChannelCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
+#[derive(Debug, Clone, PartialEq)]
+pub struct ConnectTelegramDraft {
+    pub bot_token: String,
+    pub default_agent_id: String,
+}
+
 pub fn page(
     org_id: String,
     channels: Vec<ChannelCard>,
     has_telegram_channel: bool,
     agents: Vec<AgentCard>,
+    connect_draft: Option<ConnectTelegramDraft>,
+    connect_error: Option<String>,
 ) -> String {
     let no_agents = agents.is_empty();
+    let bot_token_value = connect_draft
+        .as_ref()
+        .map(|d| d.bot_token.clone())
+        .unwrap_or_default();
+    let default_agent_value = connect_draft
+        .as_ref()
+        .map(|d| d.default_agent_id.clone())
+        .unwrap_or_default();
     let connect_action = routes::channels::ConnectTelegram {
         org_id: org_id.clone(),
     }
@@ -28,28 +44,33 @@ pub fn page(
             title: "Channels".to_string(),
             org_id,
             selected_item: SideBar::Channels,
-            header: rsx!(
-                div {
-                    class: "flex items-center justify-between gap-4",
-                    nav {
-                        aria_label: "breadcrumb",
-                        ol {
-                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
-                            li {
-                                class: "items-center gap-1.5 hidden md:block",
-                                "Agent Octo"
-                            }
-                            li { ">" }
-                            li { "Channels" }
-                        }
-                    }
+            header_left: rsx!(
+                Breadcrumb {
+                    items: vec![
+                        BreadcrumbItem {
+                            text: "Agent Octo".to_string(),
+                            href: Some("/".to_string()),
+                        },
+                        BreadcrumbItem {
+                            text: "Channels".to_string(),
+                            href: None,
+                        },
+                    ]
                 }
             ),
+            header_right: None,
             SectionIntroduction {
                 header: "Channels".to_string(),
                 subtitle: "Manage communication channels in your organization.".to_string(),
                 is_empty: false,
                 empty_text: "".to_string()
+            }
+            if let Some(message) = connect_error {
+                Alert {
+                    class: "mt-4".to_string(),
+                    alert_color: Some(AlertColor::Error),
+                    span { "{message}" }
+                }
             }
             if !has_telegram_channel {
                 Card {
@@ -82,13 +103,14 @@ pub fn page(
                                     required: true,
                                     option {
                                         disabled: true,
-                                        selected: true,
+                                        selected: default_agent_value.is_empty(),
                                         value: "",
                                         "Select an agent"
                                     }
                                     for agent in agents.clone() {
                                         option {
                                             value: "{agent.id}",
+                                            selected: default_agent_value == agent.id.to_string(),
                                             "{agent.name}"
                                         }
                                     }
@@ -98,6 +120,7 @@ pub fn page(
                                 class: "input input-bordered w-full",
                                 name: "bot_token",
                                 placeholder: "Bot Token",
+                                value: bot_token_value,
                                 required: true
                             }
                             button {

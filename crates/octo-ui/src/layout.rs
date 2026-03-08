@@ -10,6 +10,8 @@ pub enum SideBar {
     Agents,
     Channels,
     Providers,
+    Integrations,
+    Connections,
 }
 
 impl std::fmt::Display for SideBar {
@@ -22,7 +24,8 @@ impl std::fmt::Display for SideBar {
 pub fn Layout(
     title: String,
     org_id: String,
-    header: Element,
+    header_left: Element,
+    header_right: Option<Element>,
     children: Element,
     selected_item: SideBar,
     content_class: Option<String>,
@@ -42,6 +45,16 @@ pub fn Layout(
     } else {
         providers_svg.name
     };
+    let integrations_icon = if selected_item == SideBar::Integrations {
+        integrations_active_svg.name
+    } else {
+        integrations_svg.name
+    };
+    let connections_icon = if selected_item == SideBar::Connections {
+        integrations_active_svg.name
+    } else {
+        integrations_svg.name
+    };
 
     let agents_href = routes::agents::Index {
         org_id: org_id.clone(),
@@ -52,6 +65,14 @@ pub fn Layout(
     }
     .to_string();
     let providers_href = routes::providers::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+    let integrations_href = routes::integrations::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+    let connections_href = routes::connections::Index {
         org_id: org_id.clone(),
     }
     .to_string();
@@ -66,7 +87,8 @@ pub fn Layout(
                 octo_islands_bg_wasm.name.into()
             ),
             stylesheets: vec![tailwind_css.name.to_string(), "https://cdn.jsdelivr.net/npm/daisyui@5".into()],
-            header,
+            header_left,
+            header_right,
             sidebar: rsx!(
                 NavGroup {
                     heading: "Your Menu",
@@ -91,6 +113,20 @@ pub fn Layout(
                             href: providers_href,
                             icon: providers_icon,
                             title: "Providers"
+                        }
+                        NavItem {
+                            id: SideBar::Integrations.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: integrations_href,
+                            icon: integrations_icon,
+                            title: "Integrations"
+                        }
+                        NavItem {
+                            id: SideBar::Connections.to_string(),
+                            selected_item_id: selected_item.to_string(),
+                            href: connections_href,
+                            icon: connections_icon,
+                            title: "Connections"
                         }
                     )
                 }

@@ -4,4 +4,6 @@ pub mod agents;
 pub mod auth;
 pub mod channels;
 pub mod channels_list;
+pub mod integration_connections;
+pub mod integrations;
 pub mod providers;

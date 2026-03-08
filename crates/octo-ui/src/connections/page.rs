@@ -6,21 +6,21 @@ use crate::{
     layout::{Layout, SideBar},
     render, routes,
 };
-use clorinde::queries::providers::ProviderConnectionCard;
+use clorinde::queries::integration_connections::IntegrationConnectionCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, providers: Vec<ProviderConnectionCard>) -> String {
-    let new_href = routes::providers::New {
+pub fn page(org_id: String, connections: Vec<IntegrationConnectionCard>) -> String {
+    let new_href = routes::connections::New {
         org_id: org_id.clone(),
     }
     .to_string();
 
     let page = rsx! {
         Layout {
-            title: "Providers".to_string(),
+            title: "Connections".to_string(),
             org_id,
-            selected_item: SideBar::Providers,
+            selected_item: SideBar::Connections,
             header_left: rsx!(
                 Breadcrumb {
                     items: vec![
@@ -29,58 +29,51 @@ pub fn page(org_id: String, providers: Vec<ProviderConnectionCard>) -> String {
                             href: Some("/".to_string()),
                         },
                         BreadcrumbItem {
-                            text: "Providers".to_string(),
+                            text: "Connections".to_string(),
                             href: None,
                         },
                     ]
                 }
             ),
             header_right: Some(rsx!(
-                    Button {
-                        button_type: ButtonType::Link,
-                        href: new_href,
-                        button_scheme: ButtonScheme::Primary,
-                        "Add Provider"
-                    }
+                Button {
+                    button_type: ButtonType::Link,
+                    href: new_href,
+                    button_scheme: ButtonScheme::Primary,
+                    "Add Connection"
+                }
             )),
             SectionIntroduction {
-                header: "Model Providers".to_string(),
-                subtitle: "Manage provider connections used by your agents.".to_string(),
-                is_empty: providers.is_empty(),
-                empty_text: "No providers configured yet.".to_string()
+                header: "Connections".to_string(),
+                subtitle: "Manage authenticated connections for your integrations.".to_string(),
+                is_empty: connections.is_empty(),
+                empty_text: "No connections configured yet.".to_string()
             }
-            if !providers.is_empty() {
-                for provider in providers {
+            if !connections.is_empty() {
+                for connection in connections {
                     CardItem {
                         class: None,
-                        title: provider.display_name,
+                        title: connection.name,
                         description: Some(rsx!(
                             div {
                                 class: "flex flex-col gap-1",
-                                p {
-                                    class: "capitalize",
-                                    "{provider.provider_kind}"
-                                }
+                                p { "{connection.integration_name}" }
                                 p {
                                     class: "text-sm text-base-content/70",
-                                    if provider.default_model.is_empty() {
-                                        "Default model: not set"
-                                    } else {
-                                        "Default model: {provider.default_model}"
-                                    }
+                                    "Auth: {connection.auth_type}"
                                 }
                             }
                         )),
                         footer: Some(rsx!(
                             span {
                                 "Updated "
-                                {provider.updated_at.to_rfc3339()}
+                                {connection.updated_at.to_rfc3339()}
                             }
                         )),
                         count_labels: vec![
                             CountLabel {
                                 count: 1,
-                                label: "connection".to_string(),
+                                label: format!("{} visibility", connection.visibility),
                             }
                         ],
                         action: None

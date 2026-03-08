@@ -9,7 +9,8 @@ pub struct BaseLayoutProps {
     pub web_assembly: Option<(String, String)>,
     pub stylesheets: Vec<String>,
     pub js_href: Option<String>,
-    pub header: Element,
+    pub header_left: Element,
+    pub header_right: Option<Element>,
     pub children: Element,
     pub sidebar: Element,
     pub sidebar_footer: Element,
@@ -48,6 +49,12 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
                     href: "{href}",
                     "type": "text/css"
                 }
+            }
+            script {
+                src: "https://unpkg.com/@digicreon/mujs/dist/mu.min.js"
+            }
+            script {
+                dangerous_inner_html: "mu.init({{ processForms: false }});"
             }
             if let Some(js_href) = props.js_href {
                 script {
@@ -137,8 +144,17 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
                             }
                         }
                         div {
-                            class: "w-full min-w-0",
-                            {props.header}
+                            class: "w-full min-w-0 flex items-center justify-between gap-4",
+                            div {
+                                class: "min-w-0",
+                                {props.header_left}
+                            }
+                            if let Some(header_right) = props.header_right {
+                                div {
+                                    class: "shrink-0",
+                                    {header_right}
+                                }
+                            }
                         }
                     }
                     section {

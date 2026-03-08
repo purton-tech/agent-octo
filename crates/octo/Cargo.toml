@@ -13,6 +13,7 @@ db = { path = "../db" }
 dotenvy.workspace = true
 octo-assets = { path = "../octo-assets" }
 octo-ui = { path = "../octo-ui" }
+oas3.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json.workspace = true
 tokio = { features = ["fs", "macros", "rt-multi-thread"], version = "1", default-features = false }
@@ -21,3 +22,4 @@ tower-livereload = "0.10"
 tracing.workspace = true
 tracing-subscriber.workspace = true
 uuid = "1"
+validator = { version = "0.20", features = ["derive"] }
