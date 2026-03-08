@@ -23,7 +23,8 @@ impl std::fmt::Display for SideBar {
 pub fn Layout(
     title: String,
     org_id: String,
-    header: Element,
+    header_left: Element,
+    header_right: Option<Element>,
     children: Element,
     selected_item: SideBar,
     content_class: Option<String>,
@@ -76,7 +77,8 @@ pub fn Layout(
                 octo_islands_bg_wasm.name.into()
             ),
             stylesheets: vec![tailwind_css.name.to_string(), "https://cdn.jsdelivr.net/npm/daisyui@5".into()],
-            header,
+            header_left,
+            header_right,
             sidebar: rsx!(
                 NavGroup {
                     heading: "Your Menu",

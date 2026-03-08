@@ -28,23 +28,21 @@ pub fn page(
             title: "Channels".to_string(),
             org_id,
             selected_item: SideBar::Channels,
-            header: rsx!(
-                div {
-                    class: "flex items-center justify-between gap-4",
-                    nav {
-                        aria_label: "breadcrumb",
-                        ol {
-                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
-                            li {
-                                class: "items-center gap-1.5 hidden md:block",
-                                "Agent Octo"
-                            }
-                            li { ">" }
-                            li { "Channels" }
-                        }
-                    }
+            header_left: rsx!(
+                Breadcrumb {
+                    items: vec![
+                        BreadcrumbItem {
+                            text: "Agent Octo".to_string(),
+                            href: Some("/".to_string()),
+                        },
+                        BreadcrumbItem {
+                            text: "Channels".to_string(),
+                            href: None,
+                        },
+                    ]
                 }
             ),
+            header_right: None,
             SectionIntroduction {
                 header: "Channels".to_string(),
                 subtitle: "Manage communication channels in your organization.".to_string(),

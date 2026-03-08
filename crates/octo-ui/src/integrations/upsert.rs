@@ -45,34 +45,32 @@ pub fn page(org_id: String, integration: Option<IntegrationForm>) -> String {
             org_id: org_id.clone(),
             selected_item: SideBar::Integrations,
             content_class: Some("p-4 max-w-5xl w-full mx-auto".to_string()),
-            header: rsx!(
-                div {
-                    class: "flex items-center justify-between gap-4",
-                    nav {
-                        aria_label: "breadcrumb",
-                        ol {
-                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
-                            li { class: "items-center gap-1.5 hidden md:block", "Agent Octo" }
-                            li { ">" }
-                            li {
-                                a {
-                                    class: "link link-hover",
-                                    href: back_href.clone(),
-                                    "Integrations"
-                                }
-                            }
-                            li { ">" }
-                            li { "{page_title}" }
-                        }
-                    }
+            header_left: rsx!(
+                Breadcrumb {
+                    items: vec![
+                        BreadcrumbItem {
+                            text: "Agent Octo".to_string(),
+                            href: Some("/".to_string()),
+                        },
+                        BreadcrumbItem {
+                            text: "Integrations".to_string(),
+                            href: Some(back_href.clone()),
+                        },
+                        BreadcrumbItem {
+                            text: page_title.to_string(),
+                            href: None,
+                        },
+                    ]
+                }
+            ),
+            header_right: Some(rsx!(
                     Button {
                         button_type: ButtonType::Link,
                         href: back_href.clone(),
                         button_style: ButtonStyle::Outline,
                         "Back"
                     }
-                }
-            ),
+            )),
             SectionIntroduction {
                 header: page_title.to_string(),
                 subtitle: "Paste an OpenAPI JSON or YAML document. We validate it before saving.".to_string(),

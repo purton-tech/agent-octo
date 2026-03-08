@@ -41,37 +41,32 @@ pub fn page(org_id: String) -> String {
             title: "Add Provider".to_string(),
             org_id,
             selected_item: SideBar::Providers,
-            header: rsx!(
-                div {
-                    class: "flex items-center justify-between gap-4",
-                    nav {
-                        aria_label: "breadcrumb",
-                        ol {
-                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
-                            li {
-                                class: "items-center gap-1.5 hidden md:block",
-                                "Agent Octo"
-                            }
-                            li { ">" }
-                            li {
-                                a {
-                                    class: "link link-hover",
-                                    href: back_href.clone(),
-                                    "Providers"
-                                }
-                            }
-                            li { ">" }
-                            li { "Add Provider" }
-                        }
-                    }
+            header_left: rsx!(
+                Breadcrumb {
+                    items: vec![
+                        BreadcrumbItem {
+                            text: "Agent Octo".to_string(),
+                            href: Some("/".to_string()),
+                        },
+                        BreadcrumbItem {
+                            text: "Providers".to_string(),
+                            href: Some(back_href.clone()),
+                        },
+                        BreadcrumbItem {
+                            text: "Add Provider".to_string(),
+                            href: None,
+                        },
+                    ]
+                }
+            ),
+            header_right: Some(rsx!(
                     Button {
                         button_type: ButtonType::Link,
                         href: back_href.clone(),
                         button_style: ButtonStyle::Outline,
                         "Back"
                     }
-                }
-            ),
+            )),
             SectionIntroduction {
                 header: "Add Provider".to_string(),
                 subtitle: "Pick a provider and add an API key. Agents without LLM config will be attached automatically.".to_string(),

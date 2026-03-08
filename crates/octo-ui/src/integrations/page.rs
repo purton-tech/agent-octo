@@ -20,26 +20,28 @@ pub fn page(org_id: String, integrations: Vec<IntegrationCard>) -> String {
             title: "Integrations".to_string(),
             org_id: org_id.clone(),
             selected_item: SideBar::Integrations,
-            header: rsx!(
-                div {
-                    class: "flex items-center justify-between gap-4",
-                    nav {
-                        aria_label: "breadcrumb",
-                        ol {
-                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
-                            li { class: "items-center gap-1.5 hidden md:block", "Agent Octo" }
-                            li { ">" }
-                            li { "Integrations" }
-                        }
-                    }
+            header_left: rsx!(
+                Breadcrumb {
+                    items: vec![
+                        BreadcrumbItem {
+                            text: "Agent Octo".to_string(),
+                            href: Some("/".to_string()),
+                        },
+                        BreadcrumbItem {
+                            text: "Integrations".to_string(),
+                            href: None,
+                        },
+                    ]
+                }
+            ),
+            header_right: Some(rsx!(
                     Button {
                         button_type: ButtonType::Link,
                         href: new_href,
                         button_scheme: ButtonScheme::Primary,
                         "Add OpenAPI Spec"
                     }
-                }
-            ),
+            )),
             div {
                 class: "p-4 max-w-5xl w-full mx-auto flex flex-col gap-6",
                 SectionIntroduction {

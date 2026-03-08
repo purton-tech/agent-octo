@@ -21,29 +21,28 @@ pub fn page(org_id: String, providers: Vec<ProviderConnectionCard>) -> String {
             title: "Providers".to_string(),
             org_id,
             selected_item: SideBar::Providers,
-            header: rsx!(
-                div {
-                    class: "flex items-center justify-between gap-4",
-                    nav {
-                        aria_label: "breadcrumb",
-                        ol {
-                            class: "flex flex-wrap items-center gap-1.5 break-words text-sm sm:gap-2.5",
-                            li {
-                                class: "items-center gap-1.5 hidden md:block",
-                                "Agent Octo"
-                            }
-                            li { ">" }
-                            li { "Providers" }
-                        }
-                    }
+            header_left: rsx!(
+                Breadcrumb {
+                    items: vec![
+                        BreadcrumbItem {
+                            text: "Agent Octo".to_string(),
+                            href: Some("/".to_string()),
+                        },
+                        BreadcrumbItem {
+                            text: "Providers".to_string(),
+                            href: None,
+                        },
+                    ]
+                }
+            ),
+            header_right: Some(rsx!(
                     Button {
                         button_type: ButtonType::Link,
                         href: new_href,
                         button_scheme: ButtonScheme::Primary,
                         "Add Provider"
                     }
-                }
-            ),
+            )),
             SectionIntroduction {
                 header: "Model Providers".to_string(),
                 subtitle: "Manage provider connections used by your agents.".to_string(),
