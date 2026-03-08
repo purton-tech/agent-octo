@@ -7,16 +7,14 @@
     </picture>
 </p>
 
-An [OpenClaw](https://openclaw.ai/) clone with a **90% reduction** in token usage.
+Inspired by [OpenClaw](https://openclaw.ai/), Agent Octo adds some practical features:
 
-1. The Token Usage is around 10% of OpenClaw whilst still supporting most of the main features.
-1. Runs the [Monty](https://github.com/pydantic/monty) Python interpreter to give the LLM sandboxed scripting abilities.
-1. Yaml plugins which are [Open API](https://www.openapis.org/) specifications allow you to add tools at runtime with no code.
-1. All Plugins are discoverable. Only a few tokens are used in the System Prompt and no entries in the Tool Definitions.
-1. Uses [Postgresql](https://www.postgresql.org/) for storage and backup.
-1. Kubernetes deployments with [Stack](https://stack-cli.com/)
-1. `docker-compose.yaml` file for easy install and de-install.
-1. Runs in hardened docker containers, `FROM scratch` with a NON root user.
+1. Agent Octo is multi-user and multi-tenant, so you can run it for your team, family, or as your own SaaS.
+1. It includes a multi-threaded, async Python sandbox written in Rust for AI workloads, powered by [Monty](https://github.com/pydantic/monty).
+1. The sandbox supports [Code Mode](https://blog.cloudflare.com/code-mode-mcp/) to reduce token usage.
+1. Agent Octo uses [OpenAPI](https://www.openapis.org/) (Swagger) specs, letting you add integrations at runtime.
+1. Tools are discoverable and lightweight in context; in the Tool Definition section, the only tool is `exec_python`.
+1. Agent Octo supports OAuth2 for configuring API integrations (for example, Google and Microsoft).
 
 Built with the [Rust on Nails](https://rust-on-nails.com/) architecture for secure full stack web applications.
 
@@ -28,15 +26,19 @@ Download the `docker-compose.yaml` file.
 curl -LO https://raw.githubusercontent.com/purton-tech/agent-octo/main/infra-as-code/docker-compose.yaml
 ```
 
-Create a `.env` file and add your Telegram Token and model provider details.
+Create a `.env` file and add your Telegram token and model provider details.
 
 ```
 TELEGRAM_BOT_TOKEN=<telegram-token>
 OPENAI_API_KEY=<api key>
 ```
 
+If you use another provider, add that provider's API key env var as well.
+
 Run the server
 
 ```sh
 docker compose up
 ```
+
+Then open `http://localhost:3000`.
