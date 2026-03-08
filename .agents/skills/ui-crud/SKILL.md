@@ -1,5 +1,5 @@
 ---
-name: UI CRUD
+name: ui-crud
 description: Use this when building or updating CRUD screens and forms (typed routes, handlers, Daisy RSX UI, validator-based forms, and Clorinde SQL-only data access).
 ---
 
