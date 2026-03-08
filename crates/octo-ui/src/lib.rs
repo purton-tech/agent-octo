@@ -2,6 +2,7 @@ pub mod agents;
 mod base_layout;
 pub mod channels;
 pub mod components;
+pub mod connections;
 pub mod integrations;
 mod layout;
 pub mod providers;

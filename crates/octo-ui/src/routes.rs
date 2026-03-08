@@ -85,3 +85,26 @@ pub mod integrations {
         pub id: String,
     }
 }
+
+pub mod connections {
+    use axum_extra::routing::TypedPath;
+    use serde::Deserialize;
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/connections")]
+    pub struct Index {
+        pub org_id: String,
+    }
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/connections/new")]
+    pub struct New {
+        pub org_id: String,
+    }
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/connections/create")]
+    pub struct Create {
+        pub org_id: String,
+    }
+}
