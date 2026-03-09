@@ -1,0 +1,126 @@
+{
+	"components": {
+		"schemas": {
+			"SearchRequest": {
+				"properties": {
+					"gl": {
+						"description": "Geo location (e.g. \"us\")",
+						"type": "string"
+					},
+					"hl": {
+						"description": "Host language (e.g. \"en\")",
+						"type": "string"
+					},
+					"num": {
+						"description": "Number of results to return",
+						"maximum": 100,
+						"minimum": 1,
+						"type": "integer"
+					},
+					"q": {
+						"description": "Search query",
+						"type": "string"
+					}
+				},
+				"required": [
+					"q"
+				],
+				"type": "object"
+			},
+			"SearchResponse": {
+				"additionalProperties": true,
+				"description": "Response schema is intentionally loose because Serper returns variable fields depending on SERP features.",
+				"type": "object"
+			}
+		},
+		"securitySchemes": {
+			"ApiKeyAuth": {
+				"description": "Serper API key",
+				"in": "header",
+				"name": "X-API-KEY",
+				"type": "apiKey"
+			}
+		}
+	},
+	"info": {
+		"description": "OpenAPI specification for the Serper Google Search endpoint. Authentication is performed using an API key passed via the X-API-KEY header.",
+		"title": "Serper Search API",
+		"version": "1.0.0",
+		"x-logo": {
+			"url": "data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJTIGxvZ28iPgogIDwhLS0gT3V0ZXIgbGlnaHQtYmx1ZSBjaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTI4IiByPSIxMjgiIGZpbGw9IiM4ZWM5ZjAiLz4KCiAgPCEtLSBJbm5lciBkYXJrIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEwNiIgZmlsbD0iIzE0MTgyMyIvPgoKICA8IS0tIENlbnRlcmVkICJTIiAtLT4KICA8dGV4dAogICAgeD0iMTI4IgogICAgeT0iMTI4IgogICAgdGV4dC1hbmNob3I9Im1pZGRsZSIKICAgIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiCiAgICBmb250LWZhbWlseT0ic3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbCwgc2Fucy1zZXJpZiIKICAgIGZvbnQtc2l6ZT0iMTQwIgogICAgZm9udC13ZWlnaHQ9IjYwMCIKICAgIGZpbGw9IiM4ZWM5ZjAiPgogICAgUwogIDwvdGV4dD4KPC9zdmc+"
+		}
+	},
+	"openapi": "3.1.0",
+	"paths": {
+		"/search": {
+			"post": {
+				"description": "Performs a Google-style web search and returns organic results, snippets, and metadata depending on the query.",
+				"operationId": "serperSearch",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"examples": {
+								"basic": {
+									"summary": "Basic search",
+									"value": {
+										"q": "openai api pricing"
+									}
+								},
+								"withOptions": {
+									"summary": "Search with locale and result count",
+									"value": {
+										"gl": "us",
+										"hl": "en",
+										"num": 10,
+										"q": "kubernetes ingress controller"
+									}
+								}
+							},
+							"schema": {
+								"$ref": "#/components/schemas/SearchRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SearchResponse"
+								}
+							}
+						},
+						"description": "Search results"
+					},
+					"401": {
+						"description": "Unauthorized - missing or invalid API key"
+					},
+					"429": {
+						"description": "Too many requests - rate or credit limit exceeded"
+					},
+					"500": {
+						"description": "Server error"
+					}
+				},
+				"security": [
+					{
+						"ApiKeyAuth": []
+					}
+				],
+				"summary": "Google web search"
+			}
+		}
+	},
+	"security": [
+		{
+			"ApiKeyAuth": []
+		}
+	],
+	"servers": [
+		{
+			"url": "https://google.serper.dev"
+		}
+	]
+}
