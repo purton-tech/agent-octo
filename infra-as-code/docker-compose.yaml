@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:1.0.3
+    image: postgres:18
     restart: unless-stopped
     entrypoint:
       - /bin/bash

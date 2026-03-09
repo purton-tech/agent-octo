@@ -95,7 +95,7 @@ jobs:
               echo "Skipping missing file: $file"
               continue
             fi
-            sed -E -i "s#(^[[:space:]]*image:[[:space:]]*[^:[:space:]]+):[^[:space:]]+#\\1:${RELEASE_VERSION}#g" "$file"
+            sed -E -i "s#(^[[:space:]]*image:[[:space:]]*ghcr\.io/purton-tech/[^:[:space:]]+):[^[:space:]]+#\\1:${RELEASE_VERSION}#g" "$file"
           done
 
       - name: Configure git author
