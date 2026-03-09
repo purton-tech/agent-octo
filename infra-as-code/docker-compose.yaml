@@ -12,10 +12,8 @@ services:
       timeout: 5s
       retries: 20
       start_period: 10s
-    ports:
-      - "30061:5432"
     volumes:
-      - octo-postgres-data:/var/lib/postgresql/data
+      - octo-postgres-data:/var/lib/postgresql
       - ./postgres-init:/docker-entrypoint-initdb.d:ro
 
   migrations:
@@ -23,9 +21,6 @@ services:
     restart: "no"
     environment:
       DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
-      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
-      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
-      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
     depends_on:
       db:
         condition: service_healthy
@@ -35,25 +30,19 @@ services:
     restart: unless-stopped
     environment:
       APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
-      DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
-      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
-      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
     depends_on:
       db:
         condition: service_healthy
       migrations:
         condition: service_completed_successfully
     ports:
-      - "3000:3000"
+      - "4000:3000"
 
   agent-runtime:
     image: ghcr.io/purton-tech/agent-runtime:1.0.2
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
-      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
-      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
-      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
     depends_on:
       db:
         condition: service_healthy
@@ -65,9 +54,6 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
-      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
-      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
-      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
     depends_on:
       db:
         condition: service_healthy
@@ -79,9 +65,6 @@ services:
     restart: unless-stopped
     environment:
       DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
-      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
-      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
-      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
     depends_on:
       db:
         condition: service_healthy
