@@ -1,0 +1,232 @@
+<!DOCTYPE html><html lang='en'><head><title>OpenAPI Specs | agent-octo.com</title><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="Browse OpenAPI integration specs for Agent Octo and inspect the endpoints each spec exposes."/><meta property="og:title" content="OpenAPI Specs | agent-octo.com"/><meta property="og:description" content="Browse OpenAPI integration specs for Agent Octo and inspect the endpoints each spec exposes."/><meta property="og:type" content="article"/><meta property="og:site_name" content="agent-octo.com"/><meta property="og:url" content="https://agent-octo.com"/><meta property="og:image" content="https://agent-octo.com/logo.svg"/><meta property="twitter:image" content="https://agent-octo.com/logo.svg"/><link rel="stylesheet" href="/tailwind.css" type="text/css"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><script async="true" data-goatcounter="" src="/goat-counter.js"></script><script async="true" src="/copy-paste.js"></script><script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script><style>
+        .image-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 9999;
+            cursor: zoom-out;
+            padding: 2rem;
+        }
+        .image-lightbox.is-open {
+            display: flex;
+        }
+        .image-lightbox img {
+            max-width: min(96vw, 1800px);
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+            border-radius: 8px;
+        }
+        article img,
+        .prose img {
+            cursor: zoom-in;
+        }
+        .code-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 10000;
+            padding: 1rem;
+        }
+        .code-lightbox.is-open {
+            display: flex;
+        }
+        .code-lightbox__panel {
+            width: min(96vw, 1900px);
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            --code-lightbox-font-scale: 1;
+        }
+        .code-lightbox__toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .code-lightbox__button {
+            background: rgba(16, 24, 40, 0.92);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .code-lightbox__content {
+            overflow: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+        }
+        .code-lightbox__content pre {
+            margin: 0;
+            padding: 1.25rem;
+            max-height: 86vh;
+            overflow: auto;
+            font-size: calc(clamp(15px, 1.35vw, 24px) * var(--code-lightbox-font-scale));
+            line-height: 1.45;
+        }
+        article pre,
+        .prose pre {
+            cursor: zoom-in;
+        }
+    </style></head><body><header class="sticky top-0 z-50 site-nav-header"><div class="backdrop-filter backdrop-blur-lg bg-base-100/80 border-b border-base-300 site-nav-shell"><div class="navbar justify-between site-nav-bar"><div class="flex items-center gap-4"><a href="/"><span class="pl-3 flex flex-row items-center gap-2"><img class="h-8 w-auto" src="/logo.svg" alt="agent-octo.com"/><strong class="leading-none">agent-octo.com</strong></span></a><div class="hidden lg:flex"><ul class="menu menu-horizontal px-1 dropdown-content"><li><a class="" hx-boost="false" href="/">Home</a></li><li><a class="underline" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li></ul></div></div><div class="hidden lg:flex items-center"><ul class="menu menu-horizontal px-3"><li><a class="btn btn-primary" hx-boost="true" href="/#hero">Get Started</a></li></ul></div><div class="dropdown lg:hidden dropdown-end"><div tabindex="0" role="button" class="btn btn-ghost"><svg xmlns="http://www.w3.org/2000/svg" stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5"><path d="M4 6h16M4 12h8m-8 6h16" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"></path></svg></div><ul class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-sm bg-base-100 rounded-box w-52"><li><a class="" hx-boost="false" href="/">Home</a></li><li><a class="underline" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li><li><a class="" hx-boost="true" href="/#hero">Get Started</a></li></ul></div></div></div></header><main class="min-h-screen bg-base-100 text-base-content"><section class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-10"><div class="max-w-3xl space-y-4"><span class="badge badge-outline badge-primary badge-md ">OpenAPI specs</span><h1 class="text-4xl font-bold lg:text-5xl">Browse integrations Agent Octo can understand</h1><p class="text-lg text-base-content/75">Each card below maps to a YAML OpenAPI spec. Open a spec to inspect its methods, parameters, responses, and copy the source directly.</p></div><div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3"><a class="block h-full" href="/open-api-specs/airtable/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Airtable Records &#38; Comments API logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Airtable Records &#38; Comments API</h2><p class="line-clamp-3 text-sm text-base-content/75">API for viewing Airtable records and record comments using OAuth2.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.0</span><span class="badge badge-outline badge-primary badge-md ">4 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/apollo/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Apollo.io Organization Search via URL logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjgiIGhlaWdodD0iMTI4IiBmaWxsPSJub25lIj4KICA8cmVjdCB3aWR0aD0iMTI4IiBoZWlnaHQ9IjEyOCIgZmlsbD0iI0ZFQ0Y0MCIgcng9IjgiIC8+CiAgPHBhdGggZmlsbD0iIzAwMCIKICAgIGQ9Ik05MS4wNDQgMzYuMTM1SDc4LjQ4OWw2LjUxIDExLjEzNCA2LjA0NS0xMS4xMzRaTTEwOC40OTQgOTguOTg3IDYzLjkyMiAyNSAxOS41IDk4LjgzMmgyMy43OTJjMy4xNzQgMCA2LjI5Ny0uOCA5LjA1OC0yLjMxNiAyLjk4LTEuNjM4IDUuMjMtNC4wMTIgNi45ODktNi44OSAyLjA1Ni0zLjM2NyA0LjA1My02Ljc3MyA2LjA3Ny0xMC4xNmw1LjE3OC04LjY3LTYuNjc4LTExLjE2Ny0yLjk2MSA0Ljc1NWMtMy4zNzUgNS42MzEtNi41NjkgMTEuMzkyLTEwLjA2NiAxNi45NDctMS43NTkgMi43ODYtNC4wNTQgNS40MTgtNy40NDIgNi4wOTZhOS42ODYgOS42ODYgMCAwIDEtMS41NTguMTc0Yy0uNjk4LjAyNi0xLjM5Ny4wMTMtMi4wODguMDEzbDI0LjEyMS00MC45OSAzMC45NzUgNTIuMzYzaDEzLjU5N1oiIC8+Cjwvc3ZnPgo="/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Apollo.io Organization Search via URL</h2><p class="line-clamp-3 text-sm text-base-content/75">Search organizations using Apollo.io via a saved URL from the Apollo UI. This endpoint parses and executes searches from saved Apollo links. ⚠️ Consumes one credit per call.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.1</span><span class="badge badge-outline badge-primary badge-md ">1 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/blockchain/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Blockchain Ticker API logo" src="data:image/svg+xml;base64,ICA8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiPgogIDx0ZXh0IHg9IjUwJSIgeT0iNTAlIiBkb21pbmFudC1iYXNlbGluZT0ibWlkZGxlIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmb250LXNpemU9IjQ4IiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+CiAgICBCCiAgPC90ZXh0Pgo8L3N2Zz4="/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Blockchain Ticker API</h2><p class="line-clamp-3 text-sm text-base-content/75">Returns current Bitcoin price in various currencies.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.0</span><span class="badge badge-outline badge-primary badge-md ">1 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/dropbox/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Dropbox API - File &#38; Folder Listing logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Dropbox API - File &#38; Folder Listing</h2><p class="line-clamp-3 text-sm text-base-content/75">OpenAPI spec including file requests, files/folders listing, and file download endpoints.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.2.0</span><span class="badge badge-outline badge-primary badge-md ">4 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/gcal/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Google Calendar API - Create Events logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCIgZmlsbD0iIzAwMDAwMCI+PGcgaWQ9IlNWR1JlcG9fYmdDYXJyaWVyIiBzdHJva2Utd2lkdGg9IjAiPjwvZz48ZyBpZD0iU1ZHUmVwb190cmFjZXJDYXJyaWVyIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjwvZz48ZyBpZD0iU1ZHUmVwb19pY29uQ2FycmllciI+IDxnPiA8cG9seWdvbiBmaWxsPSIjRkZGRkZGIiBwb2ludHM9IjE5NS4zNjg0MjEgNjAuNjMxNTc4OSA2MC42MzE1Nzg5IDYwLjYzMTU3ODkgNjAuNjMxNTc4OSAxOTUuMzY4NDIxIDE5NS4zNjg0MjEgMTk1LjM2ODQyMSI+IDwvcG9seWdvbj4gPHBvbHlnb24gZmlsbD0iI0VBNDMzNSIgcG9pbnRzPSIxOTUuMzY4NDIxIDI1NiAyNTYgMTk1LjM2ODQyMSAyMjUuNjg0MjExIDE5MC4xOTYwMDUgMTk1LjM2ODQyMSAxOTUuMzY4NDIxIDE4OS44MzUxNjIgMjIzLjA5ODAwMiI+IDwvcG9seWdvbj4gPHBhdGggZD0iTTEuNDIxMDg1NDdlLTE0LDE5NS4zNjg0MjEgTDEuNDIxMDg1NDdlLTE0LDIzNS43ODk0NzQgQzEuNDIxMDg1NDdlLTE0LDI0Ni45NTU3ODkgOS4wNDQyMTA1MywyNTYgMjAuMjEwNTI2MywyNTYgTDYwLjYzMTU3ODksMjU2IEw2Ni44NTY4NjQ1LDIyNS42ODQyMTEgTDYwLjYzMTU3ODksMTk1LjM2ODQyMSBMMjcuNTk5MTg3NCwxOTAuMTk2MDA1IEwxLjQyMTA4NTQ3ZS0xNCwxOTUuMzY4NDIxIFoiIGZpbGw9IiMxODgwMzgiPiA8L3BhdGg+IDxwYXRoIGQ9Ik0yNTYsNjAuNjMxNTc4OSBMMjU2LDIwLjIxMDUyNjMgQzI1Niw5LjA0NDIxMDUzIDI0Ni45NTU3ODksMS40MjEwODU0N2UtMTQgMjM1Ljc4OTQ3NCwxLjQyMTA4NTQ3ZS0xNCBMMTk1LjM2ODQyMSwxLjQyMTA4NTQ3ZS0xNCBDMTkxLjY3OTU4MiwxNS4wMzU4NTQ3IDE4OS44MzUxNjIsMjYuMTAxMDk0OCAxODkuODM1MTYyLDMzLjE5NTcyMDIgQzE4OS44MzUxNjIsNDAuMjkwMzQ1NiAxOTEuNjc5NTgyLDQ5LjQzNTYzMTkgMTk1LjM2ODQyMSw2MC42MzE1Nzg5IEMyMDguNzc3OTg2LDY0LjQ3MTQ4NjYgMjE4Ljg4MzI0OSw2Ni4zOTE0NDA0IDIyNS42ODQyMTEsNjYuMzkxNDQwNCBDMjMyLjQ4NTE3Miw2Ni4zOTE0NDA0IDI0Mi41OTA0MzUsNjQuNDcxNDg2NiAyNTYsNjAuNjMxNTc4OSBaIiBmaWxsPSIjMTk2N0QyIj4gPC9wYXRoPiA8cG9seWdvbiBmaWxsPSIjRkJCQzA0IiBwb2ludHM9IjI1NiA2MC42MzE1Nzg5IDE5NS4zNjg0MjEgNjAuNjMxNTc4OSAxOTUuMzY4NDIxIDE5NS4zNjg0MjEgMjU2IDE5NS4zNjg0MjEiPiA8L3BvbHlnb24+IDxwb2x5Z29uIGZpbGw9IiMzNEE4NTMiIHBvaW50cz0iMTk1LjM2ODQyMSAxOTUuMzY4NDIxIDYwLjYzMTU3ODkgMTk1LjM2ODQyMSA2MC42MzE1Nzg5IDI1NiAxOTUuMzY4NDIxIDI1NiI+IDwvcG9seWdvbj4gPHBhdGggZD0iTTE5NS4zNjg0MjEsMCBMMjAuMjEwNTI2MywwIEM5LjA0NDIxMDUzLDAgMCw5LjA0NDIxMDUzIDAsMjAuMjEwNTI2MyBMMCwxOTUuMzY4NDIxIEw2MC42MzE1Nzg5LDE5NS4zNjg0MjEgTDYwLjYzMTU3ODksNjAuNjMxNTc4OSBMMTk1LjM2ODQyMSw2MC42MzE1Nzg5IEwxOTUuMzY4NDIxLDAgWiIgZmlsbD0iIzQyODVGNCI+IDwvcGF0aD4gPHBhdGggZD0iTTg4LjI2OTQ3MzcsMTY1LjE1MzY4NCBDODMuMjMzNjg0MiwxNjEuNzUxNTc5IDc5Ljc0NzM2ODQsMTU2Ljc4MzE1OCA3Ny44NDQyMTA1LDE1MC4yMTQ3MzcgTDg5LjUzMjYzMTYsMTQ1LjM5Nzg5NSBDOTAuNTkzNjg0MiwxNDkuNDQgOTIuNDQ2MzE1OCwxNTIuNTcyNjMyIDk1LjA5MDUyNjMsMTU0Ljc5NTc4OSBDOTcuNzE3ODk0NywxNTcuMDE4OTQ3IDEwMC45MTc4OTUsMTU4LjExMzY4NCAxMDQuNjU2ODQyLDE1OC4xMTM2ODQgQzEwOC40OCwxNTguMTEzNjg0IDExMS43NjQyMTEsMTU2Ljk1MTU3OSAxMTQuNTA5NDc0LDE1NC42MjczNjggQzExNy4yNTQ3MzcsMTUyLjMwMzE1OCAxMTguNjM1Nzg5LDE0OS4zMzg5NDcgMTE4LjYzNTc4OSwxNDUuNzUxNTc5IEMxMTguNjM1Nzg5LDE0Mi4wOCAxMTcuMTg3MzY4LDEzOS4wODIxMDUgMTE0LjI5MDUyNiwxMzYuNzU3ODk1IEMxMTEuMzkzNjg0LDEzNC40MzM2ODQgMTA3Ljc1NTc4OSwxMzMuMjcxNTc5IDEwMy40MTA1MjYsMTMzLjI3MTU3OSBMOTYuNjU2ODQyMSwxMzMuMjcxNTc5IEw5Ni42NTY4NDIxLDEyMS43MDEwNTMgTDEwMi43MiwxMjEuNzAxMDUzIEMxMDYuNDU4OTQ3LDEyMS43MDEwNTMgMTA5LjYwODQyMSwxMjAuNjkwNTI2IDExMi4xNjg0MjEsMTE4LjY2OTQ3NCBDMTE0LjcyODQyMSwxMTYuNjQ4NDIxIDExNi4wMDg0MjEsMTEzLjg4NjMxNiAxMTYuMDA4NDIxLDExMC4zNjYzMTYgQzExNi4wMDg0MjEsMTA3LjIzMzY4NCAxMTQuODYzMTU4LDEwNC43NDEwNTMgMTEyLjU3MjYzMiwxMDIuODcxNTc5IEMxMTAuMjgyMTA1LDEwMS4wMDIxMDUgMTA3LjM4NTI2MywxMDAuMDU4OTQ3IDEwMy44NjUyNjMsMTAwLjA1ODk0NyBDMTAwLjQyOTQ3NCwxMDAuMDU4OTQ3IDk3LjcwMTA1MjYsMTAwLjk2ODQyMSA5NS42OCwxMDIuODA0MjExIEM5My42NjAyODE5LDEwNC42NDQ4ODUgOTIuMTQxODIwOCwxMDYuOTY4OTQyIDkxLjI2NzM2ODQsMTA5LjU1Nzg5NSBMNzkuNjk2ODQyMSwxMDQuNzQxMDUzIEM4MS4yMjk0NzM3LDEwMC4zOTU3ODkgODQuMDQyMTA1Myw5Ni41NTU3ODk1IDg4LjE2ODQyMTEsOTMuMjM3ODk0NyBDOTIuMjk0NzM2OCw4OS45MiA5Ny41NjYzMTU4LDg4LjI1MjYzMTYgMTAzLjk2NjMxNiw4OC4yNTI2MzE2IEMxMDguNjk4OTQ3LDg4LjI1MjYzMTYgMTEyLjk2LDg5LjE2MjEwNTMgMTE2LjczMjYzMiw5MC45OTc4OTQ3IEMxMjAuNTA1MjYzLDkyLjgzMzY4NDIgMTIzLjQ2OTQ3NCw5NS4zNzY4NDIxIDEyNS42MDg0MjEsOTguNjEwNTI2MyBDMTI3Ljc0NzM2OCwxMDEuODYxMDUzIDEyOC44MDg0MjEsMTA1LjQ5ODk0NyAxMjguODA4NDIxLDEwOS41NDEwNTMgQzEyOC44MDg0MjEsMTEzLjY2NzM2OCAxMjcuODE0NzM3LDExNy4xNTM2ODQgMTI1LjgyNzM2OCwxMjAuMDE2ODQyIEMxMjMuODQsMTIyLjg4IDEyMS4zOTc4OTUsMTI1LjA2OTQ3NCAxMTguNTAxMDUzLDEyNi42MDIxMDUgTDExOC41MDEwNTMsMTI3LjI5MjYzMiBDMTIyLjI0MTU2OCwxMjguODM0Nzg5IDEyNS40OTA3NDcsMTMxLjM2Nzc1MiAxMjcuODk4OTQ3LDEzNC42MTg5NDcgQzEzMC4zNDEwNTMsMTM3LjkwMzE1OCAxMzEuNTcwNTI2LDE0MS44MjczNjggMTMxLjU3MDUyNiwxNDYuNDA4NDIxIEMxMzEuNTcwNTI2LDE1MC45ODk0NzQgMTMwLjQwODQyMSwxNTUuMDgyMTA1IDEyOC4wODQyMTEsMTU4LjY2OTQ3NCBDMTI1Ljc2LDE2Mi4yNTY4NDIgMTIyLjU0MzE1OCwxNjUuMDg2MzE2IDExOC40NjczNjgsMTY3LjE0MTA1MyBDMTE0LjM3NDczNywxNjkuMTk1Nzg5IDEwOS43NzY4NDIsMTcwLjI0MDEyNCAxMDQuNjczNjg0LDE3MC4yNDAxMjQgQzk4Ljc2MjEwNTMsMTcwLjI1Njg0MiA5My4zMDUyNjMyLDE2OC41NTU3ODkgODguMjY5NDczNywxNjUuMTUzNjg0IEw4OC4yNjk0NzM3LDE2NS4xNTM2ODQgWiBNMTYwLjA2NzM2OCwxMDcuMTQ5NDc0IEwxNDcuMjMzNjg0LDExNi40Mjk0NzQgTDE0MC44MTY4NDIsMTA2LjY5NDczNyBMMTYzLjg0LDkwLjA4ODQyMTEgTDE3Mi42NjUyNjMsOTAuMDg4NDIxMSBMMTcyLjY2NTI2MywxNjguNDIxMDUzIEwxNjAuMDY3MzY4LDE2OC40MjEwNTMgTDE2MC4wNjczNjgsMTA3LjE0OTQ3NCBaIiBmaWxsPSIjNDI4NUY0Ij4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Google Calendar API - Create Events</h2><p class="line-clamp-3 text-sm text-base-content/75">Minimal OpenAPI spec for creating events in Google Calendar using OAuth 2.0</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.0</span><span class="badge badge-outline badge-primary badge-md ">1 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/gdrive/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Google Drive API logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPCEtLSBVcGxvYWRlZCB0bzogU1ZHIFJlcG8sIHd3dy5zdmdyZXBvLmNvbSwgR2VuZXJhdG9yOiBTVkcgUmVwbyBNaXhlciBUb29scyAtLT4KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEzLjUgMjU2IDI1NiIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIiBwcmVzZXJ2ZUFzcGVjdFJhdGlvPSJ4TWlkWU1pZCI+CiAgICA8Zz4KICAgICAgICA8cGF0aCBkPSJNMTkuMzU0MjMxMiwxOTYuMDMzOTI4IEwzMC42NDQxNzIsMjE1LjUzNDgxNiBDMzIuOTkwMDI4NywyMTkuNjQwMTQgMzYuMzYyMjE2NCwyMjIuODY1ODggNDAuMzIxMDkyOSwyMjUuMjExNzM3IEM1MS42NjAyNDIxLDIxMC44MTgzNzYgNTkuNTUzNDIyNSwxOTkuNzcyODY0IDY0LjAwMDYzNCwxOTIuMDc1MjAxIEM2OC41MTM3MTE5LDE4NC4yNjM1MjkgNzQuMDYwOTY1NywxNzIuMDQ1MDM5IDgwLjY0MjM5NTQsMTU1LjQxOTczIEM2Mi45MDY0MzE1LDE1My4wODUyODIgNDkuNDY1OTk3NCwxNTEuOTE4MDU4IDQwLjMyMTA5MjksMTUxLjkxODA1OCBDMzEuNTQ1NDY1LDE1MS45MTgwNTggMTguMTA1MTAwNywxNTMuMDg1MjgyIDAsMTU1LjQxOTczIEMwLDE1OS45NjQ5OTYgMS4xNzI5ODgyNSwxNjQuNTEwMjYxIDMuNTE4OTM0NzksMTY4LjYxNTU4NiBMMTkuMzU0MjMxMiwxOTYuMDMzOTI4IFoiIGZpbGw9IiMwMDY2REEiPgoNPC9wYXRoPgogICAgICAgIDxwYXRoIGQ9Ik0yMTUuNjgxNDQzLDIyNS4yMTE3MzcgQzIxOS42NDAzMiwyMjIuODY1ODggMjIzLjAxMjUwNywyMTkuNjQwMTQgMjI1LjM1ODM2NCwyMTUuNTM0ODE2IEwyMzAuMDUwMzc3LDIwNy40NzA2MTUgTDI1Mi40ODM1MTEsMTY4LjYxNTU4NiBDMjU0LjgyOTM2OCwxNjQuNTEwMjYxIDI1Ni4wMDI0NDYsMTU5Ljk2NDk5NiAyNTYuMDAyNDQ2LDE1NS40MTk3MyBDMjM3Ljc5MjU0LDE1My4wODUyODIgMjI0LjM3NjYxMywxNTEuOTE4MDU4IDIxNS43NTQ2NjcsMTUxLjkxODA1OCBDMjA2LjQ4ODcxMiwxNTEuOTE4MDU4IDE5My4wNzI3ODUsMTUzLjA4NTI4MiAxNzUuNTA2ODg4LDE1NS40MTk3MyBDMTgyLjAxMDQ3OSwxNzIuMTM2MDkzIDE4Ny40ODQzOTQsMTg0LjM1NDU4NCAxOTEuOTI4NjMzLDE5Mi4wNzUyMDEgQzE5Ni40MTIwNzMsMTk5Ljg2MzkxOSAyMDQuMzI5Njc3LDIxMC45MDk0MzEgMjE1LjY4MTQ0MywyMjUuMjExNzM3IFoiIGZpbGw9IiNFQTQzMzUiPgoNPC9wYXRoPgogICAgICAgIDxwYXRoIGQ9Ik0xMjguMDAxMjY4LDczLjMxMTE1MTUgQzE0MS4xMjExODIsNTcuNDY1NTI2MyAxNTAuMTYyODk4LDQ1LjI0NzAwMTEgMTU1LjEyNjQxNSwzNi42NTU1NzU3IEMxNTkuMTIzMTIxLDI5LjczNzYxOTYgMTYzLjUyMTczOSwxOC42OTIwNzI2IDE2OC4zMjIyNzEsMy41MTg5MzQ3OSBDMTY0LjM2MzM5NSwxLjE3Mjk1ODMgMTU5LjgxODEyOSwwIDE1NS4xMjY0MTUsMCBMMTAwLjg3NjEyMSwwIEM5Ni4xODQxMDc5LDAgOTEuNjM4ODQyLDEuMzE5NTg1NTcgODcuNjc5OTY1NSwzLjUxODkzNDc5IEM5My43ODYxOTQzLDIwLjkyMTAwNjUgOTguOTY3NTQyOCwzMy4zMDU4MDY3IDEwMy4yMjQwMTEsNDAuNjczMzM1NCBDMTA3LjkyNzgzMiw0OC44MTUxODgxIDExNi4xODY5MTgsNTkuNjk0NDYwMiAxMjguMDAxMjY4LDczLjMxMTE1MTUgWiIgZmlsbD0iIzAwODMyRCI+Cg08L3BhdGg+CiAgICAgICAgPHBhdGggZD0iTTE3NS4zNjAxNDEsMTU1LjQxOTczIEw4MC42NDIwOTU5LDE1NS40MTk3MyBMNDAuMzIxMDkyOSwyMjUuMjExNzM3IEM0NC4yNzk5Njk0LDIyNy41NTc4OTMgNDguODI1MjM1MiwyMjguNzMwNjcyIDUzLjUxNzI0ODEsMjI4LjczMDY3MiBMMjAyLjQ4NTI4OCwyMjguNzMwNjcyIEMyMDcuMTc3MzAxLDIyOC43MzA2NzIgMjExLjcyMjU2NywyMjcuNDExMTQ2IDIxNS42ODE0NDMsMjI1LjIxMTczNyBMMTc1LjM2MDE0MSwxNTUuNDE5NzMgWiIgZmlsbD0iIzI2ODRGQyI+Cg08L3BhdGg+CiAgICAgICAgPHBhdGggZD0iTTEyOC4wMDEyNjgsNzMuMzExMTUxNSBMODcuNjgwMjY1LDMuNTE4OTM0NzkgQzgzLjcyMTM4ODUsNS44NjQ4ODEzNCA4MC4zNDg5MDEzLDkuMDkwNDQxNzkgNzguMDAzMDQ0NiwxMy4xOTYwNjU0IEwzLjUxODkzNDc5LDE0Mi4yMjM1NzUgQzEuMTcyOTg4MjUsMTQ2LjMyOTE5OCAwLDE1MC44NzQ0NjQgMCwxNTUuNDE5NzMgTDgwLjY0MjM5NTQsMTU1LjQxOTczIEwxMjguMDAxMjY4LDczLjMxMTE1MTUgWiIgZmlsbD0iIzAwQUM0NyI+Cg08L3BhdGg+CiAgICAgICAgPHBhdGggZD0iTTIxNS4yNDE1MDEsNzcuNzA5OTY5NyBMMTc3Ljk5OTQ5MiwxMy4xOTYwNjU0IEMxNzUuNjUzNjM1LDkuMDkwNDQxNzkgMTcyLjI4MTE0OCw1Ljg2NDg4MTM0IDE2OC4zMjIyNzEsMy41MTg5MzQ3OSBMMTI4LjAwMTI2OCw3My4zMTExNTE1IEwxNzUuMzYwMTQxLDE1NS40MTk3MyBMMjU1Ljg1NTk5OSwxNTUuNDE5NzMgQzI1NS44NTU5OTksMTUwLjg3NDQ2NCAyNTQuNjgyOTIxLDE0Ni4zMjkxOTggMjUyLjMzNzA2NCwxNDIuMjIzNTc1IEwyMTUuMjQxNTAxLDc3LjcwOTk2OTcgWiIgZmlsbD0iI0ZGQkEwMCI+Cg08L3BhdGg+CiAgICA8L2c+Cjwvc3ZnPg=="/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Google Drive API</h2><p class="line-clamp-3 text-sm text-base-content/75">Interact with Google Drive to list files and track changes. This API lets you search, filter, and monitor files and changes in a user&#39;s or shared drive.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.0</span><span class="badge badge-outline badge-primary badge-md ">4 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/gpeople/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Google People API - Contacts logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPgo8c3ZnIHdpZHRoPSI4MDBweCIgaGVpZ2h0PSI4MDBweCIgdmlld0JveD0iMCAwIDQ4IDQ4IiBmaWxsPSJub25lIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPg0KPHBhdGggZD0iTTE5IDIwQzIyLjg2NiAyMCAyNiAxNi44NjYgMjYgMTNDMjYgOS4xMzQwMSAyMi44NjYgNiAxOSA2QzE1LjEzNCA2IDEyIDkuMTM0MDEgMTIgMTNDMTIgMTYuODY2IDE1LjEzNCAyMCAxOSAyMFoiIGZpbGw9IiMyRjg4RkYiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMzIgMjJINDRaIiBmaWxsPSIjMkY4OEZGIi8+DQo8cGF0aCBkPSJNMzIgMjJINDQiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMzIgMTZINDRaIiBmaWxsPSIjMkY4OEZGIi8+DQo8cGF0aCBkPSJNMzIgMTZINDQiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNMzUgMTNWMjVaIiBmaWxsPSIjMkY4OEZGIi8+DQo8cGF0aCBkPSJNMzUgMTNWMjUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjxwYXRoIGZpbGwtcnVsZT0iZXZlbm9kZCIgY2xpcC1ydWxlPSJldmVub2RkIiBkPSJNNDEgMTNWMjVaIiBmaWxsPSIjMkY4OEZGIi8+DQo8cGF0aCBkPSJNNDEgMTNWMjUiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjxwYXRoIGQ9Ik00IDQwLjhWNDJIMzRWNDAuOEMzNCAzNi4zMTk2IDM0IDM0LjA3OTQgMzMuMTI4MSAzMi4zNjgxQzMyLjM2MTEgMzAuODYyOCAzMS4xMzcyIDI5LjYzODkgMjkuNjMxOSAyOC44NzE5QzI3LjkyMDYgMjggMjUuNjgwNCAyOCAyMS4yIDI4SDE2LjhDMTIuMzE5NiAyOCAxMC4wNzk0IDI4IDguMzY4MDggMjguODcxOUM2Ljg2Mjc4IDI5LjYzODkgNS42Mzg5MyAzMC44NjI4IDQuODcxOTUgMzIuMzY4MUM0IDM0LjA3OTQgNCAzNi4zMTk2IDQgNDAuOFoiIGZpbGw9IiMyRjg4RkYiIHN0cm9rZT0iIzAwMDAwMCIgc3Ryb2tlLXdpZHRoPSI0IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz4NCjwvc3ZnPg=="/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Google People API - Contacts</h2><p class="line-clamp-3 text-sm text-base-content/75">Interact programmatically with a user&#39;s Google contacts using the People API. Supports reading, creating, updating, deleting, searching, and batch operations on contacts, with field selection and pagination. OAuth2 is required for all operations.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">vv1</span><span class="badge badge-outline badge-primary badge-md ">8 methods</span></div></div></div></a><a class="block h-full" href="/open-api-specs/search-serper-search/"><div class="card h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20"><div class="card-body gap-4"><div class="flex items-start gap-4"><img class="h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2" alt="Serper Search API logo" src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIyNTYiIGhlaWdodD0iMjU2IiB2aWV3Qm94PSIwIDAgMjU2IDI1NiIgcm9sZT0iaW1nIiBhcmlhLWxhYmVsPSJTIGxvZ28iPgogIDwhLS0gT3V0ZXIgbGlnaHQtYmx1ZSBjaXJjbGUgLS0+CiAgPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTI4IiByPSIxMjgiIGZpbGw9IiM4ZWM5ZjAiLz4KCiAgPCEtLSBJbm5lciBkYXJrIGNpcmNsZSAtLT4KICA8Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEwNiIgZmlsbD0iIzE0MTgyMyIvPgoKICA8IS0tIENlbnRlcmVkICJTIiAtLT4KICA8dGV4dAogICAgeD0iMTI4IgogICAgeT0iMTI4IgogICAgdGV4dC1hbmNob3I9Im1pZGRsZSIKICAgIGRvbWluYW50LWJhc2VsaW5lPSJtaWRkbGUiCiAgICBmb250LWZhbWlseT0ic3lzdGVtLXVpLCAtYXBwbGUtc3lzdGVtLCBTZWdvZSBVSSwgUm9ib3RvLCBBcmlhbCwgc2Fucy1zZXJpZiIKICAgIGZvbnQtc2l6ZT0iMTQwIgogICAgZm9udC13ZWlnaHQ9IjYwMCIKICAgIGZpbGw9IiM4ZWM5ZjAiPgogICAgUwogIDwvdGV4dD4KPC9zdmc+"/><div class="min-w-0 space-y-2"><h2 class="card-title line-clamp-2 text-xl">Serper Search API</h2><p class="line-clamp-3 text-sm text-base-content/75">OpenAPI specification for the Serper Google Search endpoint. Authentication is performed using an API key passed via the X-API-KEY header.</p></div></div><div class="mt-auto flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.0</span><span class="badge badge-outline badge-primary badge-md ">1 methods</span></div></div></div></a></div></div></section><footer class="mt-0 bg-neutral text-neutral-content p-10"><div class="mx-auto lg:max-w-5xl flex flex-col md:flex-row justify-between"><nav><h6 class="footer-title">Resources</h6><a href="/blog" class="block link-hover">Blog</a><a href="/" class="block link-hover">Pricing</a></nav><nav><h6 class="footer-title">Company</h6><a class="block link-hover">About Us</a><a href="/" class="block link-hover">Contact</a></nav><nav><h6 class="footer-title">Legal</h6><a href="/" class="block link-hover">Terms of Use</a><a href="/" class="block link-hover">Privacy Policy</a></nav></div></footer></main><script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script><script>
+        (function () {
+          if (window.__contentLightboxReady) return;
+          window.__contentLightboxReady = true;
+
+          const imageOverlay = document.createElement("div");
+          imageOverlay.className = "image-lightbox";
+          imageOverlay.setAttribute("aria-hidden", "true");
+
+          const overlayImg = document.createElement("img");
+          overlayImg.alt = "";
+          imageOverlay.appendChild(overlayImg);
+          document.body.appendChild(imageOverlay);
+
+          const codeOverlay = document.createElement("div");
+          codeOverlay.className = "code-lightbox";
+          codeOverlay.setAttribute("aria-hidden", "true");
+
+          const codePanel = document.createElement("div");
+          codePanel.className = "code-lightbox__panel";
+
+          const codeToolbar = document.createElement("div");
+          codeToolbar.className = "code-lightbox__toolbar";
+
+          const zoomOutButton = document.createElement("button");
+          zoomOutButton.type = "button";
+          zoomOutButton.className = "code-lightbox__button";
+          zoomOutButton.textContent = "A-";
+
+          const zoomInButton = document.createElement("button");
+          zoomInButton.type = "button";
+          zoomInButton.className = "code-lightbox__button";
+          zoomInButton.textContent = "A+";
+
+          const closeButton = document.createElement("button");
+          closeButton.type = "button";
+          closeButton.className = "code-lightbox__button";
+          closeButton.textContent = "Close";
+
+          const codeContent = document.createElement("div");
+          codeContent.className = "code-lightbox__content";
+
+          codeToolbar.appendChild(zoomOutButton);
+          codeToolbar.appendChild(zoomInButton);
+          codeToolbar.appendChild(closeButton);
+          codePanel.appendChild(codeToolbar);
+          codePanel.appendChild(codeContent);
+          codeOverlay.appendChild(codePanel);
+          document.body.appendChild(codeOverlay);
+
+          let codeZoom = 1;
+
+          function setCodeZoom(nextZoom) {
+            codeZoom = Math.max(0.75, Math.min(2.25, nextZoom));
+            codePanel.style.setProperty("--code-lightbox-font-scale", String(codeZoom));
+          }
+
+          function closeImageLightbox() {
+            imageOverlay.classList.remove("is-open");
+            imageOverlay.setAttribute("aria-hidden", "true");
+            overlayImg.removeAttribute("src");
+            if (!codeOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openImageLightbox(src, alt) {
+            overlayImg.src = src;
+            overlayImg.alt = alt || "";
+            imageOverlay.classList.add("is-open");
+            imageOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          function closeCodeLightbox() {
+            codeOverlay.classList.remove("is-open");
+            codeOverlay.setAttribute("aria-hidden", "true");
+            codeContent.replaceChildren();
+            setCodeZoom(1);
+            if (!imageOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openCodeLightbox(preNode) {
+            const clone = preNode.cloneNode(true);
+            clone.querySelectorAll(".code-copy-btn").forEach((node) => node.remove());
+            codeContent.replaceChildren(clone);
+            setCodeZoom(1.25);
+            codeOverlay.classList.add("is-open");
+            codeOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          zoomInButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom + 0.15);
+          });
+
+          zoomOutButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom - 0.15);
+          });
+
+          closeButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            closeCodeLightbox();
+          });
+
+          document.addEventListener("click", function (event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            if (target.closest(".code-copy-btn")) return;
+
+            const pre = target.closest("pre");
+            if (pre && pre.closest("article, .prose") && !pre.closest(".code-lightbox")) {
+              openCodeLightbox(pre);
+              return;
+            }
+
+            if (!(target instanceof HTMLImageElement)) return;
+            if (!target.closest("article, .prose")) return;
+            if (target.closest(".image-lightbox")) return;
+            if (!target.src) return;
+            openImageLightbox(target.src, target.alt);
+          });
+
+          imageOverlay.addEventListener("click", function () {
+            closeImageLightbox();
+          });
+
+          codeOverlay.addEventListener("click", function (event) {
+            if (event.target === codeOverlay) {
+              closeCodeLightbox();
+            }
+          });
+
+          codePanel.addEventListener("click", function (event) {
+            event.stopPropagation();
+          });
+
+          document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && imageOverlay.classList.contains("is-open")) {
+              closeImageLightbox();
+            }
+            if (event.key === "Escape" && codeOverlay.classList.contains("is-open")) {
+              closeCodeLightbox();
+            }
+          });
+        })();
+    </script></body></html>

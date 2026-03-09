@@ -1,0 +1,405 @@
+<!DOCTYPE html><html lang='en'><head><title>Airtable Records &#38; Comments API | OpenAPI Spec | agent-octo.com</title><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="API for viewing Airtable records and record comments using OAuth2."/><meta property="og:title" content="Airtable Records &#38; Comments API | OpenAPI Spec | agent-octo.com"/><meta property="og:description" content="API for viewing Airtable records and record comments using OAuth2."/><meta property="og:type" content="article"/><meta property="og:site_name" content="agent-octo.com"/><meta property="og:url" content="https://agent-octo.com"/><meta property="og:image" content="https://agent-octo.com/data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/><meta property="twitter:image" content="https://agent-octo.com/data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/><link rel="stylesheet" href="/tailwind.css" type="text/css"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><script async="true" data-goatcounter="" src="/goat-counter.js"></script><script async="true" src="/copy-paste.js"></script><script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script><style>
+        .image-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 9999;
+            cursor: zoom-out;
+            padding: 2rem;
+        }
+        .image-lightbox.is-open {
+            display: flex;
+        }
+        .image-lightbox img {
+            max-width: min(96vw, 1800px);
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+            border-radius: 8px;
+        }
+        article img,
+        .prose img {
+            cursor: zoom-in;
+        }
+        .code-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 10000;
+            padding: 1rem;
+        }
+        .code-lightbox.is-open {
+            display: flex;
+        }
+        .code-lightbox__panel {
+            width: min(96vw, 1900px);
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            --code-lightbox-font-scale: 1;
+        }
+        .code-lightbox__toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .code-lightbox__button {
+            background: rgba(16, 24, 40, 0.92);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .code-lightbox__content {
+            overflow: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+        }
+        .code-lightbox__content pre {
+            margin: 0;
+            padding: 1.25rem;
+            max-height: 86vh;
+            overflow: auto;
+            font-size: calc(clamp(15px, 1.35vw, 24px) * var(--code-lightbox-font-scale));
+            line-height: 1.45;
+        }
+        article pre,
+        .prose pre {
+            cursor: zoom-in;
+        }
+    </style></head><body><header class="sticky top-0 z-50 site-nav-header"><div class="backdrop-filter backdrop-blur-lg bg-base-100/80 border-b border-base-300 site-nav-shell"><div class="navbar justify-between site-nav-bar"><div class="flex items-center gap-4"><a href="/"><span class="pl-3 flex flex-row items-center gap-2"><img class="h-8 w-auto" src="/logo.svg" alt="agent-octo.com"/><strong class="leading-none">agent-octo.com</strong></span></a><div class="hidden lg:flex"><ul class="menu menu-horizontal px-1 dropdown-content"><li><a class="" hx-boost="false" href="/">Home</a></li><li><a class="underline" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li></ul></div></div><div class="hidden lg:flex items-center"><ul class="menu menu-horizontal px-3"><li><a class="btn btn-primary" hx-boost="true" href="/#hero">Get Started</a></li></ul></div><div class="dropdown lg:hidden dropdown-end"><div tabindex="0" role="button" class="btn btn-ghost"><svg xmlns="http://www.w3.org/2000/svg" stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5"><path d="M4 6h16M4 12h8m-8 6h16" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"></path></svg></div><ul class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-sm bg-base-100 rounded-box w-52"><li><a class="" hx-boost="false" href="/">Home</a></li><li><a class="underline" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li><li><a class="" hx-boost="true" href="/#hero">Get Started</a></li></ul></div></div></div></header><main class="min-h-screen bg-base-100 text-base-content"><section class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-10"><nav><a class="link link-primary" href="/open-api-specs/">Back to all specs</a></nav><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-5 md:flex-row md:items-start"><img class="h-20 w-20 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Airtable Records &#38; Comments API logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/><div class="space-y-4"><h1 class="text-4xl font-bold">Airtable Records &#38; Comments API</h1><p class="text-base-content/75">API for viewing Airtable records and record comments using OAuth2.</p><div class="flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.0.0</span><span class="badge badge-outline badge-primary badge-md ">4 methods</span></div></div></div></div></div><section class="space-y-6"><div class="space-y-2"><h2 class="text-3xl font-bold">Methods</h2><p class="text-base-content/70">Each method below is pulled directly from the OpenAPI file.</p></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">GET</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/meta/bases</code><span class="text-sm text-base-content/60">listBases</span></div><p class="text-base-content/75">List available bases</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Airtable Records &#38; Comments API logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">List of bases</p></div></div></div></div></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">GET</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/{tableName}/records</code><span class="text-sm text-base-content/60">listRecords</span></div><p class="text-base-content/75">List records</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Airtable Records &#38; Comments API logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Parameters</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex flex-wrap items-center gap-2"><strong>tableName</strong><span class="badge badge-outline  badge-md ">path</span><span class="badge badge-outline badge-warning badge-md ">required</span></div></div></div></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">List of records</p></div></div></div></div></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">GET</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/{tableName}/records/{recordId}</code><span class="text-sm text-base-content/60">getRecord</span></div><p class="text-base-content/75">Retrieve a record</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Airtable Records &#38; Comments API logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Parameters</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex flex-wrap items-center gap-2"><strong>tableName</strong><span class="badge badge-outline  badge-md ">path</span><span class="badge badge-outline badge-warning badge-md ">required</span></div></div></div><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex flex-wrap items-center gap-2"><strong>recordId</strong><span class="badge badge-outline  badge-md ">path</span><span class="badge badge-outline badge-warning badge-md ">required</span></div></div></div></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">Single record retrieved</p></div></div></div></div></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">GET</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/{tableName}/records/{recordId}/comments</code><span class="text-sm text-base-content/60">listRecordComments</span></div><p class="text-base-content/75">List comments on a record</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Airtable Records &#38; Comments API logo" src="data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4="/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Parameters</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex flex-wrap items-center gap-2"><strong>tableName</strong><span class="badge badge-outline  badge-md ">path</span><span class="badge badge-outline badge-warning badge-md ">required</span></div></div></div><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex flex-wrap items-center gap-2"><strong>recordId</strong><span class="badge badge-outline  badge-md ">path</span><span class="badge badge-outline badge-warning badge-md ">required</span></div></div></div></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">List of comments</p></div></div></div></div></div></div></section><section class="space-y-4"><div class="space-y-2"><h2 class="text-3xl font-bold">YAML</h2><p class="text-base-content/70">Copy and paste the full spec from the textarea below.</p></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body "><textarea class="textarea textarea-bordered min-h-[28rem] w-full font-mono text-sm leading-6" readonly=true>components:
+  schemas:
+    Base:
+      properties:
+        id:
+          type: &#34;string&#34;
+        name:
+          type: &#34;string&#34;
+        permissionLevel:
+          type: &#34;string&#34;
+      required:
+        - &#34;id&#34;
+        - &#34;name&#34;
+      type: &#34;object&#34;
+    Comment:
+      properties:
+        createdTime:
+          format: &#34;date-time&#34;
+          type: &#34;string&#34;
+        id:
+          type: &#34;string&#34;
+        text:
+          type: &#34;string&#34;
+        userId:
+          type: &#34;string&#34;
+      required:
+        - &#34;id&#34;
+        - &#34;text&#34;
+      type: &#34;object&#34;
+    Record:
+      properties:
+        createdTime:
+          format: &#34;date-time&#34;
+          type: &#34;string&#34;
+        fields:
+          additionalProperties: true
+          type: &#34;object&#34;
+        id:
+          type: &#34;string&#34;
+      required:
+        - &#34;id&#34;
+        - &#34;fields&#34;
+      type: &#34;object&#34;
+  securitySchemes:
+    oauth2:
+      flows:
+        authorizationCode:
+          authorizationUrl: &#34;https://airtable.com/oauth2/v1/authorize&#34;
+          scopes:
+            data.recordComments:read: &#34;See comments in records&#34;
+            data.records:read: &#34;See the data in records&#34;
+            schema.bases:read: &#34;See information about bases&#34;
+          tokenUrl: &#34;https://airtable.com/oauth2/v1/token&#34;
+      type: &#34;oauth2&#34;
+info:
+  description: &#34;API for viewing Airtable records and record comments using OAuth2.&#34;
+  title: &#34;Airtable Records &#38; Comments API&#34;
+  version: &#34;1.0.0&#34;
+  x-bionic-slug: &#34;airtable&#34;
+  x-logo:
+    url: &#34;data:image/svg+xml;base64,PHN2ZyB2aWV3Qm94PSIwIC0yMC41IDI1NiAyNTYiIHZlcnNpb249IjEuMSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiB4bWxuczp4bGluaz0iaHR0cDovL3d3dy53My5vcmcvMTk5OS94bGluayIgcHJlc2VydmVBc3BlY3RSYXRpbz0ieE1pZFlNaWQiIGZpbGw9IiMwMDAwMDAiPjxnIGlkPSJTVkdSZXBvX2JnQ2FycmllciIgc3Ryb2tlLXdpZHRoPSIwIj48L2c+PGcgaWQ9IlNWR1JlcG9fdHJhY2VyQ2FycmllciIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIj48L2c+PGcgaWQ9IlNWR1JlcG9faWNvbkNhcnJpZXIiPiA8Zz4gPHBhdGggZD0iTTExNC4yNTg3MywyLjcwMTAxNjk1IEwxOC44NjA0MDIzLDQyLjE3NTYzODQgQzEzLjU1NTI3MjMsNDQuMzcxMTYzOCAxMy42MTAyMzI4LDUxLjkwNjUzMTEgMTguOTQ4NjI4Miw1NC4wMjI1MDg1IEwxMTQuNzQ2MTQyLDkyLjAxMTc1MTQgQzEyMy4xNjM3NjksOTUuMzQ5ODc1NyAxMzIuNTM3NDE5LDk1LjM0OTg3NTcgMTQwLjk1MzYsOTIuMDExNzUxNCBMMjM2Ljc1MjU2LDU0LjAyMjUwODUgQzI0Mi4wODk1MSw1MS45MDY1MzExIDI0Mi4xNDU5MTYsNDQuMzcxMTYzOCAyMzYuODM5MzQsNDIuMTc1NjM4NCBMMTQxLjQ0MjQ1OSwyLjcwMTAxNjk1IEMxMzIuNzM4NDU5LC0wLjkwMDMzODk4MyAxMjIuOTYxMjg0LC0wLjkwMDMzODk4MyAxMTQuMjU4NzMsMi43MDEwMTY5NSIgZmlsbD0iI0ZGQkYwMCI+IDwvcGF0aD4gPHBhdGggZD0iTTEzNi4zNDkwNzEsMTEyLjc1Njg2MyBMMTM2LjM0OTA3MSwyMDcuNjU5MTAxIEMxMzYuMzQ5MDcxLDIxMi4xNzMwODkgMTQwLjkwMDY2NCwyMTUuMjYzODkyIDE0NS4wOTY0NjEsMjEzLjYwMDYxNSBMMjUxLjg0NDEyMiwxNzIuMTY2MjE5IEMyNTQuMjgxMTg0LDE3MS4yMDAwNzIgMjU1Ljg3OTM3NiwxNjguODQ1NDUxIDI1NS44NzkzNzYsMTY2LjIyNDcwNSBMMjU1Ljg3OTM3Niw3MS4zMjI0Njc4IEMyNTUuODc5Mzc2LDY2LjgwODQ3OTEgMjUxLjMyNzc4Myw2My43MTc2NzY4IDI0Ny4xMzE5ODYsNjUuMzgwOTUzNyBMMTQwLjM4NDMyNSwxMDYuODE1MzQ5IEMxMzcuOTQ4NzEsMTA3Ljc4MTQ5NiAxMzYuMzQ5MDcxLDExMC4xMzYxMTggMTM2LjM0OTA3MSwxMTIuNzU2ODYzIiBmaWxsPSIjMjZCNUY4Ij4gPC9wYXRoPiA8cGF0aCBkPSJNMTExLjQyMjc3MSwxMTcuNjUzNTUgTDc5Ljc0MjQwOSwxMzIuOTQ5OTEyIEw3Ni41MjU3NzYzLDEzNC41MDQ3MTQgTDkuNjUwNDc2ODQsMTY2LjU0ODEwNCBDNS40MTEyOTA0LDE2OC41OTMyMTEgMC4wMDA1Nzg1MzEwNzMsMTY1LjUwMzg1NSAwLjAwMDU3ODUzMTA3MywxNjAuNzk0NjEyIEwwLjAwMDU3ODUzMTA3Myw3MS43MjEwNzU3IEMwLjAwMDU3ODUzMTA3Myw3MC4wMTczMDE3IDAuODc0MTYwNDUyLDY4LjU0NjM4NjQgMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbD0iI0VEMzA0OSI+IDwvcGF0aD4gPHBhdGggZD0iTTExMS40MjI3NzEsMTE3LjY1MzU1IEw3OS43NDI0MDksMTMyLjk0OTkxMiBMMi4wNDU2ODU4OCw2Ny40Mzg0OTk0IEMyLjUzNDU0NDYzLDY2Ljk0ODE5NDQgMy4wODg0ODgxNCw2Ni41NDQ2Njg5IDMuNjY0MTI2NTUsNjYuMjI1MDMwNSBDNS4yNjIzMTg2NCw2NS4yNjYxMTUzIDcuNTQxNzMxMDcsNjUuMDEwMTE1MyA5LjQ3OTgxMDE3LDY1Ljc3NjY2ODkgTDExMC44OTA1MjIsMTA1Ljk1NzA5OCBDMTE2LjA0NTIzNCwxMDguMDAyMjA2IDExNi40NTAyMDYsMTE1LjIyNTE2NiAxMTEuNDIyNzcxLDExNy42NTM1NSIgZmlsbC1vcGFjaXR5PSIwLjI1IiBmaWxsPSIjMDAwMDAwIj4gPC9wYXRoPiA8L2c+IDwvZz48L3N2Zz4=&#34;
+openapi: &#34;3.0.3&#34;
+paths:
+  /meta/bases:
+    get:
+      operationId: &#34;listBases&#34;
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  bases:
+                    items:
+                      $ref: &#34;#/components/schemas/Base&#34;
+                    type: &#34;array&#34;
+                type: &#34;object&#34;
+          description: &#34;List of bases&#34;
+      security:
+        - oauth2:
+            - &#34;data.bases:read&#34;
+      summary: &#34;List available bases&#34;
+  /{tableName}/records:
+    get:
+      operationId: &#34;listRecords&#34;
+      parameters:
+        - in: &#34;path&#34;
+          name: &#34;tableName&#34;
+          required: true
+          schema:
+            type: &#34;string&#34;
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  records:
+                    items:
+                      $ref: &#34;#/components/schemas/Record&#34;
+                    type: &#34;array&#34;
+                type: &#34;object&#34;
+          description: &#34;List of records&#34;
+      security:
+        - oauth2:
+            - &#34;data.records:read&#34;
+      summary: &#34;List records&#34;
+  /{tableName}/records/{recordId}:
+    get:
+      operationId: &#34;getRecord&#34;
+      parameters:
+        - in: &#34;path&#34;
+          name: &#34;tableName&#34;
+          required: true
+          schema:
+            type: &#34;string&#34;
+        - in: &#34;path&#34;
+          name: &#34;recordId&#34;
+          required: true
+          schema:
+            type: &#34;string&#34;
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/Record&#34;
+          description: &#34;Single record retrieved&#34;
+      security:
+        - oauth2:
+            - &#34;data.records:read&#34;
+      summary: &#34;Retrieve a record&#34;
+  /{tableName}/records/{recordId}/comments:
+    get:
+      operationId: &#34;listRecordComments&#34;
+      parameters:
+        - in: &#34;path&#34;
+          name: &#34;tableName&#34;
+          required: true
+          schema:
+            type: &#34;string&#34;
+        - in: &#34;path&#34;
+          name: &#34;recordId&#34;
+          required: true
+          schema:
+            type: &#34;string&#34;
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  comments:
+                    items:
+                      $ref: &#34;#/components/schemas/Comment&#34;
+                    type: &#34;array&#34;
+                type: &#34;object&#34;
+          description: &#34;List of comments&#34;
+      security:
+        - oauth2:
+            - &#34;data.recordComments:read&#34;
+      summary: &#34;List comments on a record&#34;
+security:
+  - oauth2:
+      - &#34;data.records:read&#34;
+      - &#34;data.recordComments:read&#34;
+      - &#34;data.bases:read&#34;
+servers:
+  - url: &#34;https://api.airtable.com/v0&#34;
+    variables:
+      baseId:
+        default: &#34;app1234567890&#34;
+        description: &#34;The ID of the Airtable base&#34;
+</textarea></div></div></section></div></section><footer class="mt-0 bg-neutral text-neutral-content p-10"><div class="mx-auto lg:max-w-5xl flex flex-col md:flex-row justify-between"><nav><h6 class="footer-title">Resources</h6><a href="/blog" class="block link-hover">Blog</a><a href="/" class="block link-hover">Pricing</a></nav><nav><h6 class="footer-title">Company</h6><a class="block link-hover">About Us</a><a href="/" class="block link-hover">Contact</a></nav><nav><h6 class="footer-title">Legal</h6><a href="/" class="block link-hover">Terms of Use</a><a href="/" class="block link-hover">Privacy Policy</a></nav></div></footer></main><script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script><script>
+        (function () {
+          if (window.__contentLightboxReady) return;
+          window.__contentLightboxReady = true;
+
+          const imageOverlay = document.createElement("div");
+          imageOverlay.className = "image-lightbox";
+          imageOverlay.setAttribute("aria-hidden", "true");
+
+          const overlayImg = document.createElement("img");
+          overlayImg.alt = "";
+          imageOverlay.appendChild(overlayImg);
+          document.body.appendChild(imageOverlay);
+
+          const codeOverlay = document.createElement("div");
+          codeOverlay.className = "code-lightbox";
+          codeOverlay.setAttribute("aria-hidden", "true");
+
+          const codePanel = document.createElement("div");
+          codePanel.className = "code-lightbox__panel";
+
+          const codeToolbar = document.createElement("div");
+          codeToolbar.className = "code-lightbox__toolbar";
+
+          const zoomOutButton = document.createElement("button");
+          zoomOutButton.type = "button";
+          zoomOutButton.className = "code-lightbox__button";
+          zoomOutButton.textContent = "A-";
+
+          const zoomInButton = document.createElement("button");
+          zoomInButton.type = "button";
+          zoomInButton.className = "code-lightbox__button";
+          zoomInButton.textContent = "A+";
+
+          const closeButton = document.createElement("button");
+          closeButton.type = "button";
+          closeButton.className = "code-lightbox__button";
+          closeButton.textContent = "Close";
+
+          const codeContent = document.createElement("div");
+          codeContent.className = "code-lightbox__content";
+
+          codeToolbar.appendChild(zoomOutButton);
+          codeToolbar.appendChild(zoomInButton);
+          codeToolbar.appendChild(closeButton);
+          codePanel.appendChild(codeToolbar);
+          codePanel.appendChild(codeContent);
+          codeOverlay.appendChild(codePanel);
+          document.body.appendChild(codeOverlay);
+
+          let codeZoom = 1;
+
+          function setCodeZoom(nextZoom) {
+            codeZoom = Math.max(0.75, Math.min(2.25, nextZoom));
+            codePanel.style.setProperty("--code-lightbox-font-scale", String(codeZoom));
+          }
+
+          function closeImageLightbox() {
+            imageOverlay.classList.remove("is-open");
+            imageOverlay.setAttribute("aria-hidden", "true");
+            overlayImg.removeAttribute("src");
+            if (!codeOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openImageLightbox(src, alt) {
+            overlayImg.src = src;
+            overlayImg.alt = alt || "";
+            imageOverlay.classList.add("is-open");
+            imageOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          function closeCodeLightbox() {
+            codeOverlay.classList.remove("is-open");
+            codeOverlay.setAttribute("aria-hidden", "true");
+            codeContent.replaceChildren();
+            setCodeZoom(1);
+            if (!imageOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openCodeLightbox(preNode) {
+            const clone = preNode.cloneNode(true);
+            clone.querySelectorAll(".code-copy-btn").forEach((node) => node.remove());
+            codeContent.replaceChildren(clone);
+            setCodeZoom(1.25);
+            codeOverlay.classList.add("is-open");
+            codeOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          zoomInButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom + 0.15);
+          });
+
+          zoomOutButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom - 0.15);
+          });
+
+          closeButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            closeCodeLightbox();
+          });
+
+          document.addEventListener("click", function (event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            if (target.closest(".code-copy-btn")) return;
+
+            const pre = target.closest("pre");
+            if (pre && pre.closest("article, .prose") && !pre.closest(".code-lightbox")) {
+              openCodeLightbox(pre);
+              return;
+            }
+
+            if (!(target instanceof HTMLImageElement)) return;
+            if (!target.closest("article, .prose")) return;
+            if (target.closest(".image-lightbox")) return;
+            if (!target.src) return;
+            openImageLightbox(target.src, target.alt);
+          });
+
+          imageOverlay.addEventListener("click", function () {
+            closeImageLightbox();
+          });
+
+          codeOverlay.addEventListener("click", function (event) {
+            if (event.target === codeOverlay) {
+              closeCodeLightbox();
+            }
+          });
+
+          codePanel.addEventListener("click", function (event) {
+            event.stopPropagation();
+          });
+
+          document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && imageOverlay.classList.contains("is-open")) {
+              closeImageLightbox();
+            }
+            if (event.key === "Escape" && codeOverlay.classList.contains("is-open")) {
+              closeCodeLightbox();
+            }
+          });
+        })();
+    </script></body></html>

@@ -1,0 +1,251 @@
+<!DOCTYPE html><html lang='en'><head><title>agent-octo.com</title><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="Agent Octo is a multi-tenant agent platform with runtime integrations, channels, and a Rust-powered sandbox."/><meta property="og:title" content="agent-octo.com"/><meta property="og:description" content="Agent Octo is a multi-tenant agent platform with runtime integrations, channels, and a Rust-powered sandbox."/><meta property="og:type" content="article"/><meta property="og:site_name" content="agent-octo.com"/><meta property="og:url" content="https://agent-octo.com"/><meta property="og:image" content="https://agent-octo.com/logo.svg"/><meta property="twitter:image" content="https://agent-octo.com/logo.svg"/><link rel="stylesheet" href="/tailwind.css" type="text/css"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><script async="true" data-goatcounter="" src="/goat-counter.js"></script><script async="true" src="/copy-paste.js"></script><script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script><style>
+        .image-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 9999;
+            cursor: zoom-out;
+            padding: 2rem;
+        }
+        .image-lightbox.is-open {
+            display: flex;
+        }
+        .image-lightbox img {
+            max-width: min(96vw, 1800px);
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+            border-radius: 8px;
+        }
+        article img,
+        .prose img {
+            cursor: zoom-in;
+        }
+        .code-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 10000;
+            padding: 1rem;
+        }
+        .code-lightbox.is-open {
+            display: flex;
+        }
+        .code-lightbox__panel {
+            width: min(96vw, 1900px);
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            --code-lightbox-font-scale: 1;
+        }
+        .code-lightbox__toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .code-lightbox__button {
+            background: rgba(16, 24, 40, 0.92);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .code-lightbox__content {
+            overflow: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+        }
+        .code-lightbox__content pre {
+            margin: 0;
+            padding: 1.25rem;
+            max-height: 86vh;
+            overflow: auto;
+            font-size: calc(clamp(15px, 1.35vw, 24px) * var(--code-lightbox-font-scale));
+            line-height: 1.45;
+        }
+        article pre,
+        .prose pre {
+            cursor: zoom-in;
+        }
+    </style></head><body><header class="sticky top-0 z-50 site-nav-header"><div class="backdrop-filter backdrop-blur-lg bg-base-100/80 border-b border-base-300 site-nav-shell"><div class="navbar justify-between site-nav-bar"><div class="flex items-center gap-4"><a href="/"><span class="pl-3 flex flex-row items-center gap-2"><img class="h-8 w-auto" src="/logo.svg" alt="agent-octo.com"/><strong class="leading-none">agent-octo.com</strong></span></a><div class="hidden lg:flex"><ul class="menu menu-horizontal px-1 dropdown-content"><li><a class="underline" hx-boost="false" href="/">Home</a></li><li><a class="" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li></ul></div></div><div class="hidden lg:flex items-center"><ul class="menu menu-horizontal px-3"><li><a class="btn btn-primary underline" hx-boost="true" href="/#hero">Get Started</a></li></ul></div><div class="dropdown lg:hidden dropdown-end"><div tabindex="0" role="button" class="btn btn-ghost"><svg xmlns="http://www.w3.org/2000/svg" stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5"><path d="M4 6h16M4 12h8m-8 6h16" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"></path></svg></div><ul class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-sm bg-base-100 rounded-box w-52"><li><a class="underline" hx-boost="false" href="/">Home</a></li><li><a class="" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li><li><a class="underline" hx-boost="true" href="/#hero">Get Started</a></li></ul></div></div></div></header><main class="min-h-screen bg-base-100 text-base-content"><section id="hero" class="px-6 py-20 lg:px-12"><div class="mx-auto flex max-w-6xl flex-col gap-8"><div class="flex justify-center"><span class="badge badge-outline badge-primary badge-md ">Open source agent runtime for teams</span></div><section class="py-0"><div class="flex justify-center text-center"><div class="max-w-lg"><h1 class="text-5xl font-bold">Run agents with your own tools, channels, and guardrails.</h1><p class="py-6">Agent Octo helps teams stand up a multi-tenant agent platform with runtime OpenAPI integrations, provider connections, Telegram delivery, and a Rust-based sandbox for real work.</p><div class="flex gap-2 justify-center"><a class="btn btn-primary" href="/blog">Read the starter post</a></div></div></div></section></div></section><section id="why-agent-octo" class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-8"><div class="max-w-3xl space-y-3"><h2 class="text-3xl font-bold">Why teams choose Agent Octo</h2><p class="text-base-content/75">The source page uses a direct comparison section. Here, the same layout is reframed around the practical reasons to run your own agent stack.</p></div><div class="grid gap-6 lg:grid-cols-3"><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><h3 class="card-title">Own the runtime</h3><p>Keep your agent system inside your infrastructure instead of pushing tenant data and tool execution into a hosted black box.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><h3 class="card-title">Plug in tools at runtime</h3><p>Load OpenAPI specs as integrations, connect providers with OAuth2, and expose lightweight tools without hardcoding each workflow.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><h3 class="card-title">Serve more than one team</h3><p>Agent Octo is built for multi-user, multi-tenant operation so one deployment can support internal teams, clients, or a SaaS footprint.</p></div></div></div></div></section><section id="capabilities" class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-8"><div class="max-w-3xl space-y-3"><h2 class="text-3xl font-bold">What the platform already covers</h2><p class="text-base-content/75">This section mirrors the source page’s capabilities grid, but with Agent Octo’s actual product surface.</p></div><div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3"><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><div class="flex items-center gap-3"><img class="h-10 w-10 rounded-box border border-base-300 p-2" alt="" src="/logo.svg"/><h3 class="card-title text-xl">Multi-tenant by design</h3></div><p>Run one deployment for multiple organizations, teams, or customers with scoped configuration.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><div class="flex items-center gap-3"><img class="h-10 w-10 rounded-box border border-base-300 p-2" alt="" src="/logo.svg"/><h3 class="card-title text-xl">Provider connections</h3></div><p>Configure model providers and authenticated connections without rewriting the application.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><div class="flex items-center gap-3"><img class="h-10 w-10 rounded-box border border-base-300 p-2" alt="" src="/logo.svg"/><h3 class="card-title text-xl">OpenAPI integrations</h3></div><p>Load tool definitions from Swagger/OpenAPI specs so agents can use external systems at runtime.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><div class="flex items-center gap-3"><img class="h-10 w-10 rounded-box border border-base-300 p-2" alt="" src="/logo.svg"/><h3 class="card-title text-xl">Channel delivery</h3></div><p>Receive and send messages through Telegram today, with room to grow the channel surface.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><div class="flex items-center gap-3"><img class="h-10 w-10 rounded-box border border-base-300 p-2" alt="" src="/logo.svg"/><h3 class="card-title text-xl">Rust-powered sandbox</h3></div><p>Use the Monty-based Python sandbox for code execution workloads that need stronger operational boundaries.</p></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-3"><div class="flex items-center gap-3"><img class="h-10 w-10 rounded-box border border-base-300 p-2" alt="" src="/logo.svg"/><h3 class="card-title text-xl">Code Mode support</h3></div><p>Reduce token overhead by leaning on Code Mode patterns when tool execution is the better path.</p></div></div></div></div></section><section id="architecture" class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-8"><div class="max-w-3xl space-y-3"><h2 class="text-3xl font-bold">How Agent Octo is wired</h2><p class="text-base-content/75">Like the source page’s systems section, this breaks the product down into a sequence and a few architectural guarantees.</p></div><ul class="timeline timeline-vertical timeline-compact  timeline-compact"><li class=""><div class="timeline-start timeline-box "><strong>1. Connect a channel</strong><p class="text-sm text-base-content/70">Start with Telegram or add more delivery paths over time.</p></div><div class="timeline-middle "><div class="h-3 w-3 rounded-full bg-primary"></div></div><div class="timeline-end timeline-box "><strong>2. Route into an org</strong><p class="text-sm text-base-content/70">Messages stay scoped to the correct organization, providers, and integrations.</p></div></li><li class=""><div class="timeline-start timeline-box "><strong>3. Call tools and models</strong><p class="text-sm text-base-content/70">Agents can use provider connections, runtime integrations, and sandboxed code execution.</p></div><div class="timeline-middle "><div class="h-3 w-3 rounded-full bg-secondary"></div></div><div class="timeline-end timeline-box "><strong>4. Ship the answer back</strong><p class="text-sm text-base-content/70">Responses return through the channel with the same operational boundaries you configured.</p></div></li></ul><div class="grid gap-6 md:grid-cols-3"><div class="card border border-base-300 bg-base-200/40 shadow-sm"><div class="card-body "><h3 class="card-title">Typed backend</h3><p>Axum, Rust on Nails, and generated database queries keep the core path explicit and testable.</p></div></div><div class="card border border-base-300 bg-base-200/40 shadow-sm"><div class="card-body "><h3 class="card-title">Runtime integrations</h3><p>OpenAPI specs can be loaded as integrations so the tool surface can change without recompiling the app.</p></div></div><div class="card border border-base-300 bg-base-200/40 shadow-sm"><div class="card-body "><h3 class="card-title">Operational control</h3><p>Multi-tenant org boundaries, provider setup, and channel routing are managed directly in the application.</p></div></div></div></div></section><section id="principles" class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-8"><div class="max-w-3xl space-y-3"><h2 class="text-3xl font-bold">Built around practical agent operations</h2><p class="text-base-content/75">The source page has a product-principles block. This version keeps that layout but shifts the copy to how Agent Octo is meant to be used.</p></div><div class="grid gap-6 lg:grid-cols-3"><div class="card bg-base-200/50 shadow-sm"><div class="card-body "><h3 class="card-title">Tools stay close to the work</h3><p>Integrations are discoverable and lightweight in context so agents are not flooded with irrelevant tool definitions.</p></div></div><div class="card bg-base-200/50 shadow-sm"><div class="card-body "><h3 class="card-title">Sandboxing matters</h3><p>The Rust-powered Python sandbox and Code Mode support are there to make code execution more practical and more controlled.</p></div></div><div class="card bg-base-200/50 shadow-sm"><div class="card-body "><h3 class="card-title">Configuration is productized</h3><p>Providers, channels, and integrations are first-class application concepts instead of one-off scripts hidden in deployment glue.</p></div></div></div></div></section><section id="quick-start" class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-8"><div class="max-w-3xl space-y-3"><h2 class="text-3xl font-bold">Quick start</h2><p class="text-base-content/75">This follows the same broad placement as the setup section on the inspiration page, but grounded in the actual README flow for Agent Octo.</p></div><div class="grid gap-6 lg:grid-cols-[1.2fr_0.8fr]"><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-4"><h3 class="card-title">Start locally in a few steps</h3><ol class="list-decimal space-y-3 pl-5"><li>Download the deployment file and create your environment variables.</li><li>Add a Telegram bot token and your preferred model provider credentials.</li><li>Run `docker compose up`, then open the app and configure providers, integrations, and channels.</li></ol></div></div><div class="card border border-base-300 bg-base-200/50 shadow-sm"><div class="card-body gap-3"><h3 class="card-title">Good first configuration</h3><ul class="list-disc space-y-2 pl-5"><li>One provider connection for your preferred LLM</li><li>One Telegram channel for ingress and egress</li><li>One OpenAPI integration the agent can call safely</li></ul></div></div></div></div></section><section class="mx-auto max-w-4xl px-6 py-16 lg:px-12"><h1 class="text-3xl font-medium font-display title-font mb-12 text-center">Frequently asked questions</h1><div class="collapse collapse-arrow bg-base-200"><input type="radio" name="faq-accordion"/><div class="collapse-title text-xl font-medium">Who is Agent Octo for?</div><div class="collapse-content"><p>Teams that want to run an agent product themselves, especially when they need integrations, channels, and tenant isolation.</p></div></div><div class="collapse collapse-arrow bg-base-200"><input type="radio" name="faq-accordion"/><div class="collapse-title text-xl font-medium">Do I have to hardcode every tool?</div><div class="collapse-content"><p>No. A core part of the model is loading integrations from OpenAPI specs so the available tool surface can evolve at runtime.</p></div></div><div class="collapse collapse-arrow bg-base-200"><input type="radio" name="faq-accordion"/><div class="collapse-title text-xl font-medium">Can I connect my own model provider?</div><div class="collapse-content"><p>Yes. Provider connections are part of the product, including OAuth2-based setups for APIs that require it.</p></div></div><div class="collapse collapse-arrow bg-base-200"><input type="radio" name="faq-accordion"/><div class="collapse-title text-xl font-medium">Is this only for Telegram bots?</div><div class="collapse-content"><p>No. Telegram is the current channel path in this repo, but the architecture separates channels from the rest of the agent runtime.</p></div></div><div class="collapse collapse-arrow bg-base-200"><input type="radio" name="faq-accordion"/><div class="collapse-title text-xl font-medium">Why a sandbox at all?</div><div class="collapse-content"><p>Because useful agents eventually need to execute code or handle richer workloads, and that needs explicit operational boundaries.</p></div></div></section><footer class="mt-0 bg-neutral text-neutral-content p-10"><div class="mx-auto lg:max-w-5xl flex flex-col md:flex-row justify-between"><nav><h6 class="footer-title">Resources</h6><a href="/blog" class="block link-hover">Blog</a><a href="/" class="block link-hover">Pricing</a></nav><nav><h6 class="footer-title">Company</h6><a class="block link-hover">About Us</a><a href="/" class="block link-hover">Contact</a></nav><nav><h6 class="footer-title">Legal</h6><a href="/" class="block link-hover">Terms of Use</a><a href="/" class="block link-hover">Privacy Policy</a></nav></div></footer><script>if (document.readyState !== "loading") {
+    initHeroBadge();
+} else {
+    document.addEventListener("DOMContentLoaded", initHeroBadge);
+}
+
+function initHeroBadge() {
+    const badge = document.querySelector(".badge");
+    if (!badge) {
+        return;
+    }
+
+    let active = false;
+    window.setInterval(() => {
+        active = !active;
+        badge.classList.toggle("badge-primary", active);
+        badge.classList.toggle("badge-outline", !active);
+    }, 1800);
+}
+</script></main><script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script><script>
+        (function () {
+          if (window.__contentLightboxReady) return;
+          window.__contentLightboxReady = true;
+
+          const imageOverlay = document.createElement("div");
+          imageOverlay.className = "image-lightbox";
+          imageOverlay.setAttribute("aria-hidden", "true");
+
+          const overlayImg = document.createElement("img");
+          overlayImg.alt = "";
+          imageOverlay.appendChild(overlayImg);
+          document.body.appendChild(imageOverlay);
+
+          const codeOverlay = document.createElement("div");
+          codeOverlay.className = "code-lightbox";
+          codeOverlay.setAttribute("aria-hidden", "true");
+
+          const codePanel = document.createElement("div");
+          codePanel.className = "code-lightbox__panel";
+
+          const codeToolbar = document.createElement("div");
+          codeToolbar.className = "code-lightbox__toolbar";
+
+          const zoomOutButton = document.createElement("button");
+          zoomOutButton.type = "button";
+          zoomOutButton.className = "code-lightbox__button";
+          zoomOutButton.textContent = "A-";
+
+          const zoomInButton = document.createElement("button");
+          zoomInButton.type = "button";
+          zoomInButton.className = "code-lightbox__button";
+          zoomInButton.textContent = "A+";
+
+          const closeButton = document.createElement("button");
+          closeButton.type = "button";
+          closeButton.className = "code-lightbox__button";
+          closeButton.textContent = "Close";
+
+          const codeContent = document.createElement("div");
+          codeContent.className = "code-lightbox__content";
+
+          codeToolbar.appendChild(zoomOutButton);
+          codeToolbar.appendChild(zoomInButton);
+          codeToolbar.appendChild(closeButton);
+          codePanel.appendChild(codeToolbar);
+          codePanel.appendChild(codeContent);
+          codeOverlay.appendChild(codePanel);
+          document.body.appendChild(codeOverlay);
+
+          let codeZoom = 1;
+
+          function setCodeZoom(nextZoom) {
+            codeZoom = Math.max(0.75, Math.min(2.25, nextZoom));
+            codePanel.style.setProperty("--code-lightbox-font-scale", String(codeZoom));
+          }
+
+          function closeImageLightbox() {
+            imageOverlay.classList.remove("is-open");
+            imageOverlay.setAttribute("aria-hidden", "true");
+            overlayImg.removeAttribute("src");
+            if (!codeOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openImageLightbox(src, alt) {
+            overlayImg.src = src;
+            overlayImg.alt = alt || "";
+            imageOverlay.classList.add("is-open");
+            imageOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          function closeCodeLightbox() {
+            codeOverlay.classList.remove("is-open");
+            codeOverlay.setAttribute("aria-hidden", "true");
+            codeContent.replaceChildren();
+            setCodeZoom(1);
+            if (!imageOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openCodeLightbox(preNode) {
+            const clone = preNode.cloneNode(true);
+            clone.querySelectorAll(".code-copy-btn").forEach((node) => node.remove());
+            codeContent.replaceChildren(clone);
+            setCodeZoom(1.25);
+            codeOverlay.classList.add("is-open");
+            codeOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          zoomInButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom + 0.15);
+          });
+
+          zoomOutButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom - 0.15);
+          });
+
+          closeButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            closeCodeLightbox();
+          });
+
+          document.addEventListener("click", function (event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            if (target.closest(".code-copy-btn")) return;
+
+            const pre = target.closest("pre");
+            if (pre && pre.closest("article, .prose") && !pre.closest(".code-lightbox")) {
+              openCodeLightbox(pre);
+              return;
+            }
+
+            if (!(target instanceof HTMLImageElement)) return;
+            if (!target.closest("article, .prose")) return;
+            if (target.closest(".image-lightbox")) return;
+            if (!target.src) return;
+            openImageLightbox(target.src, target.alt);
+          });
+
+          imageOverlay.addEventListener("click", function () {
+            closeImageLightbox();
+          });
+
+          codeOverlay.addEventListener("click", function (event) {
+            if (event.target === codeOverlay) {
+              closeCodeLightbox();
+            }
+          });
+
+          codePanel.addEventListener("click", function (event) {
+            event.stopPropagation();
+          });
+
+          document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && imageOverlay.classList.contains("is-open")) {
+              closeImageLightbox();
+            }
+            if (event.key === "Escape" && codeOverlay.classList.contains("is-open")) {
+              closeCodeLightbox();
+            }
+          });
+        })();
+    </script></body></html>

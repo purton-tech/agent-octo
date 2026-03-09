@@ -29,10 +29,6 @@ set -g pane-border-status top
 set -g pane-border-format "#{pane_title}"
 set-option -g mouse on
 bind -n F1 select-window -t 0
-bind -n F2 select-window -t 1
-bind -n F3 select-window -t 2
-bind -n F4 select-window -t 3
-bind -n F5 select-window -t 4
 EOF
 
   if tmux has-session -t "$SESSION" 2>/dev/null; then
@@ -61,14 +57,6 @@ EOF
 
   tmux select-pane -t "$SESSION:0.0"
   tmux select-layout -t "$SESSION:0" main-vertical
-
-  tmux new-window -t "$SESSION" -n gitui -c "$ROOT"
-  tmux send-keys -t "$SESSION:1" "gitui" C-m
-
-  tmux new-window -t "$SESSION" -n helix -c "$ROOT"
-  tmux send-keys -t "$SESSION:2" "hx" C-m
-
-  tmux new-window -t "$SESSION" -n bash -c "$ROOT"
 
   tmux select-window -t "$SESSION:0"
   exec tmux attach -t "$SESSION"
