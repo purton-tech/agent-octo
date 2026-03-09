@@ -54,7 +54,7 @@ services:
       migrations:
         condition: service_completed_successfully
     ports:
-      - "4000:3000"
+      - "3000:3000"
 
   agent-runtime:
     image: ghcr.io/purton-tech/agent-runtime:1.0.2

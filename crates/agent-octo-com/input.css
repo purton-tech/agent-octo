@@ -2,5 +2,3 @@
 @plugin "@tailwindcss/typography";
 @plugin "daisyui";
 @source "./src/**/*.{rs,html}";
-@source "../daisy_rsx/src/**/*.{rs,html}";
-@source "../ssg_whiz/src/**/*.{rs,html}";
