@@ -9,12 +9,18 @@ pub fn navigation_links() -> NavigationModel {
         logo_alt: Some("agent-octo.com".to_string()),
         desktop_left: vec![
             NavigationEntry::Link(NavigationLink::external("Home", "/", Section::Home)),
+            NavigationEntry::Link(NavigationLink::external(
+                "Specs",
+                "/open-api-specs/",
+                Section::McpServers,
+            )),
             NavigationEntry::Link(NavigationLink::external("Blog", "/blog", Section::Blog)),
         ],
         desktop_right: vec![NavigationLink::new("Get Started", "/#hero", Section::Home)
             .with_class("btn btn-primary")],
         mobile: vec![
             NavigationLink::external("Home", "/", Section::Home),
+            NavigationLink::external("Specs", "/open-api-specs/", Section::McpServers),
             NavigationLink::external("Blog", "/blog", Section::Blog),
             NavigationLink::new("Get Started", "/#hero", Section::Home),
         ],

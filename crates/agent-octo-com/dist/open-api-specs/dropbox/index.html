@@ -1,0 +1,489 @@
+<!DOCTYPE html><html lang='en'><head><title>Dropbox API - File &#38; Folder Listing | OpenAPI Spec | agent-octo.com</title><meta charset="utf-8"/><meta http-equiv="X-UA-Compatible" content="IE=edge"/><meta name="viewport" content="width=device-width, initial-scale=1"/><meta name="description" content="OpenAPI spec including file requests, files/folders listing, and file download endpoints."/><meta property="og:title" content="Dropbox API - File &#38; Folder Listing | OpenAPI Spec | agent-octo.com"/><meta property="og:description" content="OpenAPI spec including file requests, files/folders listing, and file download endpoints."/><meta property="og:type" content="article"/><meta property="og:site_name" content="agent-octo.com"/><meta property="og:url" content="https://agent-octo.com"/><meta property="og:image" content="https://agent-octo.com/data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/><meta property="twitter:image" content="https://agent-octo.com/data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/><link rel="stylesheet" href="/tailwind.css" type="text/css"/><link rel="icon" type="image/svg+xml" href="/favicon.svg"/><script async="true" data-goatcounter="" src="/goat-counter.js"></script><script async="true" src="/copy-paste.js"></script><script type="module" src="https://cdn.jsdelivr.net/npm/@justinribeiro/lite-youtube@1/lite-youtube.min.js"></script><style>
+        .image-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 9999;
+            cursor: zoom-out;
+            padding: 2rem;
+        }
+        .image-lightbox.is-open {
+            display: flex;
+        }
+        .image-lightbox img {
+            max-width: min(96vw, 1800px);
+            max-height: 92vh;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+            border-radius: 8px;
+        }
+        article img,
+        .prose img {
+            cursor: zoom-in;
+        }
+        .code-lightbox {
+            position: fixed;
+            inset: 0;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.92);
+            z-index: 10000;
+            padding: 1rem;
+        }
+        .code-lightbox.is-open {
+            display: flex;
+        }
+        .code-lightbox__panel {
+            width: min(96vw, 1900px);
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            --code-lightbox-font-scale: 1;
+        }
+        .code-lightbox__toolbar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .code-lightbox__button {
+            background: rgba(16, 24, 40, 0.92);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 0.35rem 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .code-lightbox__content {
+            overflow: auto;
+            border-radius: 10px;
+            box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45);
+        }
+        .code-lightbox__content pre {
+            margin: 0;
+            padding: 1.25rem;
+            max-height: 86vh;
+            overflow: auto;
+            font-size: calc(clamp(15px, 1.35vw, 24px) * var(--code-lightbox-font-scale));
+            line-height: 1.45;
+        }
+        article pre,
+        .prose pre {
+            cursor: zoom-in;
+        }
+    </style></head><body><header class="sticky top-0 z-50 site-nav-header"><div class="backdrop-filter backdrop-blur-lg bg-base-100/80 border-b border-base-300 site-nav-shell"><div class="navbar justify-between site-nav-bar"><div class="flex items-center gap-4"><a href="/"><span class="pl-3 flex flex-row items-center gap-2"><img class="h-8 w-auto" src="/logo.svg" alt="agent-octo.com"/><strong class="leading-none">agent-octo.com</strong></span></a><div class="hidden lg:flex"><ul class="menu menu-horizontal px-1 dropdown-content"><li><a class="" hx-boost="false" href="/">Home</a></li><li><a class="underline" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li></ul></div></div><div class="hidden lg:flex items-center"><ul class="menu menu-horizontal px-3"><li><a class="btn btn-primary" hx-boost="true" href="/#hero">Get Started</a></li></ul></div><div class="dropdown lg:hidden dropdown-end"><div tabindex="0" role="button" class="btn btn-ghost"><svg xmlns="http://www.w3.org/2000/svg" stroke="currentColor" viewBox="0 0 24 24" fill="none" class="h-5 w-5"><path d="M4 6h16M4 12h8m-8 6h16" stroke-linejoin="round" stroke-linecap="round" stroke-width="2"></path></svg></div><ul class="menu menu-sm dropdown-content mt-3 z-1 p-2 shadow-sm bg-base-100 rounded-box w-52"><li><a class="" hx-boost="false" href="/">Home</a></li><li><a class="underline" hx-boost="false" href="/open-api-specs/">Specs</a></li><li><a class="" hx-boost="false" href="/blog">Blog</a></li><li><a class="" hx-boost="true" href="/#hero">Get Started</a></li></ul></div></div></div></header><main class="min-h-screen bg-base-100 text-base-content"><section class="px-6 py-16 lg:px-12"><div class="mx-auto max-w-6xl space-y-10"><nav><a class="link link-primary" href="/open-api-specs/">Back to all specs</a></nav><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-5 md:flex-row md:items-start"><img class="h-20 w-20 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Dropbox API - File &#38; Folder Listing logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/><div class="space-y-4"><h1 class="text-4xl font-bold">Dropbox API - File &#38; Folder Listing</h1><p class="text-base-content/75">OpenAPI spec including file requests, files/folders listing, and file download endpoints.</p><div class="flex flex-wrap gap-2"><span class="badge badge-outline  badge-md ">v1.2.0</span><span class="badge badge-outline badge-primary badge-md ">4 methods</span></div></div></div></div></div><section class="space-y-6"><div class="space-y-2"><h2 class="text-3xl font-bold">Methods</h2><p class="text-base-content/70">Each method below is pulled directly from the OpenAPI file.</p></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">POST</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/2/file_requests/list</code><span class="text-sm text-base-content/60">listFileRequests</span></div><p class="text-base-content/75">Returns a list of file requests owned by this user.</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Dropbox API - File &#38; Folder Listing logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Request body</h3><div class="flex flex-wrap gap-2"><span class="badge badge-outline badge-secondary badge-md ">application/json</span></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">List of file requests</p></div></div><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">default</span></div><p class="text-sm text-base-content/70">Unexpected error</p></div></div></div></div></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">POST</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/2/files/download</code><span class="text-sm text-base-content/60">downloadFile</span></div><p class="text-base-content/75">Download the raw contents of a file (binary or text). Returns file data in the HTTP response body, not JSON.</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Dropbox API - File &#38; Folder Listing logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Parameters</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex flex-wrap items-center gap-2"><strong>Dropbox-API-Arg</strong><span class="badge badge-outline  badge-md ">header</span><span class="badge badge-outline badge-warning badge-md ">required</span></div><p class="text-sm text-base-content/70">A JSON-encoded object with a &#39;path&#39; property specifying the file to download (e.g. {&#34;path&#34;: &#34;/my-folder/file.txt&#34;})</p></div></div></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">Raw contents of the specified file returned in the response body.</p></div></div><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">default</span></div><p class="text-sm text-base-content/70">Unexpected error</p></div></div></div></div></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">POST</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/2/files/list_folder</code><span class="text-sm text-base-content/60">listFilesAndFolders</span></div><p class="text-base-content/75">Returns the contents of a folder. Includes both files and subfolders.</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Dropbox API - File &#38; Folder Listing logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Request body</h3><div class="flex flex-wrap gap-2"><span class="badge badge-outline badge-secondary badge-md ">application/json</span></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">Folder listing result</p></div></div><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">default</span></div><p class="text-sm text-base-content/70">Unexpected error</p></div></div></div></div></div></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body gap-5"><div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between"><div class="space-y-4"><div class="flex flex-wrap items-center gap-3"><span class="badge badge-outline badge-primary badge-md ">POST</span><code class="rounded bg-base-200 px-3 py-2 text-sm">/2/files/list_folder/continue</code><span class="text-sm text-base-content/60">listFilesAndFoldersContinue</span></div><p class="text-base-content/75">Retrieve more results if the previous response indicated `has_more`.</p></div><img class="h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3" alt="Dropbox API - File &#38; Folder Listing logo" src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+"/></div><div class="space-y-3"><h3 class="text-lg font-semibold">Request body</h3><div class="flex flex-wrap gap-2"><span class="badge badge-outline badge-secondary badge-md ">application/json</span></div></div><div class="space-y-3"><h3 class="text-lg font-semibold">Responses</h3><div class="grid gap-3 md:grid-cols-2"><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">200</span></div><p class="text-sm text-base-content/70">Next set of folder listing results</p></div></div><div class="card border border-base-300 bg-base-200/30"><div class="card-body gap-2 p-4"><div class="flex items-center gap-2"><span class="badge badge-outline badge-primary badge-md ">default</span></div><p class="text-sm text-base-content/70">Unexpected error</p></div></div></div></div></div></div></section><section class="space-y-4"><div class="space-y-2"><h2 class="text-3xl font-bold">YAML</h2><p class="text-base-content/70">Copy and paste the full spec from the textarea below.</p></div><div class="card border border-base-300 bg-base-100 shadow-sm"><div class="card-body "><textarea class="textarea textarea-bordered min-h-[28rem] w-full font-mono text-sm leading-6" readonly=true>components:
+  schemas:
+    Entry:
+      description: &#34;A file or folder returned from list_folder.&#34;
+      properties:
+        .tag:
+          enum:
+            - &#34;file&#34;
+            - &#34;folder&#34;
+            - &#34;deleted&#34;
+          type: &#34;string&#34;
+        id:
+          type: &#34;string&#34;
+        name:
+          type: &#34;string&#34;
+        path_display:
+          type: &#34;string&#34;
+        path_lower:
+          type: &#34;string&#34;
+      required:
+        - &#34;.tag&#34;
+        - &#34;name&#34;
+        - &#34;id&#34;
+      type: &#34;object&#34;
+    Error:
+      properties:
+        error:
+          type: &#34;object&#34;
+        error_summary:
+          type: &#34;string&#34;
+      type: &#34;object&#34;
+    FileRequest:
+      properties:
+        created:
+          description: &#34;The time this file request was created.&#34;
+          format: &#34;date-time&#34;
+          type: &#34;string&#34;
+        file_count:
+          description: &#34;The number of files uploaded to the file request.&#34;
+          type: &#34;integer&#34;
+        id:
+          description: &#34;The ID of the file request.&#34;
+          type: &#34;string&#34;
+        is_open:
+          description: &#34;Whether or not the file request is currently open.&#34;
+          type: &#34;boolean&#34;
+        title:
+          description: &#34;The title of the file request.&#34;
+          type: &#34;string&#34;
+        url:
+          description: &#34;The URL of the file request.&#34;
+          format: &#34;uri&#34;
+          type: &#34;string&#34;
+      required:
+        - &#34;id&#34;
+        - &#34;url&#34;
+        - &#34;title&#34;
+        - &#34;created&#34;
+        - &#34;is_open&#34;
+        - &#34;file_count&#34;
+      type: &#34;object&#34;
+    ListFolderResult:
+      properties:
+        cursor:
+          type: &#34;string&#34;
+        entries:
+          items:
+            $ref: &#34;#/components/schemas/Entry&#34;
+          type: &#34;array&#34;
+        has_more:
+          type: &#34;boolean&#34;
+      required:
+        - &#34;entries&#34;
+        - &#34;cursor&#34;
+        - &#34;has_more&#34;
+      type: &#34;object&#34;
+  securitySchemes:
+    OAuth2:
+      description: &#34;OAuth2 authentication for Dropbox API&#34;
+      flows:
+        authorizationCode:
+          authorizationUrl: &#34;https://www.dropbox.com/oauth2/authorize&#34;
+          scopes:
+            file_requests.read: &#34;Read file requests&#34;
+            file_requests.write: &#34;Create and manage file requests&#34;
+            files.content.read: &#34;Read file metadata and content&#34;
+          tokenUrl: &#34;https://api.dropboxapi.com/oauth2/token&#34;
+      type: &#34;oauth2&#34;
+info:
+  description: &#34;OpenAPI spec including file requests, files/folders listing, and file download endpoints.&#34;
+  title: &#34;Dropbox API - File &#38; Folder Listing&#34;
+  version: &#34;1.2.0&#34;
+  x-bionic-slug: &#34;dropbox&#34;
+  x-logo:
+    url: &#34;data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+DQo8IS0tIFVwbG9hZGVkIHRvOiBTVkcgUmVwbywgd3d3LnN2Z3JlcG8uY29tLCBHZW5lcmF0b3I6IFNWRyBSZXBvIE1peGVyIFRvb2xzIC0tPg0KPHN2ZyB3aWR0aD0iODAwcHgiIGhlaWdodD0iODAwcHgiIHZpZXdCb3g9IjAgLTEuNSA0OCA0OCIgdmVyc2lvbj0iMS4xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHhtbG5zOnhsaW5rPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5L3hsaW5rIj4NCiAgICANCiAgICA8dGl0bGU+RHJvcGJveC1jb2xvcjwvdGl0bGU+DQogICAgPGRlc2M+Q3JlYXRlZCB3aXRoIFNrZXRjaC48L2Rlc2M+DQogICAgPGRlZnM+DQoNCjwvZGVmcz4NCiAgICA8ZyBpZD0iSWNvbnMiIHN0cm9rZT0ibm9uZSIgc3Ryb2tlLXdpZHRoPSIxIiBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPg0KICAgICAgICA8ZyBpZD0iQ29sb3ItIiB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtODAwLjAwMDAwMCwgLTM2My4wMDAwMDApIiBmaWxsPSIjMEY4MkUyIj4NCiAgICAgICAgICAgIDxwYXRoIGQ9Ik04MjQsMzg5LjAzMzI1NSBMODE0LjExOTUsMzk3LjM0NTczIEw4MDAsMzg4LjA1MzUzOCBMODA5Ljc2MzUsMzgwLjE3MzQ3IEw4MjMuOTk5OTcxLDM4OS4wMzMyMzggTDgzOC4yMzYyLDM4MC4xNzIxMDkgTDg0Ny45OTk3LDM4OC4wNTM2OSBMODMzLjg4MDIsMzk3LjM0NTg4MSBMODIzLjk5OTcsMzg5LjAzMzQwNiBaIE04MTQuMTE5OCwzNjMgTDgwMC4wMDAzLDM3Mi4yOTIxOTEgTDgwOS43NjM4LDM4MC4xNzIyNiBMODI0LjAwMDMsMzcxLjMxMjQ3NSBMODE0LjExOTgsMzYzIFogTTgyNC4wMjg5NSwzOTAuODIxNjkyIEw4MTQuMTE5OTUsMzk5LjEwOTk3NiBMODA5Ljg3OTQ1LDM5Ni4zMTg5OTMgTDgwOS44Nzk0NSwzOTkuNDQ3MTMyIEw4MjQuMDI4OTUsNDA4IEw4MzguMTc4NDUsMzk5LjQ0NzEzMiBMODM4LjE3ODQ1LDM5Ni4zMTg5OTMgTDgzMy45Mzc5NSwzOTkuMTA5OTc2IEw4MjQuMDI4OTUsMzkwLjgyMTY5MiBaIE04NDgsMzcyLjI5MjM0MyBMODMzLjg4MDUsMzYzLjAwMDE1MSBMODI0LDM3MS4zMTI2MjYgTDgzOC4yMzY1LDM4MC4xNzI0MTEgTDg0OCwzNzIuMjkyMzQzIFoiIGlkPSJEcm9wYm94Ij4NCg0KPC9wYXRoPg0KICAgICAgICA8L2c+DQogICAgPC9nPg0KPC9zdmc+&#34;
+openapi: &#34;3.0.3&#34;
+paths:
+  /2/file_requests/list:
+    post:
+      description: &#34;Returns a list of file requests owned by this user.&#34;
+      operationId: &#34;listFileRequests&#34;
+      requestBody:
+        content:
+          application/json:
+            example: {}
+            schema:
+              additionalProperties: false
+              type: &#34;object&#34;
+        description: &#34;Empty JSON object&#34;
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                properties:
+                  file_requests:
+                    items:
+                      $ref: &#34;#/components/schemas/FileRequest&#34;
+                    type: &#34;array&#34;
+                required:
+                  - &#34;file_requests&#34;
+                type: &#34;object&#34;
+          description: &#34;List of file requests&#34;
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/Error&#34;
+          description: &#34;Unexpected error&#34;
+      security:
+        - OAuth2:
+            - &#34;file_requests.read&#34;
+      summary: &#34;List File Requests&#34;
+      tags:
+        - &#34;file_requests&#34;
+  /2/files/download:
+    post:
+      description: &#34;Download the raw contents of a file (binary or text). Returns file data in the HTTP response body, not JSON.&#34;
+      operationId: &#34;downloadFile&#34;
+      parameters:
+        - description: &#34;A JSON-encoded object with a &#39;path&#39; property specifying the file to download (e.g. {\&#34;path\&#34;: \&#34;/my-folder/file.txt\&#34;})&#34;
+          example: &#34;{\&#34;path\&#34;: \&#34;/Documents/report.txt\&#34;}&#34;
+          in: &#34;header&#34;
+          name: &#34;Dropbox-API-Arg&#34;
+          required: true
+          schema:
+            type: &#34;string&#34;
+      responses:
+        200:
+          content:
+            application/octet-stream: {}
+            text/plain: {}
+          description: &#34;Raw contents of the specified file returned in the response body.&#34;
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/Error&#34;
+          description: &#34;Unexpected error&#34;
+      security:
+        - OAuth2:
+            - &#34;files.content.read&#34;
+      servers:
+        - url: &#34;https://content.dropboxapi.com&#34;
+      summary: &#34;Download file contents&#34;
+      tags:
+        - &#34;files&#34;
+  /2/files/list_folder:
+    post:
+      description: &#34;Returns the contents of a folder. Includes both files and subfolders.&#34;
+      operationId: &#34;listFilesAndFolders&#34;
+      requestBody:
+        content:
+          application/json:
+            example:
+              path: &#34;&#34;
+              recursive: false
+            schema:
+              properties:
+                include_deleted:
+                  default: false
+                  type: &#34;boolean&#34;
+                include_media_info:
+                  default: false
+                  type: &#34;boolean&#34;
+                path:
+                  description: &#34;Path to the folder. Empty string for root.&#34;
+                  type: &#34;string&#34;
+                recursive:
+                  default: false
+                  type: &#34;boolean&#34;
+              required:
+                - &#34;path&#34;
+              type: &#34;object&#34;
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/ListFolderResult&#34;
+          description: &#34;Folder listing result&#34;
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/Error&#34;
+          description: &#34;Unexpected error&#34;
+      security:
+        - OAuth2:
+            - &#34;files.content.read&#34;
+      summary: &#34;List contents of a folder&#34;
+      tags:
+        - &#34;files&#34;
+  /2/files/list_folder/continue:
+    post:
+      description: &#34;Retrieve more results if the previous response indicated `has_more`.&#34;
+      operationId: &#34;listFilesAndFoldersContinue&#34;
+      requestBody:
+        content:
+          application/json:
+            schema:
+              properties:
+                cursor:
+                  description: &#34;Cursor from previous /list_folder call.&#34;
+                  type: &#34;string&#34;
+              required:
+                - &#34;cursor&#34;
+              type: &#34;object&#34;
+        required: true
+      responses:
+        200:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/ListFolderResult&#34;
+          description: &#34;Next set of folder listing results&#34;
+        default:
+          content:
+            application/json:
+              schema:
+                $ref: &#34;#/components/schemas/Error&#34;
+          description: &#34;Unexpected error&#34;
+      security:
+        - OAuth2:
+            - &#34;files.content.read&#34;
+      summary: &#34;Continue folder listing&#34;
+      tags:
+        - &#34;files&#34;
+security:
+  - OAuth2:
+      - &#34;file_requests.read&#34;
+      - &#34;files.content.read&#34;
+servers:
+  - url: &#34;https://api.dropboxapi.com&#34;
+  - url: &#34;https://content.dropboxapi.com&#34;
+</textarea></div></div></section></div></section><footer class="mt-0 bg-neutral text-neutral-content p-10"><div class="mx-auto lg:max-w-5xl flex flex-col md:flex-row justify-between"><nav><h6 class="footer-title">Resources</h6><a href="/blog" class="block link-hover">Blog</a><a href="/" class="block link-hover">Pricing</a></nav><nav><h6 class="footer-title">Company</h6><a class="block link-hover">About Us</a><a href="/" class="block link-hover">Contact</a></nav><nav><h6 class="footer-title">Legal</h6><a href="/" class="block link-hover">Terms of Use</a><a href="/" class="block link-hover">Privacy Policy</a></nav></div></footer></main><script src="https://instant.page/5.2.0" type="module" integrity="sha384-jnZyxPjiipYXnSU0ygqeac2q7CVYMbh84q0uHVRRxEtvFPiQYbXWUorga2aqZJ0z"></script><script>
+        (function () {
+          if (window.__contentLightboxReady) return;
+          window.__contentLightboxReady = true;
+
+          const imageOverlay = document.createElement("div");
+          imageOverlay.className = "image-lightbox";
+          imageOverlay.setAttribute("aria-hidden", "true");
+
+          const overlayImg = document.createElement("img");
+          overlayImg.alt = "";
+          imageOverlay.appendChild(overlayImg);
+          document.body.appendChild(imageOverlay);
+
+          const codeOverlay = document.createElement("div");
+          codeOverlay.className = "code-lightbox";
+          codeOverlay.setAttribute("aria-hidden", "true");
+
+          const codePanel = document.createElement("div");
+          codePanel.className = "code-lightbox__panel";
+
+          const codeToolbar = document.createElement("div");
+          codeToolbar.className = "code-lightbox__toolbar";
+
+          const zoomOutButton = document.createElement("button");
+          zoomOutButton.type = "button";
+          zoomOutButton.className = "code-lightbox__button";
+          zoomOutButton.textContent = "A-";
+
+          const zoomInButton = document.createElement("button");
+          zoomInButton.type = "button";
+          zoomInButton.className = "code-lightbox__button";
+          zoomInButton.textContent = "A+";
+
+          const closeButton = document.createElement("button");
+          closeButton.type = "button";
+          closeButton.className = "code-lightbox__button";
+          closeButton.textContent = "Close";
+
+          const codeContent = document.createElement("div");
+          codeContent.className = "code-lightbox__content";
+
+          codeToolbar.appendChild(zoomOutButton);
+          codeToolbar.appendChild(zoomInButton);
+          codeToolbar.appendChild(closeButton);
+          codePanel.appendChild(codeToolbar);
+          codePanel.appendChild(codeContent);
+          codeOverlay.appendChild(codePanel);
+          document.body.appendChild(codeOverlay);
+
+          let codeZoom = 1;
+
+          function setCodeZoom(nextZoom) {
+            codeZoom = Math.max(0.75, Math.min(2.25, nextZoom));
+            codePanel.style.setProperty("--code-lightbox-font-scale", String(codeZoom));
+          }
+
+          function closeImageLightbox() {
+            imageOverlay.classList.remove("is-open");
+            imageOverlay.setAttribute("aria-hidden", "true");
+            overlayImg.removeAttribute("src");
+            if (!codeOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openImageLightbox(src, alt) {
+            overlayImg.src = src;
+            overlayImg.alt = alt || "";
+            imageOverlay.classList.add("is-open");
+            imageOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          function closeCodeLightbox() {
+            codeOverlay.classList.remove("is-open");
+            codeOverlay.setAttribute("aria-hidden", "true");
+            codeContent.replaceChildren();
+            setCodeZoom(1);
+            if (!imageOverlay.classList.contains("is-open")) {
+              document.body.style.overflow = "";
+            }
+          }
+
+          function openCodeLightbox(preNode) {
+            const clone = preNode.cloneNode(true);
+            clone.querySelectorAll(".code-copy-btn").forEach((node) => node.remove());
+            codeContent.replaceChildren(clone);
+            setCodeZoom(1.25);
+            codeOverlay.classList.add("is-open");
+            codeOverlay.setAttribute("aria-hidden", "false");
+            document.body.style.overflow = "hidden";
+          }
+
+          zoomInButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom + 0.15);
+          });
+
+          zoomOutButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            setCodeZoom(codeZoom - 0.15);
+          });
+
+          closeButton.addEventListener("click", function (event) {
+            event.stopPropagation();
+            closeCodeLightbox();
+          });
+
+          document.addEventListener("click", function (event) {
+            const target = event.target;
+            if (!(target instanceof Element)) return;
+
+            if (target.closest(".code-copy-btn")) return;
+
+            const pre = target.closest("pre");
+            if (pre && pre.closest("article, .prose") && !pre.closest(".code-lightbox")) {
+              openCodeLightbox(pre);
+              return;
+            }
+
+            if (!(target instanceof HTMLImageElement)) return;
+            if (!target.closest("article, .prose")) return;
+            if (target.closest(".image-lightbox")) return;
+            if (!target.src) return;
+            openImageLightbox(target.src, target.alt);
+          });
+
+          imageOverlay.addEventListener("click", function () {
+            closeImageLightbox();
+          });
+
+          codeOverlay.addEventListener("click", function (event) {
+            if (event.target === codeOverlay) {
+              closeCodeLightbox();
+            }
+          });
+
+          codePanel.addEventListener("click", function (event) {
+            event.stopPropagation();
+          });
+
+          document.addEventListener("keydown", function (event) {
+            if (event.key === "Escape" && imageOverlay.classList.contains("is-open")) {
+              closeImageLightbox();
+            }
+            if (event.key === "Escape" && codeOverlay.classList.contains("is-open")) {
+              closeCodeLightbox();
+            }
+          });
+        })();
+    </script></body></html>

@@ -1,5 +1,6 @@
 pub mod blog_summary;
 pub mod generator;
+pub mod open_api_specs;
 pub mod pages;
 pub mod pages_summary;
 pub mod ui_links;
