@@ -43,19 +43,6 @@ pub fn page() -> String {
                             cta_href: Some("/blog".to_string()),
                             class: Some("py-0".to_string())
                         }
-                        div {
-                            class: "flex flex-wrap justify-center gap-3",
-                            a {
-                                class: "btn btn-outline",
-                                href: "https://github.com/purton-tech/agent-octo",
-                                "View the repo"
-                            }
-                            a {
-                                class: "btn btn-ghost",
-                                href: "#quick-start",
-                                "See setup"
-                            }
-                        }
                     }
                 }
 
