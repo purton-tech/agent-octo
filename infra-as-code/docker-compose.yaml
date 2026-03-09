@@ -29,6 +29,7 @@ services:
     image: ghcr.io/purton-tech/octo:1.0.2
     restart: unless-stopped
     environment:
+      DANGER_JWT_OVERRIDE: eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiIsImtpZCI6ImE0NTEyODgxYjBhZDYyM2FkNTMwOGQ1YzI1ZWQ5Yjg1In0.eyJzdWIiOiIxMjM0NTY3ODkwIiwiaXNzIjoiaHR0cHM6Ly9leGFtcGxlLmNvbSIsIm5hbWUiOiJKb2huIERvZSIsImlhdCI6MTUxNjIzOTAyMiwiZW1haWwiOiJqb2huQGFjbWUub3JnIn0.q_y5Hkt8MKQzauN7gZFrA7126N1k0NrdS4VzsYeKN4uy5iLr3Sy_Ws5jT2d921flI7CKdwg39tq-7UVGaKUTVQ
       APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
     depends_on:
       db:
