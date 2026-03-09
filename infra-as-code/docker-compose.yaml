@@ -2,6 +2,24 @@ services:
   db:
     image: postgres:18
     restart: unless-stopped
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        cat >/docker-entrypoint-initdb.d/00-demo-roles.sql <<'SQL'
+        CREATE ROLE "db-owner" LOGIN PASSWORD '2623167177252';
+        CREATE ROLE application_user LOGIN PASSWORD '2231312050241';
+        CREATE ROLE application_readonly LOGIN PASSWORD '915166195229';
+        CREATE ROLE authenticator LOGIN PASSWORD '78250191100178';
+
+        GRANT ALL PRIVILEGES ON DATABASE octo TO "db-owner";
+        GRANT CONNECT ON DATABASE octo TO application_user;
+        GRANT CONNECT ON DATABASE octo TO application_readonly;
+        GRANT CONNECT ON DATABASE octo TO authenticator;
+
+        ALTER DATABASE octo OWNER TO "db-owner";
+        SQL
+        exec docker-entrypoint.sh postgres
     environment:
       POSTGRES_DB: octo
       POSTGRES_USER: postgres
@@ -14,7 +32,6 @@ services:
       start_period: 10s
     volumes:
       - octo-postgres-data:/var/lib/postgresql
-      - ./postgres-init:/docker-entrypoint-initdb.d:ro
 
   migrations:
     image: ghcr.io/purton-tech/octo-migrations:1.0.2
