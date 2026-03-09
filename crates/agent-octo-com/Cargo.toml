@@ -1,0 +1,13 @@
+[package]
+name = "agent-octo-com"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ssg_whiz = "0.1.1"
+daisy_rsx = "0.1.56"
+dioxus = { version = "0.7.3", default-features = false, features = ["macro", "html", "signals"] }
+dioxus-ssr = { version = "0.7.3", default-features = false }
+tokio = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }

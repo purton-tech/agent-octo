@@ -1,5 +1,6 @@
 [workspace]
 members = [
+    "crates/agent-octo-com",
     "crates/tool-runtime",
     "crates/agent-runtime",
     "crates/channels",
