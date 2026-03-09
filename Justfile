@@ -62,6 +62,7 @@ get-config:
     echo "✅ kubeconfig updated and TLS verification disabled"
 
 codex: 
+    sudo chown -R vscode:vscode /home/vscode/.codex
     sudo npm install -g @openai/codex
 
 tk:
