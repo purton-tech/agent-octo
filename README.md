@@ -26,16 +26,7 @@ Download the `docker-compose.yaml` file.
 curl -LO https://raw.githubusercontent.com/purton-tech/agent-octo/main/infra-as-code/docker-compose.yaml
 ```
 
-Create a `.env` file and add your Telegram token and model provider details.
-
-```
-TELEGRAM_BOT_TOKEN=<telegram-token>
-OPENAI_API_KEY=<api key>
-```
-
-If you use another provider, add that provider's API key env var as well.
-
-Run the server
+then
 
 ```sh
 docker compose up

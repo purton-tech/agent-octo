@@ -1,5 +1,92 @@
 services:
+  db:
+    image: postgres:18
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: octo
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d octo"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    ports:
+      - "30061:5432"
+    volumes:
+      - octo-postgres-data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+
+  migrations:
+    image: ghcr.io/purton-tech/octo-migrations:1.0.2
+    restart: "no"
+    environment:
+      DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
+      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
+      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
+      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+
   octo:
-    env_file:
-      - .env
     image: ghcr.io/purton-tech/octo:1.0.2
+    restart: unless-stopped
+    environment:
+      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
+      DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
+      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
+      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+    ports:
+      - "3000:3000"
+
+  agent-runtime:
+    image: ghcr.io/purton-tech/agent-runtime:1.0.2
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
+      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
+      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
+      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
+  telegram-egress:
+    image: ghcr.io/purton-tech/telegram-egress:1.0.2
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
+      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
+      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
+      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
+  telegram-ingress-polling:
+    image: ghcr.io/purton-tech/telegram-ingress-polling:1.0.2
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgres://db-owner:2623167177252@db:5432/octo?sslmode=disable
+      APPLICATION_URL: postgres://application_user:2231312050241@db:5432/octo?sslmode=disable
+      AUTHENTICATOR_URL: postgres://authenticator:78250191100178@db:5432/octo?sslmode=disable
+      READONLY_URL: postgres://application_readonly:915166195229@db:5432/octo?sslmode=disable
+    depends_on:
+      db:
+        condition: service_healthy
+      migrations:
+        condition: service_completed_successfully
+
+volumes:
+  octo-postgres-data:
