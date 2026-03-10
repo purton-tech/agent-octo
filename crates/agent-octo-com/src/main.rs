@@ -25,10 +25,7 @@ async fn main() {
         site_meta: ui_links::site_meta(),
         site_header: None,
         site_assets: SiteAssets {
-            stylesheets: vec![
-                "/tailwind.css".to_string(),
-                "https://cdn.jsdelivr.net/npm/daisyui@5".to_string(),
-            ],
+            stylesheets: vec!["/tailwind.css".to_string()],
             head_scripts: vec![ScriptAsset {
                 src: "/copy-paste.js".to_string(),
                 script_type: None,
