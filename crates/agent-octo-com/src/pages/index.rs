@@ -19,15 +19,15 @@ pub fn page() -> String {
             mobile_menu: None,
             section: Section::Home,
             main {
-                class: "site-main",
+                class: "min-h-screen bg-base-100 text-base-content",
 
                 section {
                     id: "hero",
-                    class: "site-section site-section--hero",
+                    class: "px-6 py-20 lg:px-12",
                     div {
-                        class: "site-shell site-stack--hero",
+                        class: "mx-auto flex max-w-6xl flex-col gap-8",
                         div {
-                            class: "site-kicker-row",
+                            class: "flex justify-center",
                             Badge {
                                 badge_style: BadgeStyle::Outline,
                                 badge_color: BadgeColor::Primary,
@@ -39,30 +39,30 @@ pub fn page() -> String {
                             subtitle: "Agent Octo helps teams stand up a multi-tenant agent platform with runtime OpenAPI integrations, provider connections, Telegram delivery, and a Rust-based sandbox for real work.".to_string(),
                             cta_label: Some("Read the starter post".to_string()),
                             cta_href: Some("/blog".to_string()),
-                            class: Some("site-copy--center py-0".to_string())
+                            class: Some("py-0".to_string())
                         }
                     }
                 }
 
                 section {
                     id: "why-agent-octo",
-                    class: "site-section",
+                    class: "px-6 py-16 lg:px-12",
                     div {
-                        class: "site-shell site-stack",
+                        class: "mx-auto max-w-6xl space-y-8",
                         div {
-                            class: "site-copy",
-                            h2 { class: "site-title", "Why teams choose Agent Octo" }
+                            class: "max-w-3xl space-y-3",
+                            h2 { class: "text-3xl font-bold", "Why teams choose Agent Octo" }
                             p {
-                                class: "site-body",
+                                class: "text-base-content/75",
                                 "The source page uses a direct comparison section. Here, the same layout is reframed around the practical reasons to run your own agent stack."
                             }
                         }
                         div {
-                            class: "site-grid-3",
+                            class: "grid gap-6 lg:grid-cols-3",
                             Card {
-                                class: Some("site-card".to_string()),
+                                class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
                                 CardBody {
-                                    class: Some("site-card-body".to_string()),
+                                    class: Some("gap-3".to_string()),
                                     h3 { class: "card-title", "Own the runtime" }
                                     p {
                                         "Keep your agent system inside your infrastructure instead of pushing tenant data and tool execution into a hosted black box."
@@ -70,9 +70,9 @@ pub fn page() -> String {
                                 }
                             }
                             Card {
-                                class: Some("site-card".to_string()),
+                                class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
                                 CardBody {
-                                    class: Some("site-card-body".to_string()),
+                                    class: Some("gap-3".to_string()),
                                     h3 { class: "card-title", "Plug in tools at runtime" }
                                     p {
                                         "Load OpenAPI specs as integrations, connect providers with OAuth2, and expose lightweight tools without hardcoding each workflow."
@@ -80,9 +80,9 @@ pub fn page() -> String {
                                 }
                             }
                             Card {
-                                class: Some("site-card".to_string()),
+                                class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
                                 CardBody {
-                                    class: Some("site-card-body".to_string()),
+                                    class: Some("gap-3".to_string()),
                                     h3 { class: "card-title", "Serve more than one team" }
                                     p {
                                         "Agent Octo is built for multi-user, multi-tenant operation so one deployment can support internal teams, clients, or a SaaS footprint."
@@ -95,28 +95,28 @@ pub fn page() -> String {
 
                 section {
                     id: "capabilities",
-                    class: "site-section",
+                    class: "px-6 py-16 lg:px-12",
                     div {
-                        class: "site-shell site-stack",
+                        class: "mx-auto max-w-6xl space-y-8",
                         div {
-                            class: "site-copy",
-                            h2 { class: "site-title", "What the platform already covers" }
+                            class: "max-w-3xl space-y-3",
+                            h2 { class: "text-3xl font-bold", "What the platform already covers" }
                             p {
-                                class: "site-body",
+                                class: "text-base-content/75",
                                 "This section mirrors the source page’s capabilities grid, but with Agent Octo’s actual product surface."
                             }
                         }
                         div {
-                            class: "site-grid-caps",
+                            class: "grid gap-6 md:grid-cols-2 lg:grid-cols-3",
                             for feature in capability_features() {
                                 Card {
-                                    class: Some("site-card".to_string()),
+                                    class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
                                     CardBody {
-                                        class: Some("site-card-body".to_string()),
+                                        class: Some("gap-3".to_string()),
                                         div {
-                                            class: "site-feature-head",
+                                            class: "flex items-center gap-3",
                                             img {
-                                                class: "site-feature-icon",
+                                                class: "h-10 w-10 rounded-box border border-base-300 p-2",
                                                 alt: "",
                                                 src: "{feature.icon}"
                                             }
@@ -132,14 +132,14 @@ pub fn page() -> String {
 
                 section {
                     id: "architecture",
-                    class: "site-section",
+                    class: "px-6 py-16 lg:px-12",
                     div {
-                        class: "site-shell site-stack",
+                        class: "mx-auto max-w-6xl space-y-8",
                         div {
-                            class: "site-copy",
-                            h2 { class: "site-title", "How Agent Octo is wired" }
+                            class: "max-w-3xl space-y-3",
+                            h2 { class: "text-3xl font-bold", "How Agent Octo is wired" }
                             p {
-                                class: "site-body",
+                                class: "text-base-content/75",
                                 "Like the source page’s systems section, this breaks the product down into a sequence and a few architectural guarantees."
                             }
                         }
@@ -175,23 +175,23 @@ pub fn page() -> String {
                             }
                         }
                         div {
-                            class: "site-grid-3-tight",
+                            class: "grid gap-6 md:grid-cols-3",
                             Card {
-                                class: Some("site-card--muted".to_string()),
+                                class: Some("border border-base-300 bg-base-200/40 shadow-sm".to_string()),
                                 CardBody {
                                     h3 { class: "card-title", "Typed backend" }
                                     p { "Axum, Rust on Nails, and generated database queries keep the core path explicit and testable." }
                                 }
                             }
                             Card {
-                                class: Some("site-card--muted".to_string()),
+                                class: Some("border border-base-300 bg-base-200/40 shadow-sm".to_string()),
                                 CardBody {
                                     h3 { class: "card-title", "Runtime integrations" }
                                     p { "OpenAPI specs can be loaded as integrations so the tool surface can change without recompiling the app." }
                                 }
                             }
                             Card {
-                                class: Some("site-card--muted".to_string()),
+                                class: Some("border border-base-300 bg-base-200/40 shadow-sm".to_string()),
                                 CardBody {
                                     h3 { class: "card-title", "Operational control" }
                                     p { "Multi-tenant org boundaries, provider setup, and channel routing are managed directly in the application." }
@@ -203,35 +203,35 @@ pub fn page() -> String {
 
                 section {
                     id: "principles",
-                    class: "site-section",
+                    class: "px-6 py-16 lg:px-12",
                     div {
-                        class: "site-shell site-stack",
+                        class: "mx-auto max-w-6xl space-y-8",
                         div {
-                            class: "site-copy",
-                            h2 { class: "site-title", "Built around practical agent operations" }
+                            class: "max-w-3xl space-y-3",
+                            h2 { class: "text-3xl font-bold", "Built around practical agent operations" }
                             p {
-                                class: "site-body",
+                                class: "text-base-content/75",
                                 "The source page has a product-principles block. This version keeps that layout but shifts the copy to how Agent Octo is meant to be used."
                             }
                         }
                         div {
-                            class: "site-grid-3",
+                            class: "grid gap-6 lg:grid-cols-3",
                             Card {
-                                class: Some("site-card--soft".to_string()),
+                                class: Some("bg-base-200/50 shadow-sm".to_string()),
                                 CardBody {
                                     h3 { class: "card-title", "Tools stay close to the work" }
                                     p { "Integrations are discoverable and lightweight in context so agents are not flooded with irrelevant tool definitions." }
                                 }
                             }
                             Card {
-                                class: Some("site-card--soft".to_string()),
+                                class: Some("bg-base-200/50 shadow-sm".to_string()),
                                 CardBody {
                                     h3 { class: "card-title", "Sandboxing matters" }
                                     p { "The Rust-powered Python sandbox and Code Mode support are there to make code execution more practical and more controlled." }
                                 }
                             }
                             Card {
-                                class: Some("site-card--soft".to_string()),
+                                class: Some("bg-base-200/50 shadow-sm".to_string()),
                                 CardBody {
                                     h3 { class: "card-title", "Configuration is productized" }
                                     p { "Providers, channels, and integrations are first-class application concepts instead of one-off scripts hidden in deployment glue." }
@@ -243,26 +243,26 @@ pub fn page() -> String {
 
                 section {
                     id: "quick-start",
-                    class: "site-section",
+                    class: "px-6 py-16 lg:px-12",
                     div {
-                        class: "site-shell site-stack",
+                        class: "mx-auto max-w-6xl space-y-8",
                         div {
-                            class: "site-copy",
-                            h2 { class: "site-title", "Quick start" }
+                            class: "max-w-3xl space-y-3",
+                            h2 { class: "text-3xl font-bold", "Quick start" }
                             p {
-                                class: "site-body",
+                                class: "text-base-content/75",
                                 "This follows the same broad placement as the setup section on the inspiration page, but grounded in the actual README flow for Agent Octo."
                             }
                         }
                         div {
-                            class: "site-grid-2-1",
+                            class: "grid gap-6 lg:grid-cols-[1.2fr_0.8fr]",
                             Card {
-                                class: Some("site-card".to_string()),
+                                class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
                                 CardBody {
-                                    class: Some("site-card-body--loose".to_string()),
+                                    class: Some("gap-4".to_string()),
                                     h3 { class: "card-title", "Start locally in a few steps" }
                                     ol {
-                                        class: "site-list--ordered",
+                                        class: "list-decimal space-y-3 pl-5",
                                         li { "Download the deployment file and create your environment variables." }
                                         li { "Add a Telegram bot token and your preferred model provider credentials." }
                                         li { "Run `docker compose up`, then open the app and configure providers, integrations, and channels." }
@@ -270,12 +270,12 @@ pub fn page() -> String {
                                 }
                             }
                             Card {
-                                class: Some("site-card--soft".to_string()),
+                                class: Some("border border-base-300 bg-base-200/50 shadow-sm".to_string()),
                                 CardBody {
-                                    class: Some("site-card-body".to_string()),
+                                    class: Some("gap-3".to_string()),
                                     h3 { class: "card-title", "Good first configuration" }
                                     ul {
-                                        class: "site-list--bulleted",
+                                        class: "list-disc space-y-2 pl-5",
                                         li { "One provider connection for your preferred LLM" }
                                         li { "One Telegram channel for ingress and egress" }
                                         li { "One OpenAPI integration the agent can call safely" }
@@ -288,7 +288,7 @@ pub fn page() -> String {
 
                 Faq {
                     questions: faq_items(),
-                    class: Some("site-faq".to_string())
+                    class: Some("mx-auto max-w-4xl px-6 py-16 lg:px-12".to_string())
                 }
 
                 Footer {
