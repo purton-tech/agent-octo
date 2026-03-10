@@ -13,7 +13,7 @@ pub fn index_page(integrations: &[IntegrationSpec]) -> String {
             mobile_menu: None,
             section: Section::McpServers,
             main {
-                class: "min-h-screen bg-base-100 text-base-content",
+                class: "min-h-screen text-base-content",
 
                 section {
                     class: "px-6 py-16 lg:px-12",
@@ -116,7 +116,7 @@ pub fn detail_page(integration: &IntegrationSpec) -> String {
             mobile_menu: None,
             section: Section::McpServers,
             main {
-                class: "min-h-screen bg-base-100 text-base-content",
+                class: "min-h-screen text-base-content",
 
                 section {
                     class: "px-6 py-16 lg:px-12",

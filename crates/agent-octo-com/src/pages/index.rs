@@ -19,7 +19,7 @@ pub fn page() -> String {
             mobile_menu: None,
             section: Section::Home,
             main {
-                class: "min-h-screen bg-base-100 text-base-content",
+                class: "min-h-screen text-base-content",
 
                 section {
                     id: "hero",
@@ -60,7 +60,7 @@ pub fn page() -> String {
                         div {
                             class: "grid gap-6 lg:grid-cols-3",
                             Card {
-                                class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
+                                class: Some("card-md border border-base-300 bg-base-100 shadow-sm".to_string()),
                                 CardBody {
                                     class: Some("gap-3".to_string()),
                                     h3 { class: "card-title", "Own the runtime" }
