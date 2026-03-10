@@ -3,7 +3,8 @@
 @plugin "@tailwindcss/typography";
 @source "./src/**/*.{rs,html}";
 
-@source inline("collapse collapse-arrow");
+@source inline("collapse collapse-title collapse-content collapse-plus collapse-open collapse-close collapse-arrow");
+@source inline("card card-body card-title");
 
 @plugin "daisyui/theme" {
     name: "nano";
