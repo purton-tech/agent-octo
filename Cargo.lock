@@ -4263,12 +4263,11 @@ dependencies = [
 
 [[package]]
 name = "ssg_whiz"
-version = "0.1.1"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "441c8cf9fa05d271cb563ee5728574cb636b823a085a738365e8a3de26a2cdc5"
+checksum = "94752a4417cd8158869f8071af70539bf79ab30c9d2f123b606c2c54423b9f2a"
 dependencies = [
  "axum 0.7.9",
- "daisy_rsx",
  "dioxus",
  "dioxus-ssr",
  "image",

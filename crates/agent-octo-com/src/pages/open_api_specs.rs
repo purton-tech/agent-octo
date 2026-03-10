@@ -1,7 +1,6 @@
-use daisy_rsx::marketing::{footer::Footer, navigation::Section};
 use daisy_rsx::{Badge, BadgeColor, BadgeStyle, Card, CardBody};
 use dioxus::prelude::*;
-use ssg_whiz::layouts::layout::Layout;
+use ssg_whiz::{layouts::layout::Layout, Footer, Section};
 
 use crate::open_api_specs::{Endpoint, IntegrationSpec};
 

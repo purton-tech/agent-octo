@@ -1,6 +1,4 @@
-use daisy_rsx::marketing::footer::FooterLinks;
-use daisy_rsx::marketing::navigation::{NavigationEntry, NavigationLink, NavigationModel, Section};
-use ssg_whiz::SiteMeta;
+use ssg_whiz::{FooterLinks, NavigationEntry, NavigationLink, NavigationModel, Section, SiteMeta};
 
 pub fn navigation_links() -> NavigationModel {
     NavigationModel {

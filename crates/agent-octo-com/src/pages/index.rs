@@ -1,8 +1,6 @@
 use daisy_rsx::marketing::{
     faq_accordian::{Faq, FaqText},
-    footer::Footer,
     hero::Hero,
-    navigation::Section,
 };
 use daisy_rsx::timeline::TimelineDirection;
 use daisy_rsx::{
@@ -10,7 +8,7 @@ use daisy_rsx::{
     TimelineMiddle, TimelineStart,
 };
 use dioxus::prelude::*;
-use ssg_whiz::layouts::layout::Layout;
+use ssg_whiz::{layouts::layout::Layout, Footer, Section};
 
 pub fn page() -> String {
     let page = rsx!(

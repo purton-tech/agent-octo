@@ -7,7 +7,7 @@ pub mod ui_links;
 
 use std::net::SocketAddr;
 
-use ssg_whiz::{SiteBuilder, SiteConfig};
+use ssg_whiz::{ScriptAsset, SiteAssets, SiteBuilder, SiteConfig};
 
 #[tokio::main]
 async fn main() {
@@ -24,6 +24,20 @@ async fn main() {
         footer_links: ui_links::footer_links(),
         site_meta: ui_links::site_meta(),
         site_header: None,
+        site_assets: SiteAssets {
+            stylesheets: vec![
+                "/tailwind.css".to_string(),
+                "https://cdn.jsdelivr.net/npm/daisyui@5".to_string(),
+            ],
+            head_scripts: vec![ScriptAsset {
+                src: "/copy-paste.js".to_string(),
+                script_type: None,
+                async_load: true,
+                integrity: None,
+                data_goatcounter: None,
+            }],
+            body_scripts: vec![],
+        },
     };
 
     SiteBuilder::new(config)
