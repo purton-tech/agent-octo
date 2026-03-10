@@ -295,10 +295,6 @@ pub fn page() -> String {
                     margin_top: Some("mt-0".to_string()),
                     links: crate::ui_links::footer_links(),
                 }
-
-                script {
-                    dangerous_inner_html: include_str!("index.js")
-                }
             }
         }
     );
