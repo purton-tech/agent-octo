@@ -21,6 +21,8 @@ CREATE TABLE public.providers (
     default_model_display_name TEXT NOT NULL,
     default_model_context_size INT NOT NULL DEFAULT 0,
     default_model_description TEXT NOT NULL DEFAULT '',
+    price_per_million_input_microcents BIGINT NOT NULL DEFAULT 3000000,
+    price_per_million_output_microcents BIGINT NOT NULL DEFAULT 3000000,
 
     base_url TEXT NOT NULL,
 
@@ -30,6 +32,12 @@ CREATE TABLE public.providers (
 
 COMMENT ON TABLE public.providers IS
 'Global LLM provider catalog with required default model metadata.';
+
+COMMENT ON COLUMN public.providers.price_per_million_input_microcents IS
+'Internal input token pricing in microcents per 1,000,000 tokens.';
+
+COMMENT ON COLUMN public.providers.price_per_million_output_microcents IS
+'Internal output token pricing in microcents per 1,000,000 tokens.';
 
 CREATE TABLE public.agent_llm (
     agent_id UUID PRIMARY KEY,

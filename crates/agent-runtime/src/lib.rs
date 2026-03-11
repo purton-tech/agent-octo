@@ -5,9 +5,10 @@ pub mod system_prompt;
 use std::collections::HashMap;
 use std::sync::Arc;
 
+use rig::agent::Agent;
 use rig::client::CompletionClient;
-use rig::completion::{Chat, Message as RigMessage};
-use rig::providers::openai::Client;
+use rig::completion::Message as RigMessage;
+use rig::providers::openai::{Client, responses_api::ResponsesCompletionModel};
 use tokio::sync::RwLock;
 use tool_runtime::monty_python::RunPython;
 use tool_runtime::openapi_actions::OpenApiRegistry;
@@ -30,7 +31,7 @@ pub fn build_agent(
     model: &str,
     system_prompt: String,
     openapi_actions: Arc<OpenApiRegistry>,
-) -> impl Chat + Clone {
+) -> Agent<ResponsesCompletionModel> {
     client
         .agent(model)
         .preamble(&system_prompt)
