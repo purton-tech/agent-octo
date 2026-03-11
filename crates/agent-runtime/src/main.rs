@@ -5,12 +5,14 @@ use agent_runtime::config::Config;
 use agent_runtime::provider;
 use agent_runtime::system_prompt::SYSTEM_PROMPT;
 use agent_runtime::{build_agent, build_system_prompt};
+use db::clorinde::queries::billing::record_llm_usage_for_conversation;
 use db::clorinde::queries::channels::{
     claim_next_channel_message, insert_channel_message, list_conversation_messages,
     update_channel_message_status,
 };
 use db::clorinde::types::{ChannelMessageDirection, ChannelMessageStatus, ChannelType};
-use rig::completion::{Chat, Message as RigMessage};
+use rig::agent::{PromptRequest, PromptResponse};
+use rig::completion::Message as RigMessage;
 use tokio::time::sleep;
 use tool_runtime::openapi_actions::OpenApiRegistry;
 use tracing::{info, warn};
@@ -46,7 +48,7 @@ async fn main() -> anyhow::Result<()> {
     // Long-lived worker loop: wait for inbound work, claim one message, process it,
     // then repeat. If there is no work, sleep briefly before retrying.
     loop {
-        let client = pool.get().await?;
+        let mut client = pool.get().await?;
 
         let Some(inbound_message) = claim_next_channel_message()
             .bind(
@@ -81,7 +83,7 @@ async fn main() -> anyhow::Result<()> {
             })
             .collect::<Vec<_>>();
 
-        let (reply, inbound_status) = match process_inbound_message(
+        let (reply, usage, inbound_status) = match process_inbound_message(
             &client,
             &inbound_message.conversation_id,
             &inbound_message.message_text,
@@ -91,20 +93,42 @@ async fn main() -> anyhow::Result<()> {
         )
         .await
         {
-            Ok(reply) => (reply, ChannelMessageStatus::processed),
+            Ok(response) => (
+                response.output,
+                Some(response.usage),
+                ChannelMessageStatus::processed,
+            ),
             Err(err) => {
                 warn!(
                     message_id = %inbound_message.id,
                     error = %err,
                     "model request failed"
                 );
-                (format!("Model error: {err}"), ChannelMessageStatus::failed)
+                (
+                    format!("Model error: {err}"),
+                    None,
+                    ChannelMessageStatus::failed,
+                )
             }
         };
 
+        let transaction = client.transaction().await?;
+
+        if let Some(usage) = usage {
+            record_llm_usage_for_conversation()
+                .bind(
+                    &transaction,
+                    &inbound_message.conversation_id,
+                    &(usage.input_tokens as i64),
+                    &(usage.output_tokens as i64),
+                )
+                .one()
+                .await?;
+        }
+
         insert_channel_message()
             .bind(
-                &client,
+                &transaction,
                 &Option::<String>::None,
                 &inbound_message.channel_conversation_id,
                 &ChannelMessageDirection::outbound,
@@ -115,9 +139,11 @@ async fn main() -> anyhow::Result<()> {
             .await?;
 
         update_channel_message_status()
-            .bind(&client, &inbound_status, &inbound_message.id)
+            .bind(&transaction, &inbound_status, &inbound_message.id)
             .one()
             .await?;
+
+        transaction.commit().await?;
 
         info!(
             inbound_message_id = %inbound_message.id,
@@ -131,10 +157,10 @@ async fn process_inbound_message(
     client: &db::clorinde::deadpool_postgres::Client,
     conversation_id: &uuid::Uuid,
     message_text: &str,
-    history: Vec<RigMessage>,
+    mut history: Vec<RigMessage>,
     system_prompt: &str,
     openapi_actions: &Arc<OpenApiRegistry>,
-) -> anyhow::Result<String> {
+) -> anyhow::Result<PromptResponse> {
     let provider_config = provider::load_for_conversation(client, conversation_id).await?;
     let provider_client = provider::build_client(&provider_config)?;
     let agent = build_agent(
@@ -144,5 +170,9 @@ async fn process_inbound_message(
         Arc::clone(openapi_actions),
     );
 
-    agent.chat(message_text, history).await.map_err(Into::into)
+    PromptRequest::from_agent(&agent, message_text)
+        .with_history(&mut history)
+        .extended_details()
+        .await
+        .map_err(Into::into)
 }

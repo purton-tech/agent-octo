@@ -1,4 +1,5 @@
 pub mod blog_summary;
+pub mod components;
 pub mod generator;
 pub mod open_api_specs;
 pub mod pages;
@@ -7,7 +8,7 @@ pub mod ui_links;
 
 use std::net::SocketAddr;
 
-use ssg_whiz::{ScriptAsset, SiteAssets, SiteBuilder, SiteConfig};
+use ssg_whiz::{InlineScript, ScriptAsset, SiteAssets, SiteBuilder, SiteConfig};
 
 #[tokio::main]
 async fn main() {
@@ -33,7 +34,24 @@ async fn main() {
                 integrity: None,
                 data_goatcounter: None,
             }],
-            body_scripts: vec![],
+            body_scripts: vec![
+                ScriptAsset {
+                    src: "https://unpkg.com/@digicreon/mujs/dist/mu.min.js".to_string(),
+                    script_type: None,
+                    async_load: false,
+                    integrity: None,
+                    data_goatcounter: None,
+                },
+                ScriptAsset {
+                    src: "/scroll-story.js".to_string(),
+                    script_type: None,
+                    async_load: false,
+                    integrity: None,
+                    data_goatcounter: None,
+                },
+            ],
+            head_inline_scripts: vec![],
+            body_inline_scripts: vec![InlineScript::new("mu.init({ processForms: false });")],
         },
     };
 

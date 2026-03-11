@@ -3,10 +3,11 @@
 @plugin "@tailwindcss/typography";
 @source "./src/**/*.{rs,html}";
 
-@source inline("collapse collapse-arrow");
+@source inline("collapse collapse-title collapse-content collapse-plus collapse-open collapse-close collapse-arrow");
+@source inline("card card-body card-title");
 
 @plugin "daisyui/theme" {
-    name: "nano";
+    name: "octo";
     default: true;
     prefersdark: true;
   
@@ -48,4 +49,115 @@ body {
 
 .site-nav__backdrop {
     background-color: rgba(90, 120, 255, 0.12);
+}
+
+.octo-story {
+    position: relative;
+    height: 260vh;
+}
+
+.octo-story__sticky {
+    position: sticky;
+    top: 0;
+    display: grid;
+    height: 100vh;
+    place-items: center;
+    padding-block: 2rem;
+}
+
+.octo-story__frame {
+    display: flex;
+    height: min(38rem, 82vh);
+    width: min(46rem, 100%);
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: calc(var(--radius-box) * 1.5);
+    border: 1px solid color-mix(in oklab, var(--color-base-300) 70%, white 10%);
+    background: linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--color-base-200) 92%, black 8%),
+        color-mix(in oklab, var(--color-base-100) 88%, black 12%)
+    );
+    box-shadow: 0 24px 80px rgba(4, 9, 28, 0.35);
+}
+
+.octo-story__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--color-base-300) 72%, white 10%);
+    padding: 1.25rem 1.5rem;
+}
+
+.octo-story__viewport {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+    overflow: hidden;
+    padding: 1.5rem;
+}
+
+.octo-story__messages {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    gap: 0.875rem;
+}
+
+.octo-story__message {
+    display: none;
+    max-width: min(34rem, 82%);
+    border-radius: 1.15rem;
+    padding: 0.9rem 1rem;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.octo-story__message.left {
+    align-self: flex-start;
+    border: 1px solid color-mix(in oklab, var(--color-base-300) 78%, white 10%);
+    background-color: color-mix(in oklab, var(--color-base-200) 86%, black 14%);
+    color: color-mix(in oklab, var(--color-base-content) 94%, black 6%);
+}
+
+.octo-story__message.right {
+    align-self: flex-end;
+    border: 1px solid color-mix(in oklab, var(--color-primary) 50%, var(--color-base-300) 50%);
+    background: linear-gradient(
+        180deg,
+        color-mix(in oklab, var(--color-primary) 28%, var(--color-base-200) 72%),
+        color-mix(in oklab, var(--color-primary) 18%, var(--color-base-100) 82%)
+    );
+    color: color-mix(in oklab, var(--color-base-content) 98%, white 2%);
+}
+
+.octo-story__message.visible {
+    display: block;
+}
+
+@media (max-width: 768px) {
+    .octo-story {
+        height: 220vh;
+    }
+
+    .octo-story__sticky {
+        padding-block: 1rem;
+    }
+
+    .octo-story__frame {
+        height: min(34rem, 80vh);
+    }
+
+    .octo-story__header {
+        padding: 1rem 1rem 0.875rem;
+    }
+
+    .octo-story__viewport {
+        padding: 1rem;
+    }
+
+    .octo-story__message {
+        max-width: 88%;
+    }
 }

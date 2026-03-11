@@ -46,6 +46,7 @@ GRANT USAGE ON TYPE org.org_role TO application_readonly;
 CREATE TABLE org.orgs (
     id UUID PRIMARY KEY DEFAULT uuidv7(),
     name TEXT NOT NULL,
+    balance_microcents BIGINT NOT NULL DEFAULT 1000000000,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
@@ -57,6 +58,9 @@ COMMENT ON COLUMN org.orgs.id IS
 
 COMMENT ON COLUMN org.orgs.name IS
 'Human-friendly organization name.';
+
+COMMENT ON COLUMN org.orgs.balance_microcents IS
+'Remaining prepaid organization balance in microcents. Defaults to $10.00.';
 
 COMMENT ON COLUMN org.orgs.created_at IS
 'Creation timestamp.';
