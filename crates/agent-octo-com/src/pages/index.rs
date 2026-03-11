@@ -7,7 +7,7 @@ use crate::components::{
     homepage_faq_section::HomepageFaqSection, homepage_hero_section::HomepageHeroSection,
     homepage_principles_section::HomepagePrinciplesSection,
     homepage_quick_start_section::HomepageQuickStartSection,
-    homepage_why_section::HomepageWhySection,
+    homepage_story_section::HomepageStorySection,
 };
 
 pub fn page() -> String {
@@ -22,7 +22,7 @@ pub fn page() -> String {
                 class: "min-h-screen text-base-content",
 
                 HomepageHeroSection {}
-                HomepageWhySection {}
+                HomepageStorySection {}
                 HomepageCapabilitiesSection {}
                 HomepageArchitectureSection {}
                 HomepagePrinciplesSection {}

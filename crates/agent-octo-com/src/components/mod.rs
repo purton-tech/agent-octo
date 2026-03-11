@@ -4,4 +4,4 @@ pub mod homepage_faq_section;
 pub mod homepage_hero_section;
 pub mod homepage_principles_section;
 pub mod homepage_quick_start_section;
-pub mod homepage_why_section;
+pub mod homepage_story_section;
