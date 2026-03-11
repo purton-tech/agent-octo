@@ -18,6 +18,7 @@ pub struct CreateConnectionDraft {
 
 pub fn page(
     org_id: String,
+    balance_label: String,
     integrations: Vec<ConnectableIntegration>,
     draft: Option<CreateConnectionDraft>,
     error_message: Option<String>,
@@ -48,6 +49,7 @@ pub fn page(
         Layout {
             title: "Add Connection".to_string(),
             org_id,
+            balance_label,
             selected_item: SideBar::Connections,
             header_left: rsx!(
                 Breadcrumb {

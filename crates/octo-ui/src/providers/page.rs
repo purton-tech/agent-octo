@@ -10,7 +10,11 @@ use clorinde::queries::providers::ProviderConnectionCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, providers: Vec<ProviderConnectionCard>) -> String {
+pub fn page(
+    org_id: String,
+    balance_label: String,
+    providers: Vec<ProviderConnectionCard>,
+) -> String {
     let new_href = routes::providers::New {
         org_id: org_id.clone(),
     }
@@ -20,6 +24,7 @@ pub fn page(org_id: String, providers: Vec<ProviderConnectionCard>) -> String {
         Layout {
             title: "Providers".to_string(),
             org_id,
+            balance_label,
             selected_item: SideBar::Providers,
             header_left: rsx!(
                 Breadcrumb {

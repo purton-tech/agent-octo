@@ -1,4 +1,4 @@
-use crate::{CustomError, Jwt, authz};
+use crate::{CustomError, Jwt, authz, handlers};
 use axum::{Extension, response::Html};
 use clorinde::deadpool_postgres::Pool;
 use octo_ui::integrations;
@@ -24,10 +24,11 @@ pub async fn loader(
         .bind(&transaction, &org_id)
         .all()
         .await?;
+    let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
 
     transaction.commit().await?;
 
-    let html = integrations::page::page(org_id, integrations);
+    let html = integrations::page::page(org_id, balance_label, integrations);
     Ok(Html(html))
 }
 
@@ -46,9 +47,10 @@ pub async fn loader_new(
         ));
     }
 
+    let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
     transaction.commit().await?;
 
-    let html = integrations::upsert::page(org_id, None, None, None);
+    let html = integrations::upsert::page(org_id, balance_label, None, None, None);
     Ok(Html(html))
 }
 
@@ -75,9 +77,10 @@ pub async fn loader_edit(
         .opt()
         .await?
         .ok_or_else(|| CustomError::FaultySetup("Integration not found".to_string()))?;
+    let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
 
     transaction.commit().await?;
 
-    let html = integrations::upsert::page(org_id, Some(integration), None, None);
+    let html = integrations::upsert::page(org_id, balance_label, Some(integration), None, None);
     Ok(Html(html))
 }

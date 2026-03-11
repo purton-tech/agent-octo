@@ -34,6 +34,7 @@ pub struct CreateProviderDraft {
 
 pub fn page(
     org_id: String,
+    balance_label: String,
     draft: Option<CreateProviderDraft>,
     error_message: Option<String>,
 ) -> String {
@@ -50,6 +51,7 @@ pub fn page(
         Layout {
             title: "Add Provider".to_string(),
             org_id,
+            balance_label,
             selected_item: SideBar::Providers,
             header_left: rsx!(
                 Breadcrumb {

@@ -19,6 +19,7 @@ pub struct ConnectTelegramDraft {
 
 pub fn page(
     org_id: String,
+    balance_label: String,
     channels: Vec<ChannelCard>,
     has_telegram_channel: bool,
     agents: Vec<AgentCard>,
@@ -43,6 +44,7 @@ pub fn page(
         Layout {
             title: "Channels".to_string(),
             org_id,
+            balance_label,
             selected_item: SideBar::Channels,
             header_left: rsx!(
                 Breadcrumb {

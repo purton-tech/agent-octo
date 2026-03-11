@@ -1,4 +1,4 @@
-use crate::{CustomError, Jwt, authz};
+use crate::{CustomError, Jwt, authz, handlers};
 use axum::{Extension, response::Html};
 use clorinde::deadpool_postgres::Pool;
 use octo_ui::channels::page;
@@ -31,11 +31,13 @@ pub async fn loader(
         .bind(&transaction, &org_id)
         .all()
         .await?;
+    let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
 
     transaction.commit().await?;
 
     let html = page::page(
         org_id,
+        balance_label,
         channels,
         channel_setup.configured,
         agents,

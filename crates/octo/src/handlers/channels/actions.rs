@@ -1,4 +1,4 @@
-use crate::{CustomError, Jwt, authz};
+use crate::{CustomError, Jwt, authz, handlers};
 use axum::{
     Extension, Form,
     response::{Html, IntoResponse, Redirect, Response},
@@ -68,11 +68,13 @@ async fn render_connect_error(
         .bind(&transaction, &org_id)
         .all()
         .await?;
+    let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
 
     transaction.commit().await?;
 
     let html = octo_ui::channels::page::page(
         org_id,
+        balance_label,
         channels,
         channel_setup.configured,
         agents,

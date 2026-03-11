@@ -7,4 +7,5 @@ pub mod channels;
 pub mod channels_list;
 pub mod integration_connections;
 pub mod integrations;
+pub mod orgs;
 pub mod providers;

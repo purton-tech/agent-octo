@@ -1,4 +1,4 @@
-use crate::{CustomError, Jwt, authz};
+use crate::{CustomError, Jwt, authz, handlers};
 use axum::{
     Extension, Form,
     response::{Html, IntoResponse, Redirect, Response},
@@ -30,11 +30,13 @@ fn validate_provider_kind(value: &str) -> Result<(), ValidationError> {
 
 fn render_new_provider_error(
     org_id: String,
+    balance_label: String,
     form: &CreateProviderForm,
     message: String,
 ) -> Response {
     let html = octo_ui::providers::r#new::page(
         org_id,
+        balance_label,
         Some(CreateProviderDraft {
             provider_kind: form.provider_kind.clone(),
             api_key: form.api_key.clone(),
@@ -51,6 +53,16 @@ pub async fn action_create(
     Form(form): Form<CreateProviderForm>,
 ) -> Result<Response, CustomError> {
     if let Err(errs) = form.validate() {
+        let mut client = pool.get().await?;
+        let transaction = client.transaction().await?;
+        let context = authz::init_request(&transaction, &current_user).await?;
+        if context.org_id != org_id {
+            return Err(CustomError::FaultySetup(
+                "Requested org_id is not available for current user".to_string(),
+            ));
+        }
+        let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
+        transaction.commit().await?;
         let message = errs
             .field_errors()
             .values()
@@ -59,15 +71,31 @@ pub async fn action_create(
             .and_then(|err| err.message.clone())
             .map(|m| m.to_string())
             .unwrap_or_else(|| "Invalid form submission".to_string());
-        return Ok(render_new_provider_error(org_id, &form, message));
+        return Ok(render_new_provider_error(
+            org_id,
+            balance_label,
+            &form,
+            message,
+        ));
     }
 
     let provider_kind = form.provider_kind.trim().to_string();
     let api_key = form.api_key.trim().to_string();
 
     if provider_kind.is_empty() || api_key.is_empty() {
+        let mut client = pool.get().await?;
+        let transaction = client.transaction().await?;
+        let context = authz::init_request(&transaction, &current_user).await?;
+        if context.org_id != org_id {
+            return Err(CustomError::FaultySetup(
+                "Requested org_id is not available for current user".to_string(),
+            ));
+        }
+        let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
+        transaction.commit().await?;
         return Ok(render_new_provider_error(
             org_id,
+            balance_label,
             &form,
             "Provider kind and API key are required".to_string(),
         ));

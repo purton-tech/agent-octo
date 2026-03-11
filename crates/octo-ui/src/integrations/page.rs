@@ -9,7 +9,7 @@ use clorinde::queries::integrations::IntegrationCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, integrations: Vec<IntegrationCard>) -> String {
+pub fn page(org_id: String, balance_label: String, integrations: Vec<IntegrationCard>) -> String {
     let new_href = routes::integrations::New {
         org_id: org_id.clone(),
     }
@@ -19,6 +19,7 @@ pub fn page(org_id: String, integrations: Vec<IntegrationCard>) -> String {
         Layout {
             title: "Integrations".to_string(),
             org_id: org_id.clone(),
+            balance_label,
             selected_item: SideBar::Integrations,
             header_left: rsx!(
                 Breadcrumb {

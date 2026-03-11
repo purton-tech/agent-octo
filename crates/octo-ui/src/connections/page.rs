@@ -10,7 +10,11 @@ use clorinde::queries::integration_connections::IntegrationConnectionCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, connections: Vec<IntegrationConnectionCard>) -> String {
+pub fn page(
+    org_id: String,
+    balance_label: String,
+    connections: Vec<IntegrationConnectionCard>,
+) -> String {
     let new_href = routes::connections::New {
         org_id: org_id.clone(),
     }
@@ -20,6 +24,7 @@ pub fn page(org_id: String, connections: Vec<IntegrationConnectionCard>) -> Stri
         Layout {
             title: "Connections".to_string(),
             org_id,
+            balance_label,
             selected_item: SideBar::Connections,
             header_left: rsx!(
                 Breadcrumb {

@@ -1,4 +1,4 @@
-use crate::{CustomError, Jwt, authz};
+use crate::{CustomError, Jwt, authz, handlers};
 use axum::{
     Extension, Form,
     response::{Html, IntoResponse, Redirect, Response},
@@ -62,9 +62,15 @@ fn normalize_openapi_spec(raw: &str) -> Result<String, String> {
     serde_json::to_string_pretty(&spec).map_err(|err| format!("Failed to serialize spec: {err}"))
 }
 
-fn render_upsert_error(org_id: String, form: &UpsertIntegrationForm, message: String) -> Response {
+fn render_upsert_error(
+    org_id: String,
+    balance_label: String,
+    form: &UpsertIntegrationForm,
+    message: String,
+) -> Response {
     let html = octo_ui::integrations::upsert::page(
         org_id,
+        balance_label,
         None,
         Some(UpsertDraft {
             id: form.id.clone(),
@@ -83,8 +89,19 @@ pub async fn action_upsert(
     Form(form): Form<UpsertIntegrationForm>,
 ) -> Result<Response, CustomError> {
     if let Err(errors) = form.validate() {
+        let mut client = pool.get().await?;
+        let transaction = client.transaction().await?;
+        let context = authz::init_request(&transaction, &current_user).await?;
+        if context.org_id != org_id {
+            return Err(CustomError::FaultySetup(
+                "Requested org_id is not available for current user".to_string(),
+            ));
+        }
+        let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
+        transaction.commit().await?;
         return Ok(render_upsert_error(
             org_id,
+            balance_label,
             &form,
             validation_message(&errors),
         ));
@@ -92,11 +109,35 @@ pub async fn action_upsert(
 
     let visibility = match parse_visibility(form.visibility.trim()) {
         Ok(v) => v,
-        Err(message) => return Ok(render_upsert_error(org_id, &form, message)),
+        Err(message) => {
+            let mut client = pool.get().await?;
+            let transaction = client.transaction().await?;
+            let context = authz::init_request(&transaction, &current_user).await?;
+            if context.org_id != org_id {
+                return Err(CustomError::FaultySetup(
+                    "Requested org_id is not available for current user".to_string(),
+                ));
+            }
+            let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
+            transaction.commit().await?;
+            return Ok(render_upsert_error(org_id, balance_label, &form, message));
+        }
     };
     let normalized_spec = match normalize_openapi_spec(form.openapi_spec.trim()) {
         Ok(spec) => spec,
-        Err(message) => return Ok(render_upsert_error(org_id, &form, message)),
+        Err(message) => {
+            let mut client = pool.get().await?;
+            let transaction = client.transaction().await?;
+            let context = authz::init_request(&transaction, &current_user).await?;
+            if context.org_id != org_id {
+                return Err(CustomError::FaultySetup(
+                    "Requested org_id is not available for current user".to_string(),
+                ));
+            }
+            let balance_label = handlers::load_balance_label(&transaction, &org_id).await?;
+            transaction.commit().await?;
+            return Ok(render_upsert_error(org_id, balance_label, &form, message));
+        }
     };
     let normalized_spec_json: serde_json::Value =
         serde_json::from_str(&normalized_spec).map_err(|err| {

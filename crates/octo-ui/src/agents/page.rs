@@ -10,11 +10,12 @@ use clorinde::queries::agents::AgentCard;
 use daisy_rsx::*;
 use dioxus::prelude::*;
 
-pub fn page(org_id: String, agents: Vec<AgentCard>) -> String {
+pub fn page(org_id: String, balance_label: String, agents: Vec<AgentCard>) -> String {
     let page = rsx! {
         Layout {
             title: "Agents".to_string(),
             org_id,
+            balance_label,
             selected_item: SideBar::Agents,
             header_left: rsx!(
                 Breadcrumb {

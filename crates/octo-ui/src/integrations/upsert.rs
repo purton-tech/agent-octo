@@ -18,6 +18,7 @@ pub struct UpsertDraft {
 
 pub fn page(
     org_id: String,
+    balance_label: String,
     integration: Option<IntegrationForm>,
     draft: Option<UpsertDraft>,
     error_message: Option<String>,
@@ -58,6 +59,7 @@ pub fn page(
         Layout {
             title: page_title.to_string(),
             org_id: org_id.clone(),
+            balance_label,
             selected_item: SideBar::Integrations,
             content_class: Some("p-4 max-w-5xl w-full mx-auto".to_string()),
             header_left: rsx!(

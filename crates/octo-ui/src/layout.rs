@@ -24,6 +24,7 @@ impl std::fmt::Display for SideBar {
 pub fn Layout(
     title: String,
     org_id: String,
+    balance_label: String,
     header_left: Element,
     header_right: Option<Element>,
     children: Element,
@@ -154,8 +155,15 @@ pub fn Layout(
             ),
             sidebar_footer: rsx!(
                 div {
-                    class: "text-center text-sm",
-                    "You can place items at the bottom"
+                    class: "space-y-1 text-sm",
+                    div {
+                        class: "text-base-content/70",
+                        "Remaining Balance"
+                    }
+                    div {
+                        class: "font-semibold",
+                        "{balance_label}"
+                    }
                 }
             ),
             div {
