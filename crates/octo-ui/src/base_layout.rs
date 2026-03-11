@@ -51,10 +51,10 @@ pub fn BaseLayout(props: BaseLayoutProps) -> Element {
                 }
             }
             script {
-                src: "https://unpkg.com/@digicreon/mujs/dist/mu.min.js"
+                src: "https://unpkg.com/@digicreon/mujs@1.4.3/dist/mu.min.js"
             }
             script {
-                dangerous_inner_html: "mu.init({{ processForms: false }});"
+                dangerous_inner_html: "mu.init();"
             }
             if let Some(js_href) = props.js_href {
                 script {
