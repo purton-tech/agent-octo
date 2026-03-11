@@ -7,7 +7,7 @@
 @source inline("card card-body card-title");
 
 @plugin "daisyui/theme" {
-    name: "nano";
+    name: "octo";
     default: true;
     prefersdark: true;
   
