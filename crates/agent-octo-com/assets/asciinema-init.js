@@ -13,12 +13,14 @@
       const rows = Number(node.dataset.asciinemaRows || "28");
       const autoplay = node.dataset.asciinemaAutoplay === "true";
       const loop = node.dataset.asciinemaLoop === "true";
+      const poster = node.dataset.asciinemaPoster || undefined;
 
       window.AsciinemaPlayer.create(src, node, {
         cols,
         rows,
         autoPlay: autoplay,
         loop,
+        poster,
       });
 
       node.dataset.asciinemaMounted = "true";

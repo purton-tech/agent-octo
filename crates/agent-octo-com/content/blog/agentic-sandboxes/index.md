@@ -2,137 +2,35 @@ If we ask a model a question that requires external data, it cannot actually sol
 
 ## Why?
 
-```sh
-curl https://api.openai.com/v1/chat/completions \
-  -s \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
-  -d '{
-    "model": "gpt-5",
-    "messages": [
-      {
-        "role": "user",
-        "content":
-        "Give me the average tempature day by day in london for the last 7 days."
-      }
-    ]
-  }' | jq -r '.choices[0].message.content'
-```
+<div
+  data-asciinema-src="/openai-api.cast"
+  data-asciinema-cols="100"
+  data-asciinema-rows="30"
+  data-asciinema-autoplay="false"
+  data-asciinema-loop="false"
+  data-asciinema-poster="npt:0:05"
+></div>
 
 The model tells us it cannot access real data.
 
 This is expected. LLMs do not have internet access, and they should not execute arbitrary code.
 
-Here is a terminal recording of that workflow running end to end:
-
-<div
-  data-asciinema-src="/demo.cast"
-  data-asciinema-cols="110"
-  data-asciinema-rows="30"
-  data-asciinema-autoplay="false"
-  data-asciinema-loop="false"
-></div>
-
 But now we introduce a tool.
 
 Instead of answering directly, the model can generate code that we run in a sandbox.
 
-```sh
-curl https://api.openai.com/v1/chat/completions \
-  -s \
-  -H "Content-Type: application/json" \
-  -H "Authorization: Bearer $OPENAI_API_KEY" \
-  -d '{
-    "model": "gpt-5",
-    "messages": [
-      {
-        "role": "user",
-        "content": "Give me the average tempature day by day in london for the last 7 days."
-      }
-    ],
-    "tools": [
-      {
-        "type": "function",
-        "function": {
-          "name": "run_sandbox_code",
-          "description": "Execute code in a sandboxed environment with internet access.",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "language": {
-                "type": "string",
-                "enum": ["python"]
-              },
-              "code": {
-                "type": "string"
-              }
-            },
-            "required": ["language", "code"]
-          }
-        }
-      }
-    ]
-  }'
-```
-
-![Sandboxing on Kubernetes](agentic-flow.jpg "Sandboxing on Kubernetes")
+<div
+  data-asciinema-src="/openai-api-tool.cast"
+  data-asciinema-cols="100"
+  data-asciinema-rows="30"
+  data-asciinema-autoplay="false"
+  data-asciinema-loop="false"
+  data-asciinema-poster="npt:0:07"
+></div>
 
 The model responds with Python code that fetches historical weather data and computes the averages.
 
-```python
-import json
-from datetime import date, timedelta
-
-import requests
-
-
-# Compute last 7 complete days (excluding today)
-end_date = date.today() - timedelta(days=1)
-start_date = end_date - timedelta(days=6)
-
-lat, lon = 51.5074, -0.1278  # London
-timezone = "Europe/London"
-
-url = (
-    "https://archive-api.open-meteo.com/v1/archive?"
-    f"latitude={lat}&longitude={lon}"
-    f"&start_date={start_date}&end_date={end_date}"
-    f"&daily=temperature_2m_mean&timezone={timezone}"
-)
-
-resp = requests.get(url, timeout=20)
-resp.raise_for_status()
-js = resp.json()
-
-if (
-    "daily" not in js
-    or "time" not in js["daily"]
-    or "temperature_2m_mean" not in js["daily"]
-):
-    raise RuntimeError("Unexpected response format from Open-Meteo")
-
-dates = js["daily"]["time"]
-avgs = js["daily"]["temperature_2m_mean"]
-unit = js.get("daily_units", {}).get("temperature_2m_mean", "°C")
-
-rows = [
-    {
-        "date": d,
-        "average_temperature": round(t, 1) if isinstance(t, (int, float)) else None,
-        "unit": unit,
-    }
-    for d, t in zip(dates, avgs)
-]
-
-result = {
-    "city": "London",
-    "start_date": str(start_date),
-    "end_date": str(end_date),
-    "daily": rows,
-}
-
-print(json.dumps(result))
-```
+[The Code](https://gist.github.com/ianpurton/8e8a77711baa660a2f95cd5ce7f57e18)
 
 We take that code, execute it in a sandbox, and return the result.
 
@@ -152,6 +50,16 @@ We take that code, execute it in a sandbox, and return the result.
   ]
 }
 ```
+
+
+<div
+  data-asciinema-src="/openai-api-final.cast"
+  data-asciinema-cols="223"
+  data-asciinema-rows="48"
+  data-asciinema-autoplay="false"
+  data-asciinema-loop="false"
+  data-asciinema-poster="npt:0:07"
+></div>
 
 Now the model can solve problems that require:
 
