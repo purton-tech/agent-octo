@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-labelledby="title desc">
+  <title id="title">Agentic Sandboxes placeholder hero image</title>
+  <desc id="desc">Simple placeholder art for an article about agentic sandboxes.</desc>
+  <rect width="640" height="320" fill="#1f2937" />
+  <rect x="36" y="36" width="568" height="248" rx="20" fill="#111827" stroke="#f59e0b" stroke-width="3" />
+  <rect x="72" y="76" width="180" height="14" rx="7" fill="#f59e0b" />
+  <rect x="72" y="106" width="300" height="12" rx="6" fill="#9ca3af" />
+  <rect x="72" y="130" width="260" height="12" rx="6" fill="#6b7280" />
+  <rect x="72" y="176" width="150" height="64" rx="12" fill="#374151" />
+  <rect x="244" y="176" width="150" height="64" rx="12" fill="#374151" />
+  <circle cx="500" cy="160" r="54" fill="none" stroke="#fb7185" stroke-width="10" />
+  <path d="M500 128v64M468 160h64" stroke="#fb7185" stroke-linecap="round" stroke-width="10" />
+  <text x="72" y="268" fill="#f9fafb" font-family="Arial, sans-serif" font-size="28" font-weight="700">Agentic Sandboxes</text>
+</svg>
