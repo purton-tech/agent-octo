@@ -129,13 +129,93 @@ result
 {"city": "London", "start_date": "2026-03-05", "end_date": "2026-03-11", "daily": [{"date": "2026-03-05", "average_temperature": 11.6, "unit": "\u00b0C"}, {"date": "2026-03-06", "average_temperature": 9.1, "unit": "\u00b0C"}, {"date": "2026-03-07", "average_temperature": 8.1, "unit": "\u00b0C"}, {"date": "2026-03-08", "average_temperature": 8.8, "unit": "\u00b0C"}, {"date": "2026-03-09", "average_temperature": 9.7, "unit": "\u00b0C"}, {"date": "2026-03-10", "average_temperature": 10.1, "unit": "\u00b0C"}, {"date": "2026-03-11", "average_temperature": 10.0, "unit": "\u00b0C"}]}
 ```
 
-## Just use a Docker Container
+Here’s a **tightened version** that keeps your example but adds the **architectural reality check** without becoming long.
 
-## The Sanboxing Landscape
+---
 
+## Just Use a Docker Container
 
+A common first idea is: *just run the code inside a Docker container.*
+
+There are even projects like
+
+* [https://github.com/agent-infra/sandbox](https://github.com/agent-infra/sandbox)
+
+A simple sandbox image might look like this:
+
+```Dockerfile
+FROM python:3.11-slim
+
+WORKDIR /sandbox
+
+RUN pip install --no-cache-dir \
+    requests \
+    numpy \
+    pandas \
+    matplotlib \
+    scipy \
+    scikit-learn \
+    beautifulsoup4 \
+    lxml
+
+RUN useradd -m sandbox
+USER sandbox
+
+CMD ["python"]
+```
+
+Then run the user code:
+
+```sh
+docker build -t python-sandbox .
+docker run --rm -v "$PWD/script.py:/sandbox/script.py:ro" python-sandbox python /sandbox/script.py
+```
+
+This works well for **single-user demos**.
+
+---
+
+## The Multi-User Reality
+
+Once multiple users are involved, things get more complicated.
+
+You typically need:
+
+* **one container per execution**
+* a **queue** to control concurrency
+* **CPU / memory limits**
+* **timeouts**
+* **network restrictions**
+* **filesystem isolation**
+* **cleanup of finished containers**
+* **rate limiting per user**
+
+Very quickly the architecture becomes something like:
+
+```
+request → queue → worker → container → collect result → destroy container
+```
+
+At this point you’re essentially building a **job execution system**.
+
+Which is why many systems eventually move to things like:
+
+* **Kubernetes Jobs**
+* **gVisor / Firecracker sandboxes**
+* purpose-built sandbox infrastructure
+
+The important takeaway:
+
+> Calling `docker run` looks simple, but supporting multi-user sandbox execution quickly turns into building a scheduling, isolation, and resource management system.
+
+## Who's already built this and how can we use it?
+
+- https://github.com/vercel-labs/just-bash
+- https://github.com/pydantic/monty
+- https://cloud.google.com/blog/products/containers-kubernetes/agentic-ai-on-kubernetes-and-gke
 
 ## Sandboxing on Kubernetes
 
+https://cloud.google.com/blog/products/containers-kubernetes/agentic-ai-on-kubernetes-and-gke
 
 ![Sandboxing on Kubernetes](k8s-sandboxing.jpg "Sandboxing on Kubernetes")
