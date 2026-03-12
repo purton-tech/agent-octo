@@ -23,6 +23,16 @@ The model tells us it cannot access real data.
 
 This is expected. LLMs do not have internet access, and they should not execute arbitrary code.
 
+Here is a terminal recording of that workflow running end to end:
+
+<div
+  data-asciinema-src="/demo.cast"
+  data-asciinema-cols="110"
+  data-asciinema-rows="30"
+  data-asciinema-autoplay="false"
+  data-asciinema-loop="false"
+></div>
+
 But now we introduce a tool.
 
 Instead of answering directly, the model can generate code that we run in a sandbox.
