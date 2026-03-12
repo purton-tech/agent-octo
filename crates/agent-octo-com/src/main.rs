@@ -26,7 +26,10 @@ async fn main() {
         site_meta: ui_links::site_meta(),
         site_header: None,
         site_assets: SiteAssets {
-            stylesheets: vec!["/tailwind.css".to_string()],
+            stylesheets: vec![
+                "/tailwind.css".to_string(),
+                "/content-lightbox.css".to_string(),
+            ],
             head_scripts: vec![ScriptAsset {
                 src: "/copy-paste.js".to_string(),
                 script_type: None,
@@ -44,6 +47,13 @@ async fn main() {
                 },
                 ScriptAsset {
                     src: "/scroll-story.js".to_string(),
+                    script_type: None,
+                    async_load: false,
+                    integrity: None,
+                    data_goatcounter: None,
+                },
+                ScriptAsset {
+                    src: "/content-lightbox.js".to_string(),
                     script_type: None,
                     async_load: false,
                     integrity: None,
