@@ -65,6 +65,8 @@ curl https://api.openai.com/v1/chat/completions \
   }'
 ```
 
+![Sandboxing on Kubernetes](agentic-flow.jpg "Sandboxing on Kubernetes")
+
 The model responds with Python code that fetches historical weather data and computes the averages.
 
 ```python
@@ -156,6 +158,8 @@ You are now executing code written by an LLM.
 That means you need a sandbox.
 
 ## Just Use a Docker Container
+
+![Run code in Docker](docker.png "Run code in Docker")
 
 A common first idea is: just run the code inside Docker.
 
