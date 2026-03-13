@@ -1,6 +1,6 @@
 If we ask a model a question that requires external data, it cannot actually solve it on its own.
 
-## Why?
+## Why do we want models to run code anyway?
 
 <script src="https://asciinema.org/a/M8sXElBusgzmjZyq.js" id="asciicast-M8sXElBusgzmjZyq" async="true"></script>
 
@@ -20,22 +20,8 @@ The model responds with Python code that fetches historical weather data and com
 
 We take that code, execute it in a sandbox, and return the result.
 
-```json
-{
-  "city": "London",
-  "start_date": "2026-03-05",
-  "end_date": "2026-03-11",
-  "daily": [
-    { "date": "2026-03-05", "average_temperature": 11.6, "unit": "°C" },
-    { "date": "2026-03-06", "average_temperature": 9.1, "unit": "°C" },
-    { "date": "2026-03-07", "average_temperature": 8.1, "unit": "°C" },
-    { "date": "2026-03-08", "average_temperature": 8.8, "unit": "°C" },
-    { "date": "2026-03-09", "average_temperature": 9.7, "unit": "°C" },
-    { "date": "2026-03-10", "average_temperature": 10.1, "unit": "°C" },
-    { "date": "2026-03-11", "average_temperature": 10.0, "unit": "°C" }
-  ]
-}
-```
+
+<script src="https://asciinema.org/a/9LwQGTXwfXOSpBj9.js" id="asciicast-9LwQGTXwfXOSpBj9" async="true"></script>
 
 
 <script src="https://asciinema.org/a/4QTkXph3U8yz4NQT.js" id="asciicast-4QTkXph3U8yz4NQT" async="true"></script>
