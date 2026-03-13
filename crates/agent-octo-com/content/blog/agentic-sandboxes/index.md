@@ -2,14 +2,7 @@ If we ask a model a question that requires external data, it cannot actually sol
 
 ## Why?
 
-<div
-  data-asciinema-src="/openai-api.cast"
-  data-asciinema-cols="100"
-  data-asciinema-rows="30"
-  data-asciinema-autoplay="false"
-  data-asciinema-loop="false"
-  data-asciinema-poster="npt:0:05"
-></div>
+<script src="https://asciinema.org/a/M8sXElBusgzmjZyq.js" id="asciicast-M8sXElBusgzmjZyq" async="true"></script>
 
 The model tells us it cannot access real data.
 
@@ -19,14 +12,7 @@ But now we introduce a tool.
 
 Instead of answering directly, the model can generate code that we run in a sandbox.
 
-<div
-  data-asciinema-src="/openai-api-tool.cast"
-  data-asciinema-cols="100"
-  data-asciinema-rows="30"
-  data-asciinema-autoplay="false"
-  data-asciinema-loop="false"
-  data-asciinema-poster="npt:0:07"
-></div>
+<script src="https://asciinema.org/a/pqMiIDYWE7zqd63h.js" id="asciicast-pqMiIDYWE7zqd63h" async="true"></script>
 
 The model responds with Python code that fetches historical weather data and computes the averages.
 
@@ -52,14 +38,7 @@ We take that code, execute it in a sandbox, and return the result.
 ```
 
 
-<div
-  data-asciinema-src="/openai-api-final.cast"
-  data-asciinema-cols="223"
-  data-asciinema-rows="48"
-  data-asciinema-autoplay="false"
-  data-asciinema-loop="false"
-  data-asciinema-poster="npt:0:07"
-></div>
+<script src="https://asciinema.org/a/4QTkXph3U8yz4NQT.js" id="asciicast-4QTkXph3U8yz4NQT" async="true"></script>
 
 Now the model can solve problems that require:
 

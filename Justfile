@@ -68,6 +68,9 @@ codex:
 tk:
     tmux kill-server
 
+asciinema:
+    sudo curl -fL https://github.com/asciinema/asciinema/releases/download/v3.2.0/asciinema-x86_64-unknown-linux-gnu -o /usr/bin/asciinema && sudo chmod +x /usr/bin/asciinema
+
 octo:
     cargo binstall --no-confirm zellij
     zellij -l .devcontainer/layout.kdl
