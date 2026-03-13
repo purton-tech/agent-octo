@@ -63,19 +63,8 @@ That means you need a sandbox.
 
 ## Sandboxing on Kubernetes
 
-Many teams eventually run these sandboxes on Kubernetes.
 
-Why?
-
-Because Kubernetes already solves several problems we just described:
-
-- scheduling workloads
-- isolating containers
-- scaling execution workers
-- managing resource limits
-- cleaning up completed jobs
-
-Instead of writing your own orchestration layer, you can create ephemeral jobs or pods that execute sandboxed code.
+![Sandboxing on Kubernetes](k8s-sandboxing.png "Sandboxing on Kubernetes")
 
 ![Sandboxing on Kubernetes](k8s-sandboxing.jpg "Sandboxing on Kubernetes")
 
