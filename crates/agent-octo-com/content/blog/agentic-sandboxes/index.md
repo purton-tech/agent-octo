@@ -54,6 +54,8 @@ You are now executing code written by an LLM.
 
 That means you need a sandbox.
 
+![Ian in the Loop](ian-in-the-loop.png "Ian in the Loop")
+
 ## Just Use a Docker Container
 
 ![Run code in Docker](docker.png "Run code in Docker")
