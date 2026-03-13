@@ -7,7 +7,7 @@ pub fn summary() -> Summary {
             name: "Updates".to_string(),
             pages: vec![PageSummary {
                 date: "2026-03-09",
-                title: "Let's talk about Agentic Sandboxes",
+                title: "Let's talk about Agentic Sandboxing",
                 description: "Why safe execution boundaries are central to useful coding agents.",
                 folder: "blog/agentic-sandboxes",
                 markdown: include_str!("../content/blog/agentic-sandboxes/index.md"),

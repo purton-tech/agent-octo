@@ -56,94 +56,10 @@ That means you need a sandbox.
 
 ![Ian in the Loop](ian-in-the-loop.png "Ian in the Loop")
 
-## Just Use a Docker Container
+## Can we do this with Docker Containers?
 
-![Run code in Docker](docker.png "Run code in Docker")
+<iframe src="./presentation.html" width="100%" height="600" style="border:0;" allowfullscreen></iframe>
 
-A common first idea is: just run the code inside Docker.
-
-There are even projects like:
-
-- <https://github.com/agent-infra/sandbox>
-
-A simple sandbox image might look like this:
-
-```Dockerfile
-FROM python:3.11-slim
-
-WORKDIR /sandbox
-
-RUN pip install --no-cache-dir \
-    requests \
-    numpy \
-    pandas \
-    matplotlib \
-    scipy \
-    scikit-learn \
-    beautifulsoup4 \
-    lxml
-
-RUN useradd -m sandbox
-USER sandbox
-
-CMD ["python"]
-```
-
-Then we execute the generated script.
-
-```sh
-docker build -t python-sandbox .
-docker run --rm -v "$PWD/script.py:/sandbox/script.py:ro" python-sandbox python /sandbox/script.py
-```
-
-For a single-user demo, this works perfectly.
-
-But once you move beyond a demo, things change quickly.
-
-## The Multi-User Reality
-
-As soon as multiple users are involved, the problem becomes architectural.
-
-You cannot just call `docker run` anymore.
-
-You now need to manage:
-
-- one container per execution
-- request queues
-- timeouts
-- resource limits
-- network restrictions
-- container cleanup
-- per-user quotas
-
-The system quickly turns into something like this:
-
-```text
-request -> queue -> worker -> container -> result -> destroy container
-```
-
-At this point you are no longer just running a container.
-
-You are building a distributed job execution system.
-
-This is the moment many teams realise they are reinventing infrastructure.
-
-## Who Has Already Solved This?
-
-Several projects are already exploring this space:
-
-- <https://github.com/vercel-labs/just-bash>
-- <https://github.com/pydantic/monty>
-- <https://cloud.google.com/blog/products/containers-kubernetes/agentic-ai-on-kubernetes-and-gke>
-
-These systems manage things like:
-
-- sandbox lifecycle
-- resource isolation
-- job scheduling
-- scaling execution environments
-
-Which brings us to the next step.
 
 ## Sandboxing on Kubernetes
 
