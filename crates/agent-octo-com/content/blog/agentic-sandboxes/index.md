@@ -68,6 +68,19 @@ That means you need a sandbox.
 
 ![Sandboxing on Kubernetes](k8s-sandboxing.jpg "Sandboxing on Kubernetes")
 
+```yaml
+apiVersion: agents.x-k8s.io/v1alpha1
+kind: Sandbox
+metadata:
+  name: my-sandbox
+spec:
+  podTemplate:
+    spec:
+      containers:
+      - name: my-container
+        image: <IMAGE>
+```
+
 ## The Takeaway
 
 Adding a sandbox tool looks simple.
