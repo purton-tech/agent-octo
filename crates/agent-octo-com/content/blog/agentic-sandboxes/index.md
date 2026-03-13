@@ -2,7 +2,7 @@ If we ask a model a question that requires external data, it cannot actually sol
 
 ## Why do we want models to run code anyway?
 
-<script src="https://asciinema.org/a/M8sXElBusgzmjZyq.js" id="asciicast-M8sXElBusgzmjZyq" async="true"></script>
+<script src="https://asciinema.org/a/LBWKtA3txlHR1PWs.js" id="asciicast-LBWKtA3txlHR1PWs" async="true"></script>
 
 The model tells us it cannot access real data.
 
@@ -12,7 +12,7 @@ But now we introduce a tool.
 
 Instead of answering directly, the model can generate code that we run in a sandbox.
 
-<script src="https://asciinema.org/a/pqMiIDYWE7zqd63h.js" id="asciicast-pqMiIDYWE7zqd63h" async="true"></script>
+<script src="https://asciinema.org/a/IKCVYXKH9kWXjuLQ.js" id="asciicast-IKCVYXKH9kWXjuLQ" async="true"></script>
 
 The model responds with Python code that fetches historical weather data and computes the averages.
 
@@ -21,10 +21,10 @@ The model responds with Python code that fetches historical weather data and com
 We take that code, execute it in a sandbox, and return the result.
 
 
-<script src="https://asciinema.org/a/9LwQGTXwfXOSpBj9.js" id="asciicast-9LwQGTXwfXOSpBj9" async="true"></script>
+<script src="https://asciinema.org/a/Ct87KossSVypgeeg.js" id="asciicast-Ct87KossSVypgeeg" async="true"></script>
 
 
-<script src="https://asciinema.org/a/4QTkXph3U8yz4NQT.js" id="asciicast-4QTkXph3U8yz4NQT" async="true"></script>
+<script src="https://asciinema.org/a/VKkvFtFceHd5421f.js" id="asciicast-VKkvFtFceHd5421f" async="true"></script>
 
 Now the model can solve problems that require:
 
