@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Hello Reveal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Reveal CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/theme/black.css">
+</head>
+
+<body>
+
+    <div class="reveal">
+        <div class="slides">
+
+            <section>
+                <h2>The First Idea</h2>
+                <p>Just run the generated code inside Docker.</p>
+            </section>
+
+            <section>
+                <h2>Run the Script</h2>
+                <pre><code>
+docker build -t python-sandbox .
+docker run --rm \
+  -v "$PWD/script.py:/sandbox/script.py:ro" \
+  python-sandbox \
+  python /sandbox/script.py
+  </code></pre>
+            </section>
+
+            <section>
+                <h2>For a Demo…</h2>
+                <p>This works perfectly.</p>
+                <p>One user. One container. One execution.</p>
+            </section>
+
+            <section>
+                <h2>Then Reality Arrives</h2>
+                <p>Multiple users.</p>
+                <p>Now you must manage:</p>
+                <ul>
+                    <li>container lifecycle</li>
+                    <li>timeouts</li>
+                    <li>cleanup</li>
+                    <li>per-user limits</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>You Now Need</h2>
+                <h3>An Execution Platform</h3>
+
+                <ul>
+                    <li>per-user environments</li>
+                    <li>quotas</li>
+                    <li>job scheduling</li>
+                    <li>sandbox cleanup</li>
+                </ul>
+            </section>
+
+        </div>
+    </div>
+
+    <!-- Reveal JS -->
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+
+    <script>
+        const deck = new Reveal();
+        deck.initialize({
+            hash: true
+        });
+    </script>
+
+</body>
+
+</html>
