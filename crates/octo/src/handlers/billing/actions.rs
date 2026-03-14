@@ -105,9 +105,10 @@ pub async fn action_start_checkout(
     .to_string();
     let transaction_id_str = transaction_id.to_string();
     let success_url = format!(
-        "{}{}",
+        "{}{}?top_up_transaction_id={}",
         config.app_base_url.trim_end_matches('/'),
-        billing_href
+        billing_href,
+        transaction_id
     );
     let cancel_url = format!(
         "{}{}",

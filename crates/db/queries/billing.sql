@@ -3,6 +3,7 @@
 --: TopUpTransaction()
 --: TopUpTransactionId()
 --: TopUpCompletion()
+--: TopUpTransactionStatus()
 
 --! record_llm_usage_for_conversation : UsageCharge
 WITH billing_context AS (
@@ -128,6 +129,14 @@ SELECT
 FROM billing.top_up_transactions
 WHERE org_id = public.b64url_to_uuid(:org_id::TEXT)
 ORDER BY created_at DESC;
+
+--! get_top_up_transaction_for_org : TopUpTransactionStatus
+SELECT
+    status,
+    COALESCE(stripe_checkout_session_id, '') AS stripe_checkout_session_id
+FROM billing.top_up_transactions
+WHERE id = :transaction_id::UUID
+  AND org_id = public.b64url_to_uuid(:org_id::TEXT);
 
 --! complete_top_up_checkout_session (stripe_payment_intent?) : TopUpCompletion
 WITH updated_transaction AS (

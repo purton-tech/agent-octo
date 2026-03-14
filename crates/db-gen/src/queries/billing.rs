@@ -23,6 +23,11 @@ pub struct AttachTopUpCheckoutSessionParams<T1: crate::StringSql> {
     pub transaction_id: uuid::Uuid,
 }
 #[derive(Debug)]
+pub struct GetTopUpTransactionForOrgParams<T1: crate::StringSql> {
+    pub transaction_id: uuid::Uuid,
+    pub org_id: T1,
+}
+#[derive(Debug)]
 pub struct CompleteTopUpCheckoutSessionParams<
     T1: crate::StringSql,
     T2: crate::StringSql,
@@ -89,6 +94,28 @@ impl<'a> From<TopUpTransactionBorrowed<'a>> for TopUpTransaction {
             status: status.into(),
             created_at,
             completed_at,
+        }
+    }
+}
+#[derive(Debug, Clone, PartialEq)]
+pub struct TopUpTransactionStatus {
+    pub status: String,
+    pub stripe_checkout_session_id: String,
+}
+pub struct TopUpTransactionStatusBorrowed<'a> {
+    pub status: &'a str,
+    pub stripe_checkout_session_id: &'a str,
+}
+impl<'a> From<TopUpTransactionStatusBorrowed<'a>> for TopUpTransactionStatus {
+    fn from(
+        TopUpTransactionStatusBorrowed {
+            status,
+            stripe_checkout_session_id,
+        }: TopUpTransactionStatusBorrowed<'a>,
+    ) -> Self {
+        Self {
+            status: status.into(),
+            stripe_checkout_session_id: stripe_checkout_session_id.into(),
         }
     }
 }
@@ -336,6 +363,74 @@ where
         mapper: fn(TopUpTransactionBorrowed) -> R,
     ) -> TopUpTransactionQuery<'c, 'a, 's, C, R, N> {
         TopUpTransactionQuery {
+            client: self.client,
+            params: self.params,
+            query: self.query,
+            cached: self.cached,
+            extractor: self.extractor,
+            mapper,
+        }
+    }
+    pub async fn one(self) -> Result<T, tokio_postgres::Error> {
+        let row =
+            crate::client::async_::one(self.client, self.query, &self.params, self.cached).await?;
+        Ok((self.mapper)((self.extractor)(&row)?))
+    }
+    pub async fn all(self) -> Result<Vec<T>, tokio_postgres::Error> {
+        self.iter().await?.try_collect().await
+    }
+    pub async fn opt(self) -> Result<Option<T>, tokio_postgres::Error> {
+        let opt_row =
+            crate::client::async_::opt(self.client, self.query, &self.params, self.cached).await?;
+        Ok(opt_row
+            .map(|row| {
+                let extracted = (self.extractor)(&row)?;
+                Ok((self.mapper)(extracted))
+            })
+            .transpose()?)
+    }
+    pub async fn iter(
+        self,
+    ) -> Result<
+        impl futures::Stream<Item = Result<T, tokio_postgres::Error>> + 'c,
+        tokio_postgres::Error,
+    > {
+        let stream = crate::client::async_::raw(
+            self.client,
+            self.query,
+            crate::slice_iter(&self.params),
+            self.cached,
+        )
+        .await?;
+        let mapped = stream
+            .map(move |res| {
+                res.and_then(|row| {
+                    let extracted = (self.extractor)(&row)?;
+                    Ok((self.mapper)(extracted))
+                })
+            })
+            .into_stream();
+        Ok(mapped)
+    }
+}
+pub struct TopUpTransactionStatusQuery<'c, 'a, 's, C: GenericClient, T, const N: usize> {
+    client: &'c C,
+    params: [&'a (dyn postgres_types::ToSql + Sync); N],
+    query: &'static str,
+    cached: Option<&'s tokio_postgres::Statement>,
+    extractor:
+        fn(&tokio_postgres::Row) -> Result<TopUpTransactionStatusBorrowed, tokio_postgres::Error>,
+    mapper: fn(TopUpTransactionStatusBorrowed) -> T,
+}
+impl<'c, 'a, 's, C, T: 'c, const N: usize> TopUpTransactionStatusQuery<'c, 'a, 's, C, T, N>
+where
+    C: GenericClient,
+{
+    pub fn map<R>(
+        self,
+        mapper: fn(TopUpTransactionStatusBorrowed) -> R,
+    ) -> TopUpTransactionStatusQuery<'c, 'a, 's, C, R, N> {
+        TopUpTransactionStatusQuery {
             client: self.client,
             params: self.params,
             query: self.query,
@@ -781,6 +876,62 @@ impl ListTopUpTransactionsStmt {
             },
             mapper: |it| TopUpTransaction::from(it),
         }
+    }
+}
+pub struct GetTopUpTransactionForOrgStmt(&'static str, Option<tokio_postgres::Statement>);
+pub fn get_top_up_transaction_for_org() -> GetTopUpTransactionForOrgStmt {
+    GetTopUpTransactionForOrgStmt(
+        "SELECT status, COALESCE(stripe_checkout_session_id, '') AS stripe_checkout_session_id FROM billing.top_up_transactions WHERE id = $1::UUID AND org_id = public.b64url_to_uuid($2::TEXT)",
+        None,
+    )
+}
+impl GetTopUpTransactionForOrgStmt {
+    pub async fn prepare<'a, C: GenericClient>(
+        mut self,
+        client: &'a C,
+    ) -> Result<Self, tokio_postgres::Error> {
+        self.1 = Some(client.prepare(self.0).await?);
+        Ok(self)
+    }
+    pub fn bind<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>(
+        &'s self,
+        client: &'c C,
+        transaction_id: &'a uuid::Uuid,
+        org_id: &'a T1,
+    ) -> TopUpTransactionStatusQuery<'c, 'a, 's, C, TopUpTransactionStatus, 2> {
+        TopUpTransactionStatusQuery {
+            client,
+            params: [transaction_id, org_id],
+            query: self.0,
+            cached: self.1.as_ref(),
+            extractor: |
+                row: &tokio_postgres::Row,
+            | -> Result<TopUpTransactionStatusBorrowed, tokio_postgres::Error> {
+                Ok(TopUpTransactionStatusBorrowed {
+                    status: row.try_get(0)?,
+                    stripe_checkout_session_id: row.try_get(1)?,
+                })
+            },
+            mapper: |it| TopUpTransactionStatus::from(it),
+        }
+    }
+}
+impl<'c, 'a, 's, C: GenericClient, T1: crate::StringSql>
+    crate::client::async_::Params<
+        'c,
+        'a,
+        's,
+        GetTopUpTransactionForOrgParams<T1>,
+        TopUpTransactionStatusQuery<'c, 'a, 's, C, TopUpTransactionStatus, 2>,
+        C,
+    > for GetTopUpTransactionForOrgStmt
+{
+    fn params(
+        &'s self,
+        client: &'c C,
+        params: &'a GetTopUpTransactionForOrgParams<T1>,
+    ) -> TopUpTransactionStatusQuery<'c, 'a, 's, C, TopUpTransactionStatus, 2> {
+        self.bind(client, &params.transaction_id, &params.org_id)
     }
 }
 pub struct CompleteTopUpCheckoutSessionStmt(&'static str, Option<tokio_postgres::Statement>);

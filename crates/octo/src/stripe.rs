@@ -131,6 +131,25 @@ pub async fn create_checkout_session(
     parse_stripe_response(response, "create Stripe Checkout session").await
 }
 
+pub async fn fetch_checkout_session(
+    config: &Config,
+    checkout_session_id: &str,
+) -> Result<StripeCheckoutSessionObject, CustomError> {
+    let secret_key = stripe_secret_key(config)?;
+    let response = Client::new()
+        .get(format!(
+            "https://api.stripe.com/v1/checkout/sessions/{checkout_session_id}"
+        ))
+        .basic_auth(secret_key, Some(""))
+        .send()
+        .await
+        .map_err(|err| {
+            CustomError::FaultySetup(format!("failed to fetch Stripe Checkout session: {err}"))
+        })?;
+
+    parse_stripe_response(response, "fetch Stripe Checkout session").await
+}
+
 pub fn verify_webhook(
     config: &Config,
     signature_header: &str,
