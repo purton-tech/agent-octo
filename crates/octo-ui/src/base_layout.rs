@@ -20,7 +20,7 @@ pub struct BaseLayoutProps {
 pub fn BaseLayout(props: BaseLayoutProps) -> Element {
     let hydrate: Option<String> = if let Some((js, wasm)) = props.web_assembly {
         Some(format!(
-            "import init, {{ hydrate }} from '{}'; await init('{}');hydrate();",
+            "import init, {{ hydrate }} from '{}'; await init('{}'); hydrate(); document.addEventListener('mu:after-render', () => {{ hydrate(); }});",
             js, wasm
         ))
     } else {

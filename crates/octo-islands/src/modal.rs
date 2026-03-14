@@ -3,9 +3,15 @@ use wasm_bindgen::{JsCast, JsValue, closure::Closure};
 use web_sys::{Document, Element, Event, console};
 
 pub fn hydrate_modal_triggers(doc: &Document) -> Result<(), JsValue> {
-    if doc.query_selector("[data-target]")?.is_none() {
+    let Some(root) = doc.document_element() else {
+        return Ok(());
+    };
+
+    if root.has_attribute("data-octo-modal-hydrated") {
         return Ok(());
     }
+
+    root.set_attribute("data-octo-modal-hydrated", "true")?;
 
     let doc_for_handler = doc.clone();
     let click_handler = Closure::<dyn FnMut(_)>::new(move |event: Event| {
