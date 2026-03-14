@@ -12,6 +12,7 @@ pub enum SideBar {
     Providers,
     Integrations,
     Connections,
+    Billing,
 }
 
 impl std::fmt::Display for SideBar {
@@ -74,6 +75,10 @@ pub fn Layout(
     }
     .to_string();
     let connections_href = routes::connections::Index {
+        org_id: org_id.clone(),
+    }
+    .to_string();
+    let billing_href = routes::billing::Index {
         org_id: org_id.clone(),
     }
     .to_string();
@@ -161,8 +166,11 @@ pub fn Layout(
                         "Remaining Balance"
                     }
                     div {
-                        class: "font-semibold",
-                        "{balance_label}"
+                        a {
+                            class: "font-semibold text-primary underline underline-offset-2 hover:no-underline",
+                            href: billing_href,
+                            "{balance_label}"
+                        }
                     }
                 }
             ),

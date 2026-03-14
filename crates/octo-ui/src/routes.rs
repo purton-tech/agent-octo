@@ -26,6 +26,23 @@ pub mod channels {
     }
 }
 
+pub mod billing {
+    use axum_extra::routing::TypedPath;
+    use serde::Deserialize;
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/billing")]
+    pub struct Index {
+        pub org_id: String,
+    }
+
+    #[derive(TypedPath, Deserialize)]
+    #[typed_path("/o/{org_id}/billing/start-checkout")]
+    pub struct StartCheckout {
+        pub org_id: String,
+    }
+}
+
 pub mod providers {
     use axum_extra::routing::TypedPath;
     use serde::Deserialize;
