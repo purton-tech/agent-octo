@@ -4,10 +4,14 @@ mod errors;
 mod handlers;
 mod jwt;
 mod static_files;
+mod stripe;
 
 use std::net::SocketAddr;
 
-use axum::{Extension, Router, routing::get};
+use axum::{
+    Extension, Router,
+    routing::{get, post},
+};
 use axum_extra::routing::RouterExt;
 use clorinde::deadpool_postgres::Manager;
 use clorinde::tokio_postgres::NoTls;
@@ -42,6 +46,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(handlers::root::home))
         .typed_get(handlers::agents::loader)
+        .typed_get(handlers::billing::loader)
         .typed_get(handlers::channels::loader)
         .typed_get(handlers::providers::loader)
         .typed_get(handlers::providers::loader_new)
@@ -51,11 +56,16 @@ async fn main() {
         .typed_get(handlers::connections::loader)
         .typed_get(handlers::connections::loader_new)
         .typed_post(handlers::channels::action_connect_telegram)
+        .typed_post(handlers::billing::action_start_checkout)
         .typed_post(handlers::providers::action_create)
         .typed_post(handlers::integrations::action_upsert)
         .typed_post(handlers::integrations::action_delete)
         .typed_post(handlers::connections::action_create)
         .typed_get(static_files::static_path)
+        .route(
+            "/webhooks/stripe",
+            post(handlers::billing::action_stripe_webhook),
+        )
         .layer(LiveReloadLayer::new())
         .layer(Extension(config))
         .layer(Extension(pool.clone()));

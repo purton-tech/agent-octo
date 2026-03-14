@@ -1,5 +1,6 @@
 pub mod agents;
 mod base_layout;
+pub mod billing;
 pub mod channels;
 pub mod components;
 pub mod connections;

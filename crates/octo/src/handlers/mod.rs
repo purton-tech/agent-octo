@@ -1,4 +1,5 @@
 pub mod agents;
+pub mod billing;
 pub mod channels;
 pub mod connections;
 pub mod integrations;
@@ -20,7 +21,7 @@ pub async fn load_balance_label(
     Ok(format_balance_microcents(balance.balance_microcents))
 }
 
-fn format_balance_microcents(balance_microcents: i64) -> String {
+pub fn format_balance_microcents(balance_microcents: i64) -> String {
     let is_negative = balance_microcents < 0;
     let abs_microcents = balance_microcents.unsigned_abs();
     let cents = abs_microcents / 1_000_000;

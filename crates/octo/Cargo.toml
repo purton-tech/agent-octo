@@ -11,11 +11,15 @@ base64 = "0.22.1"
 clorinde = { version = "0.0.0", path = "../db-gen" }
 db = { path = "../db" }
 dotenvy.workspace = true
+hmac = "0.12"
+hex = "0.4"
 octo-assets = { path = "../octo-assets" }
 octo-ui = { path = "../octo-ui" }
 oas3.workspace = true
+reqwest.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json.workspace = true
+sha2 = "0.10"
 tokio = { features = ["fs", "macros", "rt-multi-thread"], version = "1", default-features = false }
 tokio-util = { version = "0.7", default-features = false, features = ["io"] }
 tower-livereload = "0.10"
