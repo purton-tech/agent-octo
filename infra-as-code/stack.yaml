@@ -6,10 +6,6 @@ metadata:
 spec:
   components:
     db: {}
-    realtime: {}
-    storage:
-      install_minio: true
-      max_upload_size: 50mb
   profiles:
     dev:
       components:
@@ -19,6 +15,11 @@ spec:
           port: 30060
         db:
           expose_db_port: 30061
+    prod:
+      components:
+        oidc:
+          # Required by keycloak for OIDC. OIDC requires a stable redirect URL.
+          hostname-url: https://app.agent-octo.com
   services:
     web:
       image: ghcr.io/purton-tech/octo:1.0.5
