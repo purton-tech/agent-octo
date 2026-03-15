@@ -4,7 +4,7 @@ pub fn navigation_links() -> NavigationModel {
     NavigationModel {
         home: "/".to_string(),
         logo_src: Some("/logo.svg".to_string()),
-        logo_alt: Some("agent-octo.com".to_string()),
+        logo_alt: Some("Agent Octo".to_string()),
         desktop_left: vec![
             NavigationEntry::Link(NavigationLink::external("Home", "/", Section::Home)),
             NavigationEntry::Link(NavigationLink::external(
@@ -54,8 +54,8 @@ pub fn footer_links() -> FooterLinks {
 pub fn site_meta() -> SiteMeta {
     SiteMeta {
         base_url: "https://agent-octo.com".to_string(),
-        site_name: "agent-octo.com".to_string(),
-        brand_name: "agent-octo.com".to_string(),
+        site_name: "Agent Octo".to_string(),
+        brand_name: "Agent Octo".to_string(),
         goatcounter: "".to_string(),
     }
 }
