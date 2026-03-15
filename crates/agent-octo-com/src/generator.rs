@@ -10,7 +10,10 @@ fn output_page(path: &str, html: String) -> SitePage {
 }
 
 pub async fn generate_static_pages() -> Vec<SitePage> {
-    let mut pages_out = vec![output_page("", pages::index::page())];
+    let mut pages_out = vec![
+        output_page("", pages::index::page()),
+        output_page("pricing", pages::pricing::page()),
+    ];
     let specs = open_api_specs::load_integration_specs();
 
     pages_out.push(output_page(

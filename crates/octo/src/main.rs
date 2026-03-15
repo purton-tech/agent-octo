@@ -66,9 +66,15 @@ async fn main() {
             "/webhooks/stripe",
             post(handlers::billing::action_stripe_webhook),
         )
-        .layer(LiveReloadLayer::new())
         .layer(Extension(config))
         .layer(Extension(pool.clone()));
+
+    // Only compile in livereload behavior for debug builds; release binaries should not serve it.
+    let app = if cfg!(debug_assertions) {
+        app.layer(LiveReloadLayer::new())
+    } else {
+        app
+    };
 
     // run it
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));

@@ -16,7 +16,7 @@ pub fn index_page(integrations: &[IntegrationSpec]) -> String {
                 class: "min-h-screen text-base-content",
 
                 section {
-                    class: "px-6 py-16 lg:px-12",
+                    class: "px-6 pt-28 pb-16 md:pt-40 lg:px-12",
                     div {
                         class: "mx-auto max-w-6xl space-y-10",
                         div {
@@ -119,7 +119,7 @@ pub fn detail_page(integration: &IntegrationSpec) -> String {
                 class: "min-h-screen text-base-content",
 
                 section {
-                    class: "px-6 py-16 lg:px-12",
+                    class: "px-6 pt-28 pb-16 md:pt-40 lg:px-12",
                     div {
                         class: "mx-auto max-w-6xl space-y-10",
                         nav {
