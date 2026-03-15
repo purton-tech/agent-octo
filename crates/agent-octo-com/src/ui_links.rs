@@ -8,19 +8,33 @@ pub fn navigation_links() -> NavigationModel {
         desktop_left: vec![
             NavigationEntry::Link(NavigationLink::external("Home", "/", Section::Home)),
             NavigationEntry::Link(NavigationLink::external(
+                "Pricing",
+                "/pricing",
+                Section::Pricing,
+            )),
+            NavigationEntry::Link(NavigationLink::external(
                 "Specs",
                 "/open-api-specs/",
                 Section::McpServers,
             )),
             NavigationEntry::Link(NavigationLink::external("Blog", "/blog", Section::Blog)),
         ],
-        desktop_right: vec![NavigationLink::new("Get Started", "/#hero", Section::Home)
-            .with_class("btn btn-primary")],
+        desktop_right: vec![NavigationLink::external(
+            "Login / Signup",
+            "https://app.agent-octo.com",
+            Section::Home,
+        )
+        .with_class("btn btn-primary")],
         mobile: vec![
             NavigationLink::external("Home", "/", Section::Home),
+            NavigationLink::external("Pricing", "/pricing", Section::Pricing),
             NavigationLink::external("Specs", "/open-api-specs/", Section::McpServers),
             NavigationLink::external("Blog", "/blog", Section::Blog),
-            NavigationLink::new("Get Started", "/#hero", Section::Home),
+            NavigationLink::external(
+                "Login / Signup",
+                "https://app.agent-octo.com",
+                Section::Home,
+            ),
         ],
     }
 }
@@ -28,7 +42,7 @@ pub fn navigation_links() -> NavigationModel {
 pub fn footer_links() -> FooterLinks {
     FooterLinks {
         blog: "/blog".to_string(),
-        pricing: "/".to_string(),
+        pricing: "/pricing".to_string(),
         contact: "/".to_string(),
         terms: "/".to_string(),
         privacy: "/".to_string(),
