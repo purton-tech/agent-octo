@@ -63,6 +63,7 @@ async fn main() {
             head_inline_scripts: vec![],
             body_inline_scripts: vec![InlineScript::new("mu.init({ processForms: false });")],
         },
+        extra_footer: None,
     };
 
     SiteBuilder::new(config)

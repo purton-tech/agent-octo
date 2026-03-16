@@ -18,19 +18,11 @@ gitsetup() {
 
 # Database (you'll need to run just dev-secrets before these will work)
 db() {
-  set -a
-  source /workspace/.env
-  set +a
-  export DATABASE_URL="${DATABASE_URL:-$MIGRATIONS_URL}"
-  psql "$DATABASE_URL" "$@"
+  /workspace/scripts/psql "$@"
 }
 
 dbmate() {
-  set -a
-  source /workspace/.env
-  set +a
-  export DATABASE_URL="${DATABASE_URL:-$MIGRATIONS_URL}"
-  command dbmate --no-dump-schema --migrations-dir /workspace/crates/db/migrations "$@"
+  /workspace/scripts/dbmate "$@"
 }
 
 alias dbdown='while dbmate down; do :; done'

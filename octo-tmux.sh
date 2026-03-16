@@ -1,17 +1,55 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT="$(pwd)"
-SESSION=octo
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="${SCRIPT_DIR}"
+MODE="${1:-}"
+TMUX_CONFIG="/tmp/octo-tmux.conf"
+DEBUG="${OCTO_TMUX_DEBUG:-0}"
+
+on_error() {
+  local exit_code="$?"
+  echo "[octo-tmux] failed at line ${BASH_LINENO[0]} with exit ${exit_code}" >&2
+  exit "$exit_code"
+}
+
+trap on_error ERR
 
 in_devcontainer() {
   [ -n "${REMOTE_CONTAINERS:-}" ] || [ -n "${CODESPACES:-}" ] || [ -f "/.dockerenv" ]
 }
 
-start_tmux() {
+debug() {
+  if [[ "$DEBUG" == "1" ]]; then
+    echo "[octo-tmux] $*" >&2
+  fi
+}
 
-  command -v tmux >/dev/null 2>&1 || (sudo apt update && sudo apt install -y tmux)
+usage() {
+  cat >&2 <<'EOF'
+Usage: ./octo-tmux.sh <mode>
 
+Modes:
+  code  Start the main app development tmux session and watchers
+  site  Start the static site tmux session and watchers
+EOF
+  exit 1
+}
+
+ensure_tmux() {
+  debug "ensuring tmux is installed"
+  if command -v tmux >/dev/null 2>&1; then
+    debug "tmux already installed at $(command -v tmux)"
+    return
+  fi
+
+  debug "tmux missing, installing via apt"
+  sudo apt update
+  sudo apt install -y tmux
+}
+
+ensure_code_tools() {
+  debug "ensuring code-mode tools are installed"
   if ! command -v gitui >/dev/null 2>&1; then
     curl -L https://github.com/gitui-org/gitui/releases/download/v0.28.0/gitui-linux-x86_64.tar.gz \
       | sudo tar -xz -C /usr/local/bin --wildcards --strip-components=1 '*/gitui'
@@ -21,8 +59,11 @@ start_tmux() {
     curl -L https://github.com/helix-editor/helix/releases/download/25.07.1/helix-25.07.1-x86_64-linux.tar.xz | sudo tar -xJ -C /opt \
       && sudo ln -sf /opt/helix-25.07.1-x86_64-linux/hx /usr/local/bin/hx
   fi
+}
 
-  cat > ~/.tmux.conf <<'EOF'
+write_tmux_config() {
+  debug "writing tmux config to $TMUX_CONFIG"
+  cat > "$TMUX_CONFIG" <<'EOF'
 set -g status on
 set -g status-position bottom
 set -g pane-border-status top
@@ -30,47 +71,117 @@ set -g pane-border-format "#{pane_title}"
 set-option -g mouse on
 bind -n F1 select-window -t 0
 EOF
+  debug "wrote tmux config"
+}
 
-  if tmux has-session -t "$SESSION" 2>/dev/null; then
-    exec tmux attach -t "$SESSION"
+attach_session() {
+  local session="$1"
+
+  debug "attaching to session '$session' (TMUX=${TMUX:-<empty>})"
+
+  if [[ -n "${TMUX:-}" ]] && tmux display-message -p '#S' >/dev/null 2>&1; then
+    debug "inside a live tmux client, switching to '$session'"
+    exec tmux switch-client -t "$session"
   fi
 
-  tmux -f ~/.tmux.conf new-session -d -s "$SESSION" -n dev -c "$ROOT"
+  debug "attaching with tmux attach-session -t '$session'"
+  exec tmux attach-session -t "$session"
+}
 
-  tmux select-pane -t "$SESSION:0.0" -T "shell"
+start_code_tmux() {
+  local session="octo"
 
-  tmux split-window -h -t "$SESSION:0" -c "$ROOT"
-  tmux select-pane -t "$SESSION:0.1" -T "octo"
-  tmux send-keys -t "$SESSION:0.1" "just wo" C-m
+  debug "starting code mode in $REPO_ROOT"
+  ensure_code_tools
 
-  tmux split-window -v -t "$SESSION:0.1" -c "$ROOT"
-  tmux select-pane -t "$SESSION:0.2" -T "db queries"
-  tmux send-keys -t "$SESSION:0.2" "just wd" C-m
+  if tmux has-session -t "$session" 2>/dev/null; then
+    debug "session '$session' already exists"
+    attach_session "$session"
+  fi
 
-  tmux split-window -v -t "$SESSION:0.2" -c "$ROOT"
-  tmux select-pane -t "$SESSION:0.3" -T "wasm"
-  tmux send-keys -t "$SESSION:0.3" "just wi" C-m
+  debug "creating session '$session'"
+  tmux -f "$TMUX_CONFIG" new-session -d -s "$session" -n dev -c "$REPO_ROOT"
 
-  tmux split-window -v -t "$SESSION:0.3" -c "$ROOT"
-  tmux select-pane -t "$SESSION:0.4" -T "tailwind"
-  tmux send-keys -t "$SESSION:0.4" "just wtw" C-m
+  tmux select-pane -t "$session:0.0" -T "shell"
 
-  tmux select-pane -t "$SESSION:0.0"
-  tmux select-layout -t "$SESSION:0" main-vertical
+  tmux split-window -h -t "$session:0" -c "$REPO_ROOT"
+  tmux select-pane -t "$session:0.1" -T "octo"
+  tmux send-keys -t "$session:0.1" "just wo" C-m
 
-  tmux select-window -t "$SESSION:0"
-  exec tmux attach -t "$SESSION"
+  tmux split-window -v -t "$session:0.1" -c "$REPO_ROOT"
+  tmux select-pane -t "$session:0.2" -T "db queries"
+  tmux send-keys -t "$session:0.2" "just wd" C-m
+
+  tmux split-window -v -t "$session:0.2" -c "$REPO_ROOT"
+  tmux select-pane -t "$session:0.3" -T "wasm"
+  tmux send-keys -t "$session:0.3" "just wi" C-m
+
+  tmux split-window -v -t "$session:0.3" -c "$REPO_ROOT"
+  tmux select-pane -t "$session:0.4" -T "tailwind"
+  tmux send-keys -t "$session:0.4" "just wtw" C-m
+
+  tmux select-pane -t "$session:0.0"
+  tmux select-layout -t "$session:0" main-vertical
+
+  tmux select-window -t "$session:0"
+  attach_session "$session"
+}
+
+start_site_tmux() {
+  local session="agent-octo-com"
+  local site_root="${REPO_ROOT}/crates/agent-octo-com"
+
+  debug "starting site mode in $site_root"
+
+  if tmux has-session -t "$session" 2>/dev/null; then
+    debug "session '$session' already exists"
+    attach_session "$session"
+  fi
+
+  debug "creating session '$session'"
+  tmux -f "$TMUX_CONFIG" new-session -d -s "$session" -n site -c "$site_root"
+
+  tmux select-pane -t "$session:0.0" -T "site"
+  tmux send-keys -t "$session:0.0" "just ws" C-m
+
+  tmux split-window -h -t "$session:0" -c "$site_root"
+  tmux select-pane -t "$session:0.1" -T "tailwind"
+  tmux send-keys -t "$session:0.1" "just wts" C-m
+
+  tmux select-pane -t "$session:0.0"
+  tmux select-layout -t "$session:0" even-horizontal
+  attach_session "$session"
+}
+
+start_tmux() {
+  debug "mode='$MODE' repo_root='$REPO_ROOT' in_devcontainer=$(in_devcontainer && echo yes || echo no)"
+  case "$MODE" in
+    code|site) ;;
+    *) usage ;;
+  esac
+
+  ensure_tmux
+  write_tmux_config
+  debug "starting tmux mode dispatcher"
+
+  case "$MODE" in
+    code) start_code_tmux ;;
+    site) start_site_tmux ;;
+  esac
 }
 
 if in_devcontainer; then
+  debug "running inside devcontainer"
   start_tmux
 else
+  debug "running outside devcontainer"
   command -v devcontainer >/dev/null 2>&1 || {
     echo "devcontainer CLI is not installed."
     echo "Install it with: npm install -g @devcontainers/cli"
     exit 1
   }
 
-  devcontainer up --workspace-folder "$ROOT" >/dev/null
-  exec devcontainer exec --workspace-folder "$ROOT" bash -lc "./octo-tmux.sh"
+  devcontainer up --workspace-folder "$REPO_ROOT" >/dev/null
+  debug "re-entering devcontainer in $REPO_ROOT"
+  exec devcontainer exec --workspace-folder "$REPO_ROOT" bash -lc "cd '$REPO_ROOT' && ./octo-tmux.sh '$MODE'"
 fi

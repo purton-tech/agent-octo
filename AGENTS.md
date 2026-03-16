@@ -17,13 +17,13 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 
 ## Database Migrations
 
-* `dbmate` will only work if you replicate the operation of the `dbmate()` function in `bash_aliases`.
+* Use `./scripts/dbmate ...` for migrations and `./scripts/psql ...` for direct `psql` access. These scripts load `/workspace/.env`, set `DATABASE_URL`, and point `dbmate` at `crates/db/migrations`.
 * When adding a new enum value (e.g., `ALTER TYPE ... ADD VALUE`), do not use the new value in the same migration transaction. Split into a follow-up migration before inserting rows that reference the new enum value.
 
 ## Folder: db
 
 * All of the `dbmate` migrations are stored in the `migrations` folder.
-* To create a new migration run `dbmate new migration-name` where migration name somehow represents the work you are doing. Always use `dbmate new` so timestamps are correct.
+* To create a new migration run `./scripts/dbmate new migration-name` or `just migrate-new migration-name`. Always use `dbmate new` so timestamps are correct.
 * All of the `.sql` files are in a folder called `queries`.
 * The `sql` files are named after the main tables or schemas. i.e. `users.sql` for the `users` table.
 * All the database CRUD operation are in these files.
