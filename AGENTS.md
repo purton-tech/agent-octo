@@ -23,7 +23,7 @@ You are running in a `devcontainer`. The developer is running a handful of `watc
 ## Folder: db
 
 * All of the `dbmate` migrations are stored in the `migrations` folder.
-* To create a new migration run `./scripts/dbmate new migration-name` or `just migrate-new migration-name`. Always use `dbmate new` so timestamps are correct.
+* To create a new migration run `./scripts/dbmate new migration-name`. Always use `dbmate new` so timestamps are correct.
 * All of the `.sql` files are in a folder called `queries`.
 * The `sql` files are named after the main tables or schemas. i.e. `users.sql` for the `users` table.
 * All the database CRUD operation are in these files.

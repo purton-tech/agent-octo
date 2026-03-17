@@ -1,0 +1,40 @@
+<div>
+  <h2 class="text-2xl font-semibold">Workspace settings</h2>
+  <p class="text-base-content/70 mt-1 text-sm">Administration controls layout.</p>
+</div>
+
+<div class="grid gap-6 lg:grid-cols-2">
+  <section class="card">
+    <div class="card-body">
+      <h3 class="card-title">Branding</h3>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Workspace name</legend>
+        <input class="input input-bordered w-full" value="Acme PLC">
+      </fieldset>
+      <fieldset class="fieldset">
+        <legend class="fieldset-legend">Primary domain</legend>
+        <input class="input input-bordered w-full" value="portal.acme.example">
+      </fieldset>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-body">
+      <h3 class="card-title">Notifications</h3>
+      <fieldset class="fieldset gap-4">
+        <label class="label justify-start gap-3">
+          <input type="checkbox" checked class="toggle">
+          <span>Weekly leadership digest</span>
+        </label>
+        <label class="label justify-start gap-3">
+          <input type="checkbox" checked class="toggle">
+          <span>Approval reminder emails</span>
+        </label>
+        <label class="label justify-start gap-3">
+          <input type="checkbox" class="toggle">
+          <span>Daily exception report</span>
+        </label>
+      </fieldset>
+    </div>
+  </section>
+</div>

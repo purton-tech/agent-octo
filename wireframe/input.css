@@ -1,0 +1,57 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@source "./*.html";
+@source "./app.js";
+
+.app-shell {
+    @apply min-h-screen lg:flex;
+}
+
+.app-sidebar {
+    @apply w-full bg-base-100 lg:w-72 lg:border-r border-base-300;
+}
+
+.app-main {
+    @apply flex-1;
+}
+
+.section-padding {
+    @apply p-6;
+}
+
+.page-stack {
+    @apply space-y-6;
+}
+
+.page-header-row {
+    @apply flex flex-col gap-4 md:flex-row md:items-center md:justify-between;
+}
+
+.stats-grid {
+    @apply grid gap-4 md:grid-cols-2 xl:grid-cols-4;
+}
+
+.content-split {
+    @apply grid gap-6 xl:grid-cols-[2fr_1fr];
+}
+
+.card-grid {
+    @apply grid gap-4 md:grid-cols-2 xl:grid-cols-3;
+}
+
+.card {
+    @apply bg-base-100;
+}
+
+.stat {
+    @apply bg-base-100;
+}
+
+.list.rounded-box {
+    @apply bg-base-100;
+}
+
+.data-surface {
+    @apply rounded-box bg-base-100;
+}

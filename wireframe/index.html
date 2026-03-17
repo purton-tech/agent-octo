@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Acme PLC Wireframe</title>
+    <link href="./dist/tailwind.css" rel="stylesheet" type="text/css">
+  </head>
+  <body class="min-h-screen bg-base-200">
+    <div class="app-shell">
+      <aside class="app-sidebar">
+        <div class="flex h-full flex-col">
+          <div class="border-base-300 border-b px-6 py-5">
+            <div class="flex items-center gap-3">
+              <div class="bg-primary text-primary-content flex h-10 w-10 items-center justify-center rounded-box">
+                AP
+              </div>
+              <div>
+                <p class="text-sm font-semibold uppercase">Acme PLC</p>
+                <p class="text-base-content/70 text-sm">Operations Console</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-1 px-4 py-5">
+            <ul class="menu w-full gap-1 p-0" id="menu">
+              <li class="menu-title"><span>Workspace</span></li>
+              <li><a class="wireframe-link" href="?page=dashboard" data-page="dashboard">Dashboard</a></li>
+              <li><a class="wireframe-link" href="?page=users" data-page="users">Users</a></li>
+              <li><a class="wireframe-link" href="?page=teams" data-page="teams">Teams</a></li>
+              <li><a class="wireframe-link" href="?page=billing" data-page="billing">Billing</a></li>
+              <li><a class="wireframe-link" href="?page=settings" data-page="settings">Settings</a></li>
+            </ul>
+          </div>
+
+          <div class="border-base-300 border-t px-6 py-5">
+            <p class="text-base-content/70 text-sm">Current plan balance</p>
+            <a class="link link-primary mt-2 inline-block" href="?page=billing" data-page="billing">
+              £18,420 remaining
+            </a>
+          </div>
+        </div>
+      </aside>
+
+      <main class="app-main">
+        <header class="border-base-300 bg-base-100 border-b px-6 py-5">
+          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 id="page-title" class="text-2xl font-semibold">Dashboard</h1>
+            </div>
+            <div class="flex gap-3">
+              <button class="btn btn-outline">Export</button>
+              <button class="btn btn-primary">Create Report</button>
+            </div>
+          </div>
+        </header>
+
+        <section class="section-padding">
+          <div id="router-error" class="alert alert-error mb-4 hidden"></div>
+          <div id="page-content" class="page-stack"></div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
