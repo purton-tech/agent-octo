@@ -1,8 +1,141 @@
 <div class="page-stack">
-  <h2 class="text-2xl font-semibold">Usage</h2>
+  <div class="flex justify-end">
+    <select class="select select-bordered">
+      <option>This month</option>
+      <option>Last month</option>
+      <option>Last 3 months</option>
+    </select>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat rounded-box">
+      <div class="stat-title">Total spend</div>
+      <div class="stat-value text-2xl">1.3k credits</div>
+    </div>
+    <div class="stat rounded-box">
+      <div class="stat-title">Today</div>
+      <div class="stat-value text-2xl">1.3k credits</div>
+    </div>
+    <div class="stat rounded-box">
+      <div class="stat-title">Avg / day</div>
+      <div class="stat-value text-2xl">75 credits</div>
+    </div>
+  </div>
+
   <section class="card">
     <div class="card-body">
-      <p class="text-base-content/70 text-sm">Placeholder wireframe page.</p>
+      <div class="page-header-row">
+        <h2 class="card-title">Daily spend</h2>
+        <div class="flex gap-4 text-sm">
+          <span class="flex items-center gap-2"><span class="badge badge-secondary badge-xs"></span> One-off tasks</span>
+          <span class="flex items-center gap-2"><span class="badge badge-primary badge-xs"></span> Scheduled tasks</span>
+        </div>
+      </div>
+
+      <div class="mt-4">
+        <div class="flex h-56 items-end gap-2 border-b border-base-300 pb-2">
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex-1"></div>
+          <div class="flex flex-1 flex-col justify-end gap-1">
+            <div class="bg-secondary h-16 rounded-t-box"></div>
+            <div class="bg-primary h-10 rounded-t-box"></div>
+          </div>
+        </div>
+        <div class="mt-2 grid grid-cols-17 gap-2 text-center text-xs text-base-content/70">
+          <span>1</span>
+          <span>2</span>
+          <span>3</span>
+          <span>4</span>
+          <span>5</span>
+          <span>6</span>
+          <span>7</span>
+          <span>8</span>
+          <span>9</span>
+          <span>10</span>
+          <span>11</span>
+          <span>12</span>
+          <span>13</span>
+          <span>14</span>
+          <span>15</span>
+          <span>16</span>
+          <span>17</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <div class="card-body">
+      <div class="page-header-row">
+        <h2 class="card-title">Threads</h2>
+        <select class="select select-bordered select-sm">
+          <option>Top spend</option>
+          <option>Newest</option>
+        </select>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Created</th>
+              <th class="text-right">Credits</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Scheduled task: Workflow Discovery</td>
+              <td>Mar 17</td>
+              <td class="text-right">513</td>
+            </tr>
+            <tr>
+              <td>DM: Ian</td>
+              <td>Mar 17</td>
+              <td class="text-right">238</td>
+            </tr>
+            <tr>
+              <td>DM: Ian</td>
+              <td>Mar 17</td>
+              <td class="text-right">215</td>
+            </tr>
+            <tr>
+              <td>DM: Ian</td>
+              <td>Mar 17</td>
+              <td class="text-right">171</td>
+            </tr>
+            <tr>
+              <td>DM: Ian</td>
+              <td>Mar 17</td>
+              <td class="text-right">73</td>
+            </tr>
+            <tr>
+              <td>DM: Ian</td>
+              <td>Mar 17</td>
+              <td class="text-right">47</td>
+            </tr>
+            <tr>
+              <td>Slack: general</td>
+              <td>Mar 17</td>
+              <td class="text-right">11</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </section>
 </div>

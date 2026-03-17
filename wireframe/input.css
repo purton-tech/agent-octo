@@ -5,15 +5,23 @@
 @source "./app.js";
 
 .app-shell {
-    @apply min-h-screen lg:flex;
+    @apply h-screen lg:flex overflow-hidden;
 }
 
 .app-sidebar {
-    @apply w-full bg-base-100 lg:w-72 lg:border-r border-base-300;
+    @apply w-full bg-base-100 lg:w-72 lg:border-r border-base-300 shrink-0;
+}
+
+.app-sidebar-inner {
+    @apply flex h-full flex-col;
+}
+
+.app-sidebar-nav {
+    @apply flex-1 overflow-y-auto px-4 py-5 min-h-0;
 }
 
 .app-main {
-    @apply flex-1;
+    @apply flex-1 min-h-0 overflow-y-auto;
 }
 
 .section-padding {
