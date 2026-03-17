@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Viktor Wireframe</title>
+    <title>Hey Airbus Wireframe</title>
     <link href="./dist/tailwind.css" rel="stylesheet" type="text/css">
   </head>
   <body class="min-h-screen bg-base-200">
@@ -13,10 +13,10 @@
           <div class="border-base-300 border-b px-6 py-5">
             <div class="flex items-center gap-3">
               <div class="bg-primary text-primary-content flex h-10 w-10 items-center justify-center rounded-box">
-                V
+                HA
               </div>
               <div>
-                <p class="text-sm font-semibold">getviktor.com</p>
+                <p class="text-sm font-semibold">Hey Airbus</p>
               </div>
             </div>
           </div>
@@ -25,11 +25,10 @@
             <ul class="menu w-full gap-1 p-0" id="menu">
               <li><a class="wireframe-link" href="?page=integrations" data-page="integrations">Integrations</a></li>
               <li><a class="wireframe-link" href="?page=spaces" data-page="spaces">Spaces</a></li>
+              <li><a class="wireframe-link" href="?page=databases" data-page="databases">Databases</a></li>
               <li><a class="wireframe-link" href="?page=scheduled-tasks" data-page="scheduled-tasks">Scheduled Tasks</a></li>
               <li><a class="wireframe-link" href="?page=team" data-page="team">Team</a></li>
               <li><a class="wireframe-link" href="?page=usage" data-page="usage">Usage</a></li>
-              <li><a class="wireframe-link" href="?page=billing" data-page="billing">Billing</a></li>
-              <li><a class="wireframe-link" href="?page=account" data-page="account">Account</a></li>
               <li><a class="wireframe-link" href="?page=settings" data-page="settings">Settings</a></li>
             </ul>
           </div>
@@ -48,13 +47,11 @@
 
       <main class="app-main">
         <header class="border-base-300 bg-base-100 border-b px-6 py-5">
-          <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div class="flex min-h-10 flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div>
               <h1 id="page-title" class="text-2xl font-semibold">Integrations</h1>
             </div>
-            <div class="flex gap-3">
-              <button class="btn btn-outline">Add Custom MCP</button>
-            </div>
+            <div id="page-actions" class="flex min-h-10 items-center gap-3"></div>
           </div>
         </header>
 
