@@ -1,14 +1,17 @@
 const pageTitles = {
-  dashboard: "Dashboard",
-  users: "Users",
-  teams: "Teams",
+  integrations: "Integrations",
+  spaces: "Spaces",
+  "scheduled-tasks": "Scheduled Tasks",
+  team: "Team",
+  usage: "Usage",
   billing: "Billing",
+  account: "Account",
   settings: "Settings",
 };
 
 function getPageFromLocation() {
   const params = new URLSearchParams(window.location.search);
-  return params.get("page") || "dashboard";
+  return params.get("page") || "integrations";
 }
 
 function setActiveLink(page) {
@@ -18,7 +21,7 @@ function setActiveLink(page) {
 }
 
 async function loadPage(page, pushState) {
-  const safePage = pageTitles[page] ? page : "dashboard";
+  const safePage = pageTitles[page] ? page : "integrations";
   const title = document.getElementById("page-title");
   const content = document.getElementById("page-content");
   const error = document.getElementById("router-error");

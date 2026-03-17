@@ -40,6 +40,18 @@
     @apply grid gap-4 md:grid-cols-2 xl:grid-cols-3;
 }
 
+.toolbar-stack {
+    @apply flex flex-col gap-4;
+}
+
+.chip-row {
+    @apply flex flex-wrap gap-2;
+}
+
+.catalog-grid {
+    @apply grid gap-4 lg:grid-cols-2;
+}
+
 .card {
     @apply bg-base-100;
 }
