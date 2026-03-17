@@ -60,6 +60,22 @@
     @apply grid gap-4 lg:grid-cols-2;
 }
 
+.knowledge-grid {
+    @apply grid gap-4 lg:grid-cols-3;
+}
+
+.knowledge-detail-grid {
+    @apply grid gap-6 xl:grid-cols-[1.2fr_0.8fr];
+}
+
+.layer-grid {
+    @apply grid gap-4 lg:grid-cols-3;
+}
+
+.example-grid {
+    @apply grid gap-4 lg:grid-cols-2;
+}
+
 .card {
     @apply bg-base-100;
 }

@@ -49,6 +49,41 @@ const pages = {
       },
     ],
   },
+  knowledge: {
+    title: "Knowledge",
+    controls: [
+      {
+        type: "button",
+        label: "Create knowledge item",
+        className: "btn btn-primary",
+      },
+    ],
+  },
+  "knowledge-item": {
+    title: "Knowledge Item",
+    controls: [
+      {
+        type: "button",
+        label: "Add attachment",
+        className: "btn btn-outline",
+      },
+      {
+        type: "button",
+        label: "Save",
+        className: "btn btn-primary",
+      },
+    ],
+  },
+  memory: {
+    title: "Memory",
+    controls: [
+      {
+        type: "button",
+        label: "Add memory",
+        className: "btn btn-primary",
+      },
+    ],
+  },
   usage: {
     title: "Usage",
     controls: [
@@ -152,6 +187,16 @@ document.addEventListener("click", (event) => {
 
   event.preventDefault();
   loadPage(link.dataset.page, true);
+});
+
+document.addEventListener("click", (event) => {
+  const card = event.target.closest("[data-route]");
+  if (!card) {
+    return;
+  }
+
+  event.preventDefault();
+  loadPage(card.dataset.route, true);
 });
 
 window.addEventListener("popstate", (event) => {

@@ -50,6 +50,6 @@ Then open the URL shown in the terminal.
 ## Notes
 
 - `index.html` contains the shared header and sidebar.
-- `integrations.html`, `spaces.html`, `databases.html`, `scheduled-tasks.html`, `team.html`, `usage.html`, and `settings.html` are partials loaded into the shell.
+- `integrations.html`, `spaces.html`, `databases.html`, `scheduled-tasks.html`, `team.html`, `knowledge.html`, `knowledge-item.html`, `memory.html`, `usage.html`, and `settings.html` are partials loaded into the shell.
 - `input.css` is the Tailwind v4 entrypoint and the place to add shared `@apply` rules.
 - If the page body does not load, check that you are serving the folder over HTTP rather than opening the file directly.
