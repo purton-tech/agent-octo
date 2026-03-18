@@ -15,6 +15,7 @@ The scripts in this folder are the stable command surface for repo-specific oper
 - `dev-env`: loads `/workspace/.env`, exports `DATABASE_URL`, and validates that the database connection settings are present.
 - `psql`: opens `psql` using the repo's configured `DATABASE_URL`.
 - `dbmate`: runs `dbmate` with the repo's configured `DATABASE_URL` and `crates/db/migrations` path.
+- `clorinde`: runs one-shot Clorinde code generation against the repo's configured `DATABASE_URL`, reading from `crates/db/queries` and writing to `crates/db-gen`.
 
 ## How this fits with other tools
 
