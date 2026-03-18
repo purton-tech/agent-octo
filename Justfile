@@ -18,7 +18,7 @@ dev-secrets:
 
 ## Run the code generators
 wd:
-    cargo watch -w ./crates/db/queries/ -s 'clorinde live -q ./crates/db/queries/ -d crates/db-gen && cargo fmt'
+    cargo watch -w ./crates/db/queries/ -s './scripts/clorinde'
 
 _watch binary:
     mold -run cargo watch \
