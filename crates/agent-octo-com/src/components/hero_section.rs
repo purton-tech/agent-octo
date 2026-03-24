@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn HomepageHeroSection() -> Element {
+pub fn HeroSection() -> Element {
     rsx! {
         section {
             id: "hero",

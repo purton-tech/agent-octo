@@ -1,7 +1,9 @@
 use dioxus::prelude::*;
 use ssg_whiz::{layouts::layout::Layout, Footer, Section};
 
-use crate::components::homepage_hero_section::HomepageHeroSection;
+use crate::components::capabilities_section::CapabilitiesSection;
+use crate::components::hero_section::HeroSection;
+use crate::components::platform_section::PlatformSection;
 
 pub fn page() -> String {
     let page = rsx!(
@@ -14,7 +16,13 @@ pub fn page() -> String {
             main {
                 class: "min-h-screen text-base-content",
 
-                HomepageHeroSection {}
+                div {
+                    class: "grid gap-16 md:gap-24",
+
+                    HeroSection {}
+                    PlatformSection {}
+                    CapabilitiesSection {}
+                }
 
                 Footer {
                     margin_top: Some("mt-0".to_string()),
