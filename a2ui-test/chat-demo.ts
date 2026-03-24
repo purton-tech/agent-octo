@@ -8,19 +8,32 @@ import { defaultTheme } from "./src/a2ui-default-theme";
 import { renderMarkdown } from "./vendor/a2ui/renderers/markdown/markdown-it/src/markdown";
 
 const SURFACE_ID = "chat-demo";
+const ASSISTANT_COMPONENT_SEQUENCE = [
+  "Text",
+  "MultipleChoice",
+  "Tabs",
+  "Card",
+  "Button",
+  "TextField",
+] as const;
 
 type DemoRole = "user" | "assistant";
+type AssistantComponentKind = (typeof ASSISTANT_COMPONENT_SEQUENCE)[number];
 
 interface DemoMessage {
   id: string;
   role: DemoRole;
   content: string;
+  componentKind?: AssistantComponentKind;
+  staged?: boolean;
 }
 
 const seedMessages: DemoMessage[] = [
   {
     id: crypto.randomUUID(),
     role: "assistant",
+    componentKind: "Text",
+    staged: false,
     content:
       "Hello from local vendored A2UI.\n\nType a prompt below and this demo will stream a fake assistant response through the message processor.",
   },
@@ -45,24 +58,269 @@ function roleLabel(role: DemoRole) {
   return role === "user" ? "User" : "Assistant";
 }
 
-function buildComponents(messages: DemoMessage[]) {
-  const transcript = messages
-    .map((message) => `### ${roleLabel(message.role)}\n\n${message.content || "_..._"}`)
-    .join("\n\n---\n\n");
+function nextAssistantComponentKind(messages: DemoMessage[]): AssistantComponentKind {
+  const stagedAssistantCount = messages.filter(
+    (message) => message.role === "assistant" && message.staged,
+  ).length;
+  return ASSISTANT_COMPONENT_SEQUENCE[
+    Math.min(stagedAssistantCount, ASSISTANT_COMPONENT_SEQUENCE.length - 1)
+  ];
+}
 
-  return [
-    {
-      id: "root",
-      component: {
-        Text: {
-          usageHint: "body",
-          text: {
-            literalString: transcript,
-          },
-        },
+function addText(
+  components: any[],
+  id: string,
+  text: string,
+  usageHint: "caption" | "body" | "h4" = "body",
+) {
+  components.push({
+    id,
+    component: {
+      Text: {
+        usageHint,
+        text: { literalString: text || "_..._" },
       },
     },
-  ];
+  });
+}
+
+function addMessageBlock(
+  components: any[],
+  message: DemoMessage,
+  messageIndex: number,
+): string {
+  const prefix = `message-${messageIndex}-${message.id}`;
+  const blockChildren: string[] = [];
+
+  const labelId = `${prefix}-label`;
+  addText(components, labelId, roleLabel(message.role), "caption");
+  blockChildren.push(labelId);
+
+  const bodyChildren: string[] = [];
+  const summaryId = `${prefix}-summary`;
+  addText(components, summaryId, message.content, "body");
+  bodyChildren.push(summaryId);
+
+  if (message.role === "assistant" && message.componentKind) {
+    const componentId = addAssistantComponent(
+      components,
+      prefix,
+      message.componentKind,
+      message.content,
+    );
+    if (componentId) {
+      const panelBodyId = `${prefix}-panel-body`;
+      components.push({
+        id: panelBodyId,
+        component: {
+          Column: {
+            children: {
+              explicitList: [componentId],
+            },
+            alignment: "stretch",
+          },
+        },
+      });
+
+      const panelId = `${prefix}-panel`;
+      components.push({
+        id: panelId,
+        component: {
+          Card: {
+            child: panelBodyId,
+          },
+        },
+      });
+      bodyChildren.push(panelId);
+    }
+  }
+
+  const bodyId = `${prefix}-body`;
+  components.push({
+    id: bodyId,
+    component: {
+      Column: {
+        children: {
+          explicitList: bodyChildren,
+        },
+        alignment: "stretch",
+      },
+    },
+  });
+
+  const shellId = `${prefix}-${message.role === "assistant" ? "assistant" : "user"}-shell`;
+  components.push({
+    id: shellId,
+    component: {
+      Card: {
+        child: bodyId,
+      },
+    },
+  });
+  blockChildren.push(shellId);
+
+  const blockId = `${prefix}-block`;
+  components.push({
+    id: blockId,
+    component: {
+      Column: {
+        children: {
+          explicitList: blockChildren,
+        },
+        alignment: "stretch",
+      },
+    },
+  });
+
+  return blockId;
+}
+
+function addAssistantComponent(
+  components: any[],
+  prefix: string,
+  kind: AssistantComponentKind,
+  content: string,
+): string | null {
+  switch (kind) {
+    case "Text":
+      return null;
+
+    case "MultipleChoice": {
+      const componentId = `${prefix}-multi-choice`;
+      components.push({
+        id: componentId,
+        component: {
+          MultipleChoice: {
+            selections: { literalArray: [] },
+            options: [
+              { label: { literalString: "Summarize it" }, value: "summarize" },
+              { label: { literalString: "Show raw data" }, value: "raw" },
+              { label: { literalString: "Turn into tasks" }, value: "tasks" },
+            ],
+            type: "checkbox",
+          },
+        },
+      });
+      return componentId;
+    }
+
+    case "Tabs": {
+      const summaryId = `${prefix}-tab-summary`;
+      const detailId = `${prefix}-tab-detail`;
+      const rawId = `${prefix}-tab-raw`;
+      addText(components, summaryId, `Summary\n\n${content || "_..._"}`, "body");
+      addText(
+        components,
+        detailId,
+        "Details\n\nThis tab can hold structured follow-up output for the same assistant turn.",
+        "body",
+      );
+      addText(
+        components,
+        rawId,
+        "Raw\n\n```json\n{\"status\":\"demo\",\"source\":\"a2ui-test\"}\n```",
+        "body",
+      );
+
+      const componentId = `${prefix}-tabs`;
+      components.push({
+        id: componentId,
+        component: {
+          Tabs: {
+            tabItems: [
+              { title: { literalString: "Summary" }, child: summaryId },
+              { title: { literalString: "Details" }, child: detailId },
+              { title: { literalString: "Raw" }, child: rawId },
+            ],
+          },
+        },
+      });
+      return componentId;
+    }
+
+    case "Card": {
+      const cardBodyId = `${prefix}-card-body`;
+      addText(
+        components,
+        cardBodyId,
+        "Card payload\n\nThis assistant turn is rendered inside a card container.",
+        "body",
+      );
+      const componentId = `${prefix}-card`;
+      components.push({
+        id: componentId,
+        component: {
+          Card: {
+            child: cardBodyId,
+          },
+        },
+      });
+      return componentId;
+    }
+
+    case "Button": {
+      const buttonLabelId = `${prefix}-button-label`;
+      addText(components, buttonLabelId, "Continue", "body");
+      const componentId = `${prefix}-button`;
+      components.push({
+        id: componentId,
+        component: {
+          Button: {
+            child: buttonLabelId,
+            primary: true,
+            action: {
+              name: "demo.continue",
+              context: [
+                {
+                  key: "source",
+                  value: { literalString: "chat-demo" },
+                },
+              ],
+            },
+          },
+        },
+      });
+      return componentId;
+    }
+
+    case "TextField": {
+      const componentId = `${prefix}-text-field`;
+      components.push({
+        id: componentId,
+        component: {
+          TextField: {
+            label: { literalString: "Follow-up input" },
+            text: {
+              literalString: content ? `Seeded from: ${content.slice(0, 48)}` : "",
+            },
+            textFieldType: "longText",
+          },
+        },
+      });
+      return componentId;
+    }
+  }
+}
+
+function buildComponents(messages: DemoMessage[]) {
+  const components: any[] = [];
+  const rootChildren = messages.map((message, index) =>
+    addMessageBlock(components, message, index),
+  );
+
+  components.unshift({
+    id: "root",
+    component: {
+      Column: {
+        children: {
+          explicitList: rootChildren,
+        },
+        alignment: "stretch",
+      },
+    },
+  });
+
+  return components;
 }
 
 @customElement("a2ui-chat-demo")
@@ -112,21 +370,6 @@ class A2uiChatDemo extends LitElement {
 
   get surface() {
     return this.surfaceState;
-  }
-
-  get debugState() {
-    const surface = this.surface;
-    return {
-      draft: this.draft,
-      messageCount: this.messages.length,
-      isStreaming: this.isStreaming,
-      hasSurface: Boolean(surface),
-      rootComponentId: surface?.rootComponentId ?? null,
-      hasComponentTree: Boolean(surface?.componentTree),
-      componentCount: surface?.components?.size ?? 0,
-      styles: surface?.styles ?? null,
-      lastMessage: this.messages.at(-1) ?? null,
-    };
   }
 
   handleScroll = () => {
@@ -194,9 +437,16 @@ class A2uiChatDemo extends LitElement {
     ];
 
     const assistantId = crypto.randomUUID();
+    const assistantComponentKind = nextAssistantComponentKind(this.messages);
     this.messages = [
       ...this.messages,
-      { id: assistantId, role: "assistant", content: "" },
+      {
+        id: assistantId,
+        role: "assistant",
+        content: "",
+        componentKind: assistantComponentKind,
+        staged: true,
+      },
     ];
     this.isStreaming = true;
     this.syncSurface();
@@ -291,6 +541,8 @@ class A2uiChatDemo extends LitElement {
 
     a2ui-surface {
       display: block;
+      max-width: 760px;
+      margin: 0 auto;
     }
 
     form {

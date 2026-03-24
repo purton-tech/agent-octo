@@ -255,13 +255,16 @@ export const litTheme: Types.Theme = {
     // =========================================================================
 
     Card: {
-      'border-br-9': true,
+      'border-br-16': true,
       'layout-p-4': true,
-      'color-bgc-n100': true,
+      'border-bw-1': true,
+      'border-bs-s': true,
+      'color-bc-p70': true,
+      'color-bgc-p95': true,
     },
 
     Column: {
-      'layout-g-2': true,
+      'layout-g-3': true,
     },
 
     List: {
@@ -288,12 +291,36 @@ export const litTheme: Types.Theme = {
     },
 
     Tabs: {
-      container: {},
-      controls: {
-        all: {},
-        selected: {},
+      container: {
+        'layout-g-3': true,
+        'layout-p-2': true,
+        'border-br-12': true,
+        'color-bgc-p95': true,
       },
-      element: {},
+      controls: {
+        all: {
+          'layout-pt-2': true,
+          'layout-pb-2': true,
+          'layout-pl-3': true,
+          'layout-pr-3': true,
+          'border-br-12': true,
+          'border-bw-1': true,
+          'border-bs-s': true,
+          'color-bc-p80': true,
+          'color-bgc-p100': true,
+          'color-c-n10': true,
+        },
+        selected: {
+          'color-bgc-p80': true,
+          'color-c-p20': true,
+          'border-c-p70': true,
+        },
+      },
+      element: {
+        'layout-p-3': true,
+        'border-br-12': true,
+        'color-bgc-p100': true,
+      },
     },
 
     // =========================================================================
@@ -303,13 +330,13 @@ export const litTheme: Types.Theme = {
     Button: {
       'layout-pt-2': true,
       'layout-pb-2': true,
-      'layout-pl-3': true,
-      'layout-pr-3': true,
-      'border-br-12': true,
+      'layout-pl-4': true,
+      'layout-pr-4': true,
+      'border-br-16': true,
       'border-bw-0': true,
       'border-bs-s': true,
-      'color-bgc-p30': true,
-      'color-c-p100': true, // White text on dark purple background
+      'color-bgc-p70': true,
+      'color-c-p20': true,
       'behavior-ho-70': true,
       'typography-w-400': true,
     },
@@ -370,9 +397,15 @@ export const litTheme: Types.Theme = {
     },
 
     MultipleChoice: {
-      container: {},
-      label: {},
-      element: {},
+      container: {
+        'layout-w-100': true,
+      },
+      label: {
+        'color-c-n20': true,
+      },
+      element: {
+        'color-bgc-p100': true,
+      },
     },
 
     Slider: {
@@ -386,13 +419,12 @@ export const litTheme: Types.Theme = {
         'typography-sz-bm': true,
         'layout-w-100': true,
         'layout-g-2': true,
-        'layout-dsp-flexhor': true,
-        'layout-al-c': true,
-        'typography-ws-nw': true,
+        'layout-dsp-flexver': true,
+        'layout-al-s': true,
       },
       label: {
         'layout-flx-0': true,
-        'color-c-p30': true,
+        'color-c-n20': true,
       },
       element: {
         'typography-sz-bm': true,
@@ -400,14 +432,59 @@ export const litTheme: Types.Theme = {
         'layout-pb-2': true,
         'layout-pl-3': true,
         'layout-pr-3': true,
-        'border-br-2': true,
+        'border-br-12': true,
         'border-bw-1': true,
         'border-bs-s': true,
         'color-bgc-p100': true,
-        'color-bc-p60': true,
-        'color-c-n30': true,
-        'color-c-p30': true,
+        'color-bc-p80': true,
+        'color-c-n10': true,
       },
+    },
+  },
+
+  additionalStyles: {
+    Card: {
+      backgroundColor: "rgba(30, 41, 59, 0.9)",
+      color: "#e5ebff",
+      borderColor: "rgba(124, 147, 255, 0.22)",
+      boxShadow: "0 18px 42px rgba(15, 23, 42, 0.28)",
+      backdropFilter: "blur(14px)",
+    },
+    Column: {
+      gap: "0.9rem",
+    },
+    Text: {
+      body: {
+        color: "#e5ebff",
+      },
+      caption: {
+        color: "rgba(196, 208, 255, 0.78)",
+        textTransform: "uppercase",
+        letterSpacing: "0.08em",
+      },
+      h1: {
+        color: "#f8fbff",
+      },
+      h2: {
+        color: "#f8fbff",
+      },
+      h3: {
+        color: "#f8fbff",
+      },
+      h4: {
+        color: "#f8fbff",
+      },
+      h5: {
+        color: "#f8fbff",
+      },
+    },
+    Tabs: {
+      backgroundColor: "rgba(30, 41, 59, 0.82)",
+      border: "1px solid rgba(124, 147, 255, 0.22)",
+    },
+    TextField: {
+      background: "rgba(15, 23, 42, 0.9)",
+      color: "#e5ebff",
     },
   },
 
