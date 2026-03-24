@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "allowJs": false,
+    "checkJs": false,
+    "strict": false,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@a2ui/web_core": ["vendor/a2ui/renderers/web_core/src/v0_8/index.ts"],
+      "@a2ui/web_core/*": ["vendor/a2ui/renderers/web_core/src/v0_8/*"],
+      "@a2ui/spec": ["vendor/a2ui/specification/v0_8/json"],
+      "@a2ui/spec/*": ["vendor/a2ui/specification/v0_8/json/*"],
+      "@a2ui/lit": ["vendor/a2ui/renderers/lit/src/index.ts"],
+      "@a2ui/lit/*": ["vendor/a2ui/renderers/lit/src/*"]
+    }
+  },
+  "include": [
+    "main.ts",
+    "chat-demo.ts",
+    "vite.config.js",
+    "vendor/a2ui/renderers/lit/src/**/*.ts",
+    "vendor/a2ui/renderers/web_core/src/**/*.ts"
+  ]
+}

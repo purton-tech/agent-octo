@@ -11,5 +11,6 @@ if [[ ! -x ./tailwindcss-extra-linux-x64 ]]; then
   chmod +x ./tailwindcss-extra-linux-x64
 fi
 
-./tailwindcss-extra-linux-x64 -i ./input.css -o ./dist/tailwind.css
+cargo fetch --locked
+../../scripts/tailwind-crates --input ./input.css --output ./dist/tailwind.css --tailwind-bin ./tailwindcss-extra-linux-x64
 cargo run

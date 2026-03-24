@@ -2,4 +2,4 @@ ws:
     cd /workspace/crates/agent-octo-com && cargo watch --workdir /workspace/crates/agent-octo-com -w ./content -w ./src --no-gitignore -x "run --bin agent-octo-com"
 
 wts:
-    cd /workspace/crates/agent-octo-com && tailwind-extra -i ./input.css -o ./dist/tailwind.css --watch
+    cd /workspace/crates/agent-octo-com && /workspace/scripts/tailwind-crates --input ./input.css --output ./dist/tailwind.css --watch

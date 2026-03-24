@@ -2,27 +2,9 @@
 @plugin "daisyui";
 @plugin "@tailwindcss/typography";
 @source "./src/**/*.{rs,html}";
+@crate "ssg_whiz";
+@crate "daisy_rsx";
 
-@source inline("collapse collapse-title collapse-content collapse-plus collapse-open collapse-close collapse-arrow");
-@source inline("card card-body card-title");
-
-/* Shared navigation layout from ssg_whiz */
-@source inline("active backdrop-blur-lg backdrop-filter bg-base-100 bg-opacity-30 btn btn-ghost btn-primary dropdown dropdown-content flex flex-row gap-2 gap-3 gap-4 h-5 h-8 hidden items-center justify-between lg:flex lg:hidden lg:block lg:left-0 lg:overflow-y-auto lg:sticky left-[-100%] menu menu-horizontal menu-sm mt-3 navbar p-2 pl-3 px-1 rounded-box shadow shrink-0 sticky top-0 top-2.5 w-5 w-52 w-[420px] w-auto z-10 z-40 z-50");
-
-/* Shared prose styling for blog, docs, and markdown pages */
-@source inline("lg:prose-xl max-w-none max-w-prose mt-24 mx-auto prose prose-code:font-mono prose-img:max-w-full prose-pre:bg-slate-100 prose-pre:overflow-x-auto prose-pre:rounded-xl prose-slate");
-
-/* Shared blog post layout */
-@source inline("aspect-video block border-base-300 border-y btn-sm leading-tight mb-4 mb-8 mt-32 my-8 object-cover opacity-70 px-5 py-2 rounded-full rounded-box shadow-md text-4xl text-5xl text-base text-sm uppercase tracking-wide md:text-5xl");
-
-/* Shared blog index card layout */
-@source inline("bg-base-100 card card-actions card-body card-title gap-6 grid line-clamp-3 max-w-5xl max-w-6xl max-w-sm mb-12 md:grid-cols-2 md:text-xl mx-auto opacity-60 opacity-80 pb-8 pt-2 ring-1 ring-base-300 text-balance text-center text-lg text-xl w-full");
-
-/* Shared docs layout */
-@source inline("border-r cursor-not-allowed flex-1 font-semibold h-[calc(100vh-108px)] mb-2 mb-6 mb-12 overflow-y-auto p-0 pb-5 pointer-events-none pt-12 rounded-xl text-3xl w-full");
-
-/* Shared footer and extra-footer layout */
-@source inline("bg-base-200 flex flex-col font-bold gap-2 gap-8 link link-hover max-w-3xl max-w-4xl max-w-5xl mx-auto py-10 py-16 px-6 sm:flex-row sm:justify-center text-3xl text-4xl text-base-content tracking-[0.08em] md:flex-row md:justify-between md:text-4xl mt-24 mt-0");
 
 @plugin "daisyui/theme" {
     name: "octo";
@@ -63,119 +45,4 @@ body {
     background:
         radial-gradient(circle at top, rgba(90, 120, 255, 0.12), transparent 32rem),
         linear-gradient(to bottom, #10183d, #0b1230);
-}
-
-.site-nav__backdrop {
-    background-color: rgba(90, 120, 255, 0.12);
-}
-
-.octo-story {
-    position: relative;
-    height: 260vh;
-}
-
-.octo-story__sticky {
-    position: sticky;
-    top: 0;
-    display: grid;
-    height: 100vh;
-    place-items: center;
-    padding-block: 2rem;
-}
-
-.octo-story__frame {
-    display: flex;
-    height: min(38rem, 82vh);
-    width: min(46rem, 100%);
-    flex-direction: column;
-    overflow: hidden;
-    border-radius: calc(var(--radius-box) * 1.5);
-    border: 1px solid color-mix(in oklab, var(--color-base-300) 70%, white 10%);
-    background: linear-gradient(
-        180deg,
-        color-mix(in oklab, var(--color-base-200) 92%, black 8%),
-        color-mix(in oklab, var(--color-base-100) 88%, black 12%)
-    );
-    box-shadow: 0 24px 80px rgba(4, 9, 28, 0.35);
-}
-
-.octo-story__header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    border-bottom: 1px solid color-mix(in oklab, var(--color-base-300) 72%, white 10%);
-    padding: 1.25rem 1.5rem;
-}
-
-.octo-story__viewport {
-    display: flex;
-    flex: 1;
-    align-items: flex-end;
-    overflow: hidden;
-    padding: 1.5rem;
-}
-
-.octo-story__messages {
-    display: flex;
-    width: 100%;
-    flex-direction: column;
-    gap: 0.875rem;
-}
-
-.octo-story__message {
-    display: none;
-    max-width: min(34rem, 82%);
-    border-radius: 1.15rem;
-    padding: 0.9rem 1rem;
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
-.octo-story__message.left {
-    align-self: flex-start;
-    border: 1px solid color-mix(in oklab, var(--color-base-300) 78%, white 10%);
-    background-color: color-mix(in oklab, var(--color-base-200) 86%, black 14%);
-    color: color-mix(in oklab, var(--color-base-content) 94%, black 6%);
-}
-
-.octo-story__message.right {
-    align-self: flex-end;
-    border: 1px solid color-mix(in oklab, var(--color-primary) 50%, var(--color-base-300) 50%);
-    background: linear-gradient(
-        180deg,
-        color-mix(in oklab, var(--color-primary) 28%, var(--color-base-200) 72%),
-        color-mix(in oklab, var(--color-primary) 18%, var(--color-base-100) 82%)
-    );
-    color: color-mix(in oklab, var(--color-base-content) 98%, white 2%);
-}
-
-.octo-story__message.visible {
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .octo-story {
-        height: 220vh;
-    }
-
-    .octo-story__sticky {
-        padding-block: 1rem;
-    }
-
-    .octo-story__frame {
-        height: min(34rem, 80vh);
-    }
-
-    .octo-story__header {
-        padding: 1rem 1rem 0.875rem;
-    }
-
-    .octo-story__viewport {
-        padding: 1rem;
-    }
-
-    .octo-story__message {
-        max-width: 88%;
-    }
 }

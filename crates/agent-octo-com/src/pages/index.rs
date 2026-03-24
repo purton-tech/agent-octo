@@ -1,19 +1,14 @@
 use dioxus::prelude::*;
 use ssg_whiz::{layouts::layout::Layout, Footer, Section};
 
-use crate::components::{
-    homepage_architecture_section::HomepageArchitectureSection,
-    homepage_capabilities_section::HomepageCapabilitiesSection,
-    homepage_faq_section::HomepageFaqSection, homepage_hero_section::HomepageHeroSection,
-    homepage_principles_section::HomepagePrinciplesSection,
-    homepage_quick_start_section::HomepageQuickStartSection,
-    homepage_story_section::HomepageStorySection,
-};
+use crate::components::capabilities_section::CapabilitiesSection;
+use crate::components::hero_section::HeroSection;
+use crate::components::platform_section::PlatformSection;
 
 pub fn page() -> String {
     let page = rsx!(
         Layout {
-            title: "agent-octo.com".to_string(),
+            title: "Agent Octo - Agentic AI Assistant".to_string(),
             description: "Agent Octo is a multi-tenant agent platform with runtime integrations, channels, and a Rust-powered sandbox.".to_string(),
             image: Some("/logo.svg".to_string()),
             mobile_menu: None,
@@ -21,13 +16,13 @@ pub fn page() -> String {
             main {
                 class: "min-h-screen text-base-content",
 
-                HomepageHeroSection {}
-                HomepageStorySection {}
-                HomepageCapabilitiesSection {}
-                HomepageArchitectureSection {}
-                HomepagePrinciplesSection {}
-                HomepageQuickStartSection {}
-                HomepageFaqSection {}
+                div {
+                    class: "grid gap-16 md:gap-24",
+
+                    HeroSection {}
+                    PlatformSection {}
+                    CapabilitiesSection {}
+                }
 
                 Footer {
                     margin_top: Some("mt-0".to_string()),

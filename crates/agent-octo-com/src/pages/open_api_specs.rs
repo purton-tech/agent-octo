@@ -1,7 +1,8 @@
-use daisy_rsx::{Badge, BadgeColor, BadgeStyle, Card, CardBody};
+use daisy_rsx::{Badge, BadgeColor, BadgeStyle};
 use dioxus::prelude::*;
 use ssg_whiz::{layouts::layout::Layout, Footer, Section};
 
+use crate::components::site_card::SiteCard;
 use crate::open_api_specs::{Endpoint, IntegrationSpec};
 
 pub fn index_page(integrations: &[IntegrationSpec]) -> String {
@@ -27,7 +28,7 @@ pub fn index_page(integrations: &[IntegrationSpec]) -> String {
                                 "OpenAPI specs"
                             }
                             h1 {
-                                class: "text-4xl font-bold lg:text-5xl",
+                                class: "font-mono text-4xl font-bold tracking-tight lg:text-5xl",
                                 "Browse integrations Agent Octo can understand"
                             }
                             p {
@@ -47,42 +48,41 @@ pub fn index_page(integrations: &[IntegrationSpec]) -> String {
                                     a {
                                         class: "block h-full",
                                         href: "{integration.detail_path()}",
-                                        Card {
-                                            class: Some("h-full border border-base-300 bg-base-100 shadow-sm transition-colors hover:border-primary/40 hover:bg-base-200/20".to_string()),
-                                            CardBody {
-                                                class: Some("gap-4".to_string()),
-                                                div {
-                                                    class: "flex items-start gap-4",
-                                                    SpecLogo {
-                                                        logo_url: integration.logo_url.clone(),
-                                                        title: integration.title.clone(),
-                                                        class: Some("h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2".to_string())
-                                                    }
-                                                    div {
-                                                        class: "min-w-0 space-y-2",
-                                                        h2 {
-                                                            class: "card-title line-clamp-2 text-xl",
-                                                            "{integration.title}"
-                                                        }
-                                                        p {
-                                                            class: "line-clamp-3 text-sm text-base-content/75",
-                                                            "{integration.description.as_deref().unwrap_or(\"No description provided.\")}"
-                                                        }
-                                                    }
+                                        SiteCard {
+                                            class: Some("h-full".to_string()),
+                                            body_class: Some("h-full gap-4".to_string()),
+                                            interactive: Some(true),
+                                            div {
+                                                class: "flex items-start gap-4",
+                                                SpecLogo {
+                                                    logo_url: integration.logo_url.clone(),
+                                                    title: integration.title.clone(),
+                                                    class: Some("h-14 w-14 shrink-0 rounded-box border border-base-300 bg-base-200/40 p-2".to_string())
                                                 }
                                                 div {
-                                                    class: "mt-auto flex flex-wrap gap-2",
-                                                    if let Some(version) = integration.version.as_deref() {
-                                                        Badge {
-                                                            badge_style: BadgeStyle::Outline,
-                                                            "v{version}"
-                                                        }
+                                                    class: "min-w-0 space-y-2",
+                                                    h2 {
+                                                        class: "card-title line-clamp-2 font-mono text-xl tracking-tight",
+                                                        "{integration.title}"
                                                     }
+                                                    p {
+                                                        class: "line-clamp-3 text-sm text-base-content/75",
+                                                        "{integration.description.as_deref().unwrap_or(\"No description provided.\")}"
+                                                    }
+                                                }
+                                            }
+                                            div {
+                                                class: "mt-auto flex flex-wrap gap-2",
+                                                if let Some(version) = integration.version.as_deref() {
                                                     Badge {
                                                         badge_style: BadgeStyle::Outline,
-                                                        badge_color: BadgeColor::Primary,
-                                                        "{integration.endpoints.len()} methods"
+                                                        "v{version}"
                                                     }
+                                                }
+                                                Badge {
+                                                    badge_style: BadgeStyle::Outline,
+                                                    badge_color: BadgeColor::Primary,
+                                                    "{integration.endpoints.len()} methods"
                                                 }
                                             }
                                         }
@@ -129,37 +129,35 @@ pub fn detail_page(integration: &IntegrationSpec) -> String {
                                 "Back to all specs"
                             }
                         }
-                        Card {
-                            class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
-                            CardBody {
-                                class: Some("gap-5".to_string()),
+                        SiteCard {
+                            body_class: Some("gap-5".to_string()),
+                            interactive: Some(false),
+                            div {
+                                class: "flex flex-col gap-5 md:flex-row md:items-start",
+                                SpecLogo {
+                                    logo_url: integration.logo_url.clone(),
+                                    title: integration.title.clone(),
+                                    class: Some("h-20 w-20 rounded-box border border-base-300 bg-base-200/40 p-3".to_string())
+                                }
                                 div {
-                                    class: "flex flex-col gap-5 md:flex-row md:items-start",
-                                    SpecLogo {
-                                        logo_url: integration.logo_url.clone(),
-                                        title: integration.title.clone(),
-                                        class: Some("h-20 w-20 rounded-box border border-base-300 bg-base-200/40 p-3".to_string())
+                                    class: "space-y-4",
+                                    h1 { class: "font-mono text-4xl font-bold tracking-tight", "{integration.title}" }
+                                    p {
+                                        class: "text-base-content/75",
+                                        "{integration.description.as_deref().unwrap_or(\"No description provided.\")}"
                                     }
                                     div {
-                                        class: "space-y-4",
-                                        h1 { class: "text-4xl font-bold", "{integration.title}" }
-                                        p {
-                                            class: "text-base-content/75",
-                                            "{integration.description.as_deref().unwrap_or(\"No description provided.\")}"
-                                        }
-                                        div {
-                                            class: "flex flex-wrap gap-2",
-                                            if let Some(version) = integration.version.as_deref() {
-                                                Badge {
-                                                    badge_style: BadgeStyle::Outline,
-                                                    "v{version}"
-                                                }
-                                            }
+                                        class: "flex flex-wrap gap-2",
+                                        if let Some(version) = integration.version.as_deref() {
                                             Badge {
                                                 badge_style: BadgeStyle::Outline,
-                                                badge_color: BadgeColor::Primary,
-                                                "{integration.endpoints.len()} methods"
+                                                "v{version}"
                                             }
+                                        }
+                                        Badge {
+                                            badge_style: BadgeStyle::Outline,
+                                            badge_color: BadgeColor::Primary,
+                                            "{integration.endpoints.len()} methods"
                                         }
                                     }
                                 }
@@ -170,18 +168,17 @@ pub fn detail_page(integration: &IntegrationSpec) -> String {
                             class: "space-y-6",
                             div {
                                 class: "space-y-2",
-                                h2 { class: "text-3xl font-bold", "Methods" }
+                                h2 { class: "font-mono text-3xl font-bold tracking-tight", "Methods" }
                                 p {
                                     class: "text-base-content/70",
                                     "Each method below is pulled directly from the OpenAPI file."
                                 }
                             }
                             if integration.endpoints.is_empty() {
-                                Card {
-                                    class: Some("border border-dashed border-base-300 bg-base-100".to_string()),
-                                    CardBody {
-                                        p { class: "text-base-content/70", "This spec does not define any methods." }
-                                    }
+                                SiteCard {
+                                    class: Some("border-dashed shadow-none".to_string()),
+                                    interactive: Some(false),
+                                    p { class: "text-base-content/70", "This spec does not define any methods." }
                                 }
                             } else {
                                 for endpoint in integration.endpoints.clone() {
@@ -194,20 +191,18 @@ pub fn detail_page(integration: &IntegrationSpec) -> String {
                             class: "space-y-4",
                             div {
                                 class: "space-y-2",
-                                h2 { class: "text-3xl font-bold", "YAML" }
+                                h2 { class: "font-mono text-3xl font-bold tracking-tight", "YAML" }
                                 p {
                                     class: "text-base-content/70",
                                     "Copy and paste the full spec from the textarea below."
                                 }
                             }
-                            Card {
-                                class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
-                                CardBody {
-                                    textarea {
-                                        class: "textarea textarea-bordered min-h-[28rem] w-full font-mono text-sm leading-6",
-                                        readonly: true,
-                                        "{integration.yaml}"
-                                    }
+                            SiteCard {
+                                interactive: Some(false),
+                                textarea {
+                                    class: "textarea textarea-bordered min-h-[28rem] w-full font-mono text-sm leading-6",
+                                    readonly: true,
+                                    "{integration.yaml}"
                                 }
                             }
                         }
@@ -234,112 +229,108 @@ fn EndpointCard(endpoint: Endpoint, logo_url: Option<String>, title: String) -> 
         .unwrap_or("No description provided.");
 
     rsx! {
-        Card {
-            class: Some("border border-base-300 bg-base-100 shadow-sm".to_string()),
-            CardBody {
-                class: Some("gap-5".to_string()),
+        SiteCard {
+            body_class: Some("gap-5".to_string()),
+            interactive: Some(false),
+            div {
+                class: "flex flex-col gap-4 md:flex-row md:items-start md:justify-between",
                 div {
-                    class: "flex flex-col gap-4 md:flex-row md:items-start md:justify-between",
+                    class: "space-y-4",
                     div {
-                        class: "space-y-4",
-                        div {
-                            class: "flex flex-wrap items-center gap-3",
+                        class: "flex flex-wrap items-center gap-3",
+                        Badge {
+                            badge_style: BadgeStyle::Outline,
+                            badge_color: BadgeColor::Primary,
+                            "{endpoint.method}"
+                        }
+                        code {
+                            class: "rounded bg-base-200 px-3 py-2 text-sm",
+                            "{endpoint.path}"
+                        }
+                        if let Some(operation_id) = endpoint.operation_id.as_deref() {
+                            span {
+                                class: "text-sm text-base-content/60",
+                                "{operation_id}"
+                            }
+                        }
+                    }
+                    p {
+                        class: "text-base-content/75",
+                        "{description}"
+                    }
+                }
+                SpecLogo {
+                    logo_url,
+                    title,
+                    class: Some("h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3".to_string())
+                }
+            }
+            if !endpoint.parameters.is_empty() {
+                div {
+                    class: "space-y-3",
+                    h3 { class: "font-mono text-lg font-semibold tracking-tight", "Parameters" }
+                    div {
+                        class: "grid gap-3 md:grid-cols-2",
+                        for parameter in endpoint.parameters {
+                            SiteCard {
+                                class: Some("bg-base-200/30 shadow-none".to_string()),
+                                body_class: Some("gap-2 p-4".to_string()),
+                                interactive: Some(false),
+                                div {
+                                    class: "flex flex-wrap items-center gap-2",
+                                    strong { "{parameter.name}" }
+                                    if let Some(location) = parameter.location.as_deref() {
+                                        Badge { badge_style: BadgeStyle::Outline, "{location}" }
+                                    }
+                                    if parameter.required {
+                                        Badge { badge_style: BadgeStyle::Outline, badge_color: BadgeColor::Warning, "required" }
+                                    }
+                                }
+                                if let Some(description) = parameter.description.as_deref() {
+                                    p { class: "text-sm text-base-content/70", "{description}" }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if !endpoint.request_body_content.is_empty() {
+                div {
+                    class: "space-y-3",
+                    h3 { class: "font-mono text-lg font-semibold tracking-tight", "Request body" }
+                    div {
+                        class: "flex flex-wrap gap-2",
+                        for content_type in endpoint.request_body_content {
                             Badge {
                                 badge_style: BadgeStyle::Outline,
-                                badge_color: BadgeColor::Primary,
-                                "{endpoint.method}"
-                            }
-                            code {
-                                class: "rounded bg-base-200 px-3 py-2 text-sm",
-                                "{endpoint.path}"
-                            }
-                            if let Some(operation_id) = endpoint.operation_id.as_deref() {
-                                span {
-                                    class: "text-sm text-base-content/60",
-                                    "{operation_id}"
-                                }
+                                badge_color: BadgeColor::Secondary,
+                                "{content_type}"
                             }
                         }
-                        p {
-                            class: "text-base-content/75",
-                            "{description}"
-                        }
-                    }
-                    SpecLogo {
-                        logo_url,
-                        title,
-                        class: Some("h-16 w-16 rounded-box border border-base-300 bg-base-200/40 p-3".to_string())
                     }
                 }
-                if !endpoint.parameters.is_empty() {
+            }
+            if !endpoint.responses.is_empty() {
+                div {
+                    class: "space-y-3",
+                    h3 { class: "font-mono text-lg font-semibold tracking-tight", "Responses" }
                     div {
-                        class: "space-y-3",
-                        h3 { class: "text-lg font-semibold", "Parameters" }
-                        div {
-                            class: "grid gap-3 md:grid-cols-2",
-                            for parameter in endpoint.parameters {
-                                Card {
-                                    class: Some("border border-base-300 bg-base-200/30".to_string()),
-                                    CardBody {
-                                        class: Some("gap-2 p-4".to_string()),
-                                        div {
-                                            class: "flex flex-wrap items-center gap-2",
-                                            strong { "{parameter.name}" }
-                                            if let Some(location) = parameter.location.as_deref() {
-                                                Badge { badge_style: BadgeStyle::Outline, "{location}" }
-                                            }
-                                            if parameter.required {
-                                                Badge { badge_style: BadgeStyle::Outline, badge_color: BadgeColor::Warning, "required" }
-                                            }
-                                        }
-                                        if let Some(description) = parameter.description.as_deref() {
-                                            p { class: "text-sm text-base-content/70", "{description}" }
-                                        }
+                        class: "grid gap-3 md:grid-cols-2",
+                        for response in endpoint.responses {
+                            SiteCard {
+                                class: Some("bg-base-200/30 shadow-none".to_string()),
+                                body_class: Some("gap-2 p-4".to_string()),
+                                interactive: Some(false),
+                                div {
+                                    class: "flex items-center gap-2",
+                                    Badge {
+                                        badge_style: BadgeStyle::Outline,
+                                        badge_color: BadgeColor::Primary,
+                                        "{response.status}"
                                     }
                                 }
-                            }
-                        }
-                    }
-                }
-                if !endpoint.request_body_content.is_empty() {
-                    div {
-                        class: "space-y-3",
-                        h3 { class: "text-lg font-semibold", "Request body" }
-                        div {
-                            class: "flex flex-wrap gap-2",
-                            for content_type in endpoint.request_body_content {
-                                Badge {
-                                    badge_style: BadgeStyle::Outline,
-                                    badge_color: BadgeColor::Secondary,
-                                    "{content_type}"
-                                }
-                            }
-                        }
-                    }
-                }
-                if !endpoint.responses.is_empty() {
-                    div {
-                        class: "space-y-3",
-                        h3 { class: "text-lg font-semibold", "Responses" }
-                        div {
-                            class: "grid gap-3 md:grid-cols-2",
-                            for response in endpoint.responses {
-                                Card {
-                                    class: Some("border border-base-300 bg-base-200/30".to_string()),
-                                    CardBody {
-                                        class: Some("gap-2 p-4".to_string()),
-                                        div {
-                                            class: "flex items-center gap-2",
-                                            Badge {
-                                                badge_style: BadgeStyle::Outline,
-                                                badge_color: BadgeColor::Primary,
-                                                "{response.status}"
-                                            }
-                                        }
-                                        if let Some(description) = response.description.as_deref() {
-                                            p { class: "text-sm text-base-content/70", "{description}" }
-                                        }
-                                    }
+                                if let Some(description) = response.description.as_deref() {
+                                    p { class: "text-sm text-base-content/70", "{description}" }
                                 }
                             }
                         }

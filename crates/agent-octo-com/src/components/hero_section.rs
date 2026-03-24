@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 #[component]
-pub fn HomepageHeroSection() -> Element {
+pub fn HeroSection() -> Element {
     rsx! {
         section {
             id: "hero",
@@ -20,7 +20,7 @@ pub fn HomepageHeroSection() -> Element {
                     class: "flex flex-col items-center text-center",
 
                     h1 {
-                        class: "text-5xl font-extrabold tracking-tight md:text-7xl",
+                        class: "font-mono text-5xl font-bold tracking-tight md:text-7xl",
                         span {
                             class: "underline decoration-primary underline-offset-8 decoration-8",
                             "Agent Octo"
@@ -28,7 +28,7 @@ pub fn HomepageHeroSection() -> Element {
                     }
 
                     h2 {
-                        class: "mt-28 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl",
+                        class: "mt-14 max-w-3xl font-mono text-4xl font-bold leading-tight tracking-tight md:text-6xl",
                         "Manage your life with Agentic AI. "
                         span {
                             class: "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent",
