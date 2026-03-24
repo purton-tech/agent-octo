@@ -16,6 +16,7 @@ The scripts in this folder are the stable command surface for repo-specific oper
 - `psql`: opens `psql` using the repo's configured `DATABASE_URL`.
 - `dbmate`: runs `dbmate` with the repo's configured `DATABASE_URL` and `crates/db/migrations` path.
 - `clorinde`: runs one-shot Clorinde code generation against the repo's configured `DATABASE_URL`, reading from `crates/db/queries` and writing to `crates/db-gen`.
+- `tailwind-crates`: resolves `@crate "package";` directives in a Tailwind input CSS file into Cargo registry `@source` paths, then runs `tailwind-extra`.
 
 ## How this fits with other tools
 

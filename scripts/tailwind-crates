@@ -1,0 +1,171 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'EOF'
+Usage: tailwind-crates --input <input.css> --output <output.css> [--watch] [--tailwind-bin <bin>] [-- <extra tailwind args>]
+EOF
+  exit 1
+}
+
+INPUT_FILE=""
+OUTPUT_FILE=""
+WATCH=0
+TAILWIND_BIN="${TAILWIND_BIN:-tailwind-extra}"
+TAILWIND_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --input)
+      INPUT_FILE="${2:-}"
+      shift 2
+      ;;
+    --output)
+      OUTPUT_FILE="${2:-}"
+      shift 2
+      ;;
+    --watch)
+      WATCH=1
+      shift
+      ;;
+    --tailwind-bin)
+      TAILWIND_BIN="${2:-}"
+      shift 2
+      ;;
+    --)
+      shift
+      TAILWIND_ARGS+=("$@")
+      break
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+
+if [[ -z "${INPUT_FILE}" || -z "${OUTPUT_FILE}" ]]; then
+  usage
+fi
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+CARGO_LOCK="${WORKSPACE_ROOT}/Cargo.lock"
+
+if [[ ! -f "${INPUT_FILE}" ]]; then
+  echo "Input CSS file not found: ${INPUT_FILE}" >&2
+  exit 1
+fi
+
+if [[ ! -f "${CARGO_LOCK}" ]]; then
+  echo "Cargo.lock not found at ${CARGO_LOCK}" >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "${OUTPUT_FILE}")"
+INPUT_DIR="$(cd "$(dirname "${INPUT_FILE}")" && pwd)"
+rm -f "${INPUT_DIR}/.tailwind-crates"
+rm -f "${INPUT_DIR}"/.tailwind-crates-*.css
+GENERATED_INPUT="${INPUT_DIR}/.tailwind-crates"
+
+cleanup() {
+  rm -f "${GENERATED_INPUT}"
+}
+
+trap cleanup EXIT INT TERM
+
+declare -A PACKAGE_VERSIONS=()
+current_name=""
+current_version=""
+while IFS= read -r line || [[ -n "${line}" ]]; do
+  case "${line}" in
+    "[[package]]")
+      current_name=""
+      current_version=""
+      ;;
+    "name = "*)
+      current_name="${line#name = \"}"
+      current_name="${current_name%\"}"
+      ;;
+    "version = "*)
+      current_version="${line#version = \"}"
+      current_version="${current_version%\"}"
+      if [[ -n "${current_name}" && -z "${PACKAGE_VERSIONS[${current_name}]:-}" ]]; then
+        PACKAGE_VERSIONS["${current_name}"]="${current_version}"
+      fi
+      ;;
+  esac
+done < "${CARGO_LOCK}"
+
+search_roots=()
+if [[ -n "${CARGO_HOME:-}" ]]; then
+  search_roots+=("${CARGO_HOME}")
+fi
+if [[ -n "${HOME:-}" ]]; then
+  search_roots+=("${HOME}/.cargo")
+fi
+search_roots+=("/usr/local/cargo")
+
+resolve_registry_path() {
+  local package_name="$1"
+  local version="$2"
+  local root=""
+  local candidate=""
+
+  for root in "${search_roots[@]}"; do
+    local registry_src="${root}/registry/src"
+    if [[ ! -d "${registry_src}" ]]; then
+      continue
+    fi
+
+    candidate="$(
+      find "${registry_src}" -maxdepth 2 -type d -name "${package_name//-/_}-${version}" 2>/dev/null | head -n 1
+    )"
+    if [[ -n "${candidate}" ]]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+
+    candidate="$(
+      find "${registry_src}" -maxdepth 2 -type d -name "${package_name}-${version}" 2>/dev/null | head -n 1
+    )"
+    if [[ -n "${candidate}" ]]; then
+      printf '%s\n' "${candidate}"
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+>"${GENERATED_INPUT}"
+while IFS= read -r line || [[ -n "${line}" ]]; do
+  if [[ "${line}" =~ ^@crate[[:space:]]+\"([^\"]+)\"\;[[:space:]]*$ ]]; then
+    package_name="${BASH_REMATCH[1]}"
+    package_version="${PACKAGE_VERSIONS[${package_name}]:-}"
+
+    if [[ -z "${package_version}" ]]; then
+      echo "Could not determine version for @crate \"${package_name}\" from ${CARGO_LOCK}" >&2
+      exit 1
+    fi
+
+    if ! package_path="$(resolve_registry_path "${package_name}" "${package_version}")"; then
+      echo "Could not find ${package_name}-${package_version} in any Cargo registry cache." >&2
+      echo "Checked roots: ${search_roots[*]}" >&2
+      echo "Run 'cargo fetch --locked' first." >&2
+      exit 1
+    fi
+
+    printf '@source "%s/**/*.{rs,html}";\n' "${package_path}" >>"${GENERATED_INPUT}"
+  else
+    printf '%s\n' "${line}" >>"${GENERATED_INPUT}"
+  fi
+done < "${INPUT_FILE}"
+
+if (( WATCH )); then
+  trap 'if [[ -n "${TAILWIND_PID:-}" ]]; then kill "${TAILWIND_PID}" 2>/dev/null || true; fi; cleanup; exit 0' INT TERM
+  "${TAILWIND_BIN}" -i "${GENERATED_INPUT}" -o "${OUTPUT_FILE}" --watch=always "${TAILWIND_ARGS[@]}" &
+  TAILWIND_PID=$!
+  wait "${TAILWIND_PID}"
+else
+  "${TAILWIND_BIN}" -i "${GENERATED_INPUT}" -o "${OUTPUT_FILE}" "${TAILWIND_ARGS[@]}"
+fi
