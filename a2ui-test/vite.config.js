@@ -11,6 +11,13 @@ const tsCompilerOptions = {
 };
 
 export default defineConfig({
+  build: {
+    rollupOptions: {
+      input: {
+        index: path.resolve(root, "index.html"),
+      },
+    },
+  },
   esbuild: {
     tsconfigRaw: {
       compilerOptions: tsCompilerOptions,

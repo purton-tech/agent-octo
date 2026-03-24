@@ -22,6 +22,7 @@
   },
   "include": [
     "main.ts",
+    "chat-demo.ts",
     "vite.config.js",
     "vendor/a2ui/renderers/lit/src/**/*.ts",
     "vendor/a2ui/renderers/web_core/src/**/*.ts"
