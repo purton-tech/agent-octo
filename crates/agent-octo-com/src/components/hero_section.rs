@@ -28,7 +28,7 @@ pub fn HeroSection() -> Element {
                     }
 
                     h2 {
-                        class: "mt-28 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl",
+                        class: "mt-14 max-w-3xl text-4xl font-extrabold leading-tight tracking-tight md:text-6xl",
                         "Manage your life with Agentic AI. "
                         span {
                             class: "bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent",

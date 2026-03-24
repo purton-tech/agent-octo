@@ -8,7 +8,7 @@ use crate::components::platform_section::PlatformSection;
 pub fn page() -> String {
     let page = rsx!(
         Layout {
-            title: "agent-octo.com".to_string(),
+            title: "Agent Octo - Agentic AI Assistant".to_string(),
             description: "Agent Octo is a multi-tenant agent platform with runtime integrations, channels, and a Rust-powered sandbox.".to_string(),
             image: Some("/logo.svg".to_string()),
             mobile_menu: None,

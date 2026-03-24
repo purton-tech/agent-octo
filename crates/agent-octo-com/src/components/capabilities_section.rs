@@ -61,13 +61,6 @@ pub fn CapabilitiesSection() -> Element {
             class: "relative overflow-hidden px-6 pb-24 lg:px-12",
 
             div {
-                class: "pointer-events-none absolute inset-0",
-                div {
-                    class: "absolute left-1/2 top-8 h-[24rem] w-[58rem] -translate-x-1/2 rounded-full bg-primary/5 blur-3xl"
-                }
-            }
-
-            div {
                 class: "relative mx-auto max-w-6xl",
                 div {
                     class: "mx-auto max-w-3xl text-center",

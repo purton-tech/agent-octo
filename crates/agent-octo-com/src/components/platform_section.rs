@@ -22,16 +22,6 @@ pub fn PlatformSection() -> Element {
             class: "relative overflow-hidden px-6 pb-20 lg:px-12",
 
             div {
-                class: "pointer-events-none absolute inset-0",
-                div {
-                    class: "absolute left-1/2 top-12 h-[28rem] w-[72rem] -translate-x-1/2 rounded-full bg-primary/6 blur-3xl"
-                }
-                div {
-                    class: "absolute right-[10%] top-40 h-48 w-48 rounded-full bg-accent/8 blur-3xl"
-                }
-            }
-
-            div {
                 class: "relative mx-auto max-w-6xl",
 
                 div {
