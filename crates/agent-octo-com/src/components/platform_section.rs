@@ -1,5 +1,7 @@
 use dioxus::prelude::*;
 
+use crate::components::site_card::{CardIconShell, SiteCard};
+
 const SPECS_ITEMS: [&str; 4] = [
     "OpenAPI specs define typed runtime integrations",
     "External services stay inspectable before execution",
@@ -102,26 +104,19 @@ fn PlatformCard(
     items: &'static [&'static str],
 ) -> Element {
     rsx! {
-        article {
-            class: "group relative overflow-hidden rounded-[1.75rem] border border-primary/15 bg-base-100/45 p-6 shadow-[0_24px_80px_rgba(5,10,28,0.24)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-primary/30 hover:bg-base-100/55 md:p-7",
+        SiteCard {
+            class: Some("h-full".to_string()),
+            body_class: Some("h-full gap-0 p-6 md:p-7".to_string()),
+            interactive: Some(false),
 
             div {
-                class: "absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100",
-                div {
-                    class: "absolute right-0 top-0 h-36 w-36 translate-x-10 -translate-y-10 rounded-full bg-primary/10 blur-3xl"
+                class: "flex items-start justify-between gap-4",
+                p {
+                    class: "font-mono text-[0.65rem] uppercase tracking-[0.32em] text-primary/65 md:text-xs",
+                    "{step_label}"
                 }
-            }
-
-            div {
-                class: "relative flex items-start justify-between gap-4",
-                div {
-                    p {
-                        class: "font-mono text-[0.65rem] uppercase tracking-[0.32em] text-primary/65 md:text-xs",
-                        "{step_label}"
-                    }
-                }
-                div {
-                    class: "flex h-12 w-12 items-center justify-center rounded-xl border border-primary/12 bg-base-200/55 text-primary shadow-inner shadow-primary/5",
+                CardIconShell {
+                    class: Some("text-primary".to_string()),
                     {icon}
                 }
             }
@@ -163,9 +158,9 @@ fn PlatformCard(
             }
 
             div {
-                class: "mt-7 border-t border-primary/12 pt-4",
+                class: "mt-7 border-t border-base-300 pt-4",
                 p {
-                    class: "font-mono text-xs uppercase tracking-[0.35em] text-primary/38",
+                    class: "font-mono text-xs uppercase tracking-[0.35em] text-base-content/45",
                     "{footer_label}"
                 }
             }

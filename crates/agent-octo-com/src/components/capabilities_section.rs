@@ -1,5 +1,7 @@
 use dioxus::prelude::*;
 
+use crate::components::site_card::{CardIconShell, SiteCard};
+
 struct CapabilityCard {
     title: &'static str,
     body: &'static str,
@@ -104,20 +106,15 @@ fn CapabilityGridCard(
     icon: Element,
 ) -> Element {
     rsx! {
-        article {
-            class: "group relative overflow-hidden rounded-2xl border border-primary/14 bg-base-100/40 p-5 shadow-[0_18px_56px_rgba(5,10,28,0.18)] backdrop-blur-sm transition duration-300 hover:-translate-y-1 hover:border-primary/26 hover:bg-base-100/52",
+        SiteCard {
+            class: Some("h-full".to_string()),
+            body_class: Some("h-full gap-0 p-5".to_string()),
+            interactive: Some(false),
 
             div {
-                class: "absolute inset-0 opacity-0 transition duration-300 group-hover:opacity-100",
-                div {
-                    class: "absolute left-0 top-0 h-28 w-28 -translate-x-6 -translate-y-6 rounded-full bg-primary/8 blur-3xl"
-                }
-            }
-
-            div {
-                class: "relative flex h-full flex-col",
-                div {
-                    class: format_args!("flex h-11 w-11 items-center justify-center rounded-xl border border-primary/12 bg-base-200/50 shadow-inner shadow-primary/5 {}", accent_class),
+                class: "flex h-full flex-col",
+                CardIconShell {
+                    class: Some(format!("h-11 w-11 {}", accent_class)),
                     {icon}
                 }
 
@@ -132,9 +129,9 @@ fn CapabilityGridCard(
                 }
 
                 div {
-                    class: "mt-auto border-t border-primary/12 pt-4",
+                    class: "mt-auto border-t border-base-300 pt-4",
                     p {
-                        class: "font-mono text-[0.65rem] uppercase tracking-[0.32em] text-primary/40",
+                        class: "font-mono text-[0.65rem] uppercase tracking-[0.32em] text-base-content/45",
                         "{footer}"
                     }
                 }
