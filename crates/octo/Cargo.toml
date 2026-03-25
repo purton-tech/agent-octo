@@ -19,7 +19,7 @@ oas3.workspace = true
 reqwest.workspace = true
 serde = { version = "1", features = ["derive"] }
 serde_json.workspace = true
-sha2 = "0.10"
+sha2 = "0.11"
 tokio = { features = ["fs", "macros", "rt-multi-thread"], version = "1", default-features = false }
 tokio-util = { version = "0.7", default-features = false, features = ["io"] }
 tower-livereload = "0.10"
