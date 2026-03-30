@@ -11,7 +11,7 @@ base64 = "0.22.1"
 clorinde = { version = "0.0.0", path = "../db-gen" }
 db = { path = "../db" }
 dotenvy.workspace = true
-hmac = "0.12"
+hmac = "0.13"
 hex = "0.4"
 octo-assets = { path = "../octo-assets" }
 octo-ui = { path = "../octo-ui" }
